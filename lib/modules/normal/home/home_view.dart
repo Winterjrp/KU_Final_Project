@@ -151,7 +151,7 @@ class _HomeViewState extends State<HomeView> {
       {required double height, required BuildContext context}) {
     return SingleChildScrollView(
         child: SizedBox(
-      height: height * 0.6,
+      height: height * 0.62,
       child: ListView.builder(
         itemCount: _viewModel.homeData.petList.length,
         itemBuilder: (context, index) {
@@ -159,8 +159,6 @@ class _HomeViewState extends State<HomeView> {
             context: context,
             userInfo: widget.userInfo,
             petProfileInfo: _viewModel.homeData.petList[index],
-            index: index,
-            homeViewModel: _viewModel,
           );
         },
       ),
@@ -189,62 +187,54 @@ class _HomeViewState extends State<HomeView> {
 
   Widget _addPetButton() {
     return Container(
-      alignment: Alignment.bottomCenter,
-      padding: const EdgeInsets.symmetric(vertical: 5),
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: GestureDetector(
-            onTap: () async {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => UpdatePetProfileView(
-                          userInfo: widget.userInfo,
-                          isCreate: true,
-                          petProfileInfo: PetProfileModel(
-                              petID: "-1",
-                              petName: "-1",
-                              petType: "-1",
-                              factorType: "-1",
-                              petFactorNumber: -1,
-                              petWeight: -1,
-                              petNeuteringStatus: "-1",
-                              petAgeType: "-1",
-                              petPhysiologyStatus: "-1",
-                              petChronicDisease: [],
-                              petActivityType: "-1",
-                              updateRecent: ""),
-                          homeViewModel: _viewModel,
-                          index: -1,
-                        )),
-              );
-            },
-            child: Container(
-              width: 180,
-              padding: const EdgeInsets.only(right: 10, top: 5, bottom: 5),
-              decoration: const BoxDecoration(
-                color: Color.fromRGBO(254, 208, 163, 1),
-                borderRadius: BorderRadius.all(Radius.circular(10)),
+        width: 200,
+        alignment: Alignment.bottomCenter,
+        child: ElevatedButton(
+          onPressed: () async {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => UpdatePetProfileView(
+                        userInfo: widget.userInfo,
+                        isCreate: true,
+                        petProfileInfo: PetProfileModel(
+                            petID: "-1",
+                            petName: "-1",
+                            petType: "-1",
+                            factorType: "-1",
+                            petFactorNumber: -1,
+                            petWeight: -1,
+                            petNeuteringStatus: "-1",
+                            petAgeType: "-1",
+                            petPhysiologyStatus: "-1",
+                            petChronicDisease: [],
+                            petActivityType: "-1",
+                            updateRecent: ""),
+                      )),
+            );
+          },
+          style: ElevatedButton.styleFrom(
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
+            backgroundColor: const Color.fromRGBO(254, 208, 163, 1),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.add_rounded,
+                size: 40,
+                color: primary,
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    Icons.add_rounded,
-                    size: 40,
-                    color: primary,
-                  ),
-                  Text(
-                    " เพิ่มสัตว์เลี้ยง",
-                    style: TextStyle(
-                        fontSize: 17,
-                        color: primary,
-                        fontWeight: FontWeight.bold),
-                  )
-                ],
-              ),
-            )),
-      ),
-    );
+              Text(
+                " เพิ่มสัตว์เลี้ยง",
+                style: TextStyle(
+                    fontSize: 17, color: primary, fontWeight: FontWeight.bold),
+              )
+            ],
+          ),
+        ));
   }
 }

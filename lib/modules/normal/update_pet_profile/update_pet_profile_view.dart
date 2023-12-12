@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:untitled1/constants/color.dart';
@@ -18,14 +19,10 @@ class UpdatePetProfileView extends StatefulWidget {
   final PetProfileModel petProfileInfo;
   final UserInfoModel userInfo;
   final bool isCreate;
-  final HomeViewModel homeViewModel;
-  final int index;
   const UpdatePetProfileView(
       {required this.userInfo,
       required this.isCreate,
       required this.petProfileInfo,
-      required this.homeViewModel,
-      required this.index,
       Key? key})
       : super(key: key);
 
@@ -141,18 +138,15 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
         leading: IconButton(
           icon: Icon(Icons.keyboard_backspace_rounded, color: red),
           onPressed: () {
-            showDialog(
-              context: context,
-              builder: (context) {
-                return widget.isCreate
-                    ? const CancelPopup(
-                        cancelText: 'ยกเลิกการเพิ่มข้อมูลสัตว์เลี้ยง?',
-                      )
-                    : const CancelPopup(
-                        cancelText: 'ยกเลิกการแก้ไขข้อมูลสัตว์เลี้ยง?',
-                      );
-              },
-            );
+            widget.isCreate
+                ? CancelPopup(
+                    context: context,
+                    cancelText: 'ยกเลิกการเพิ่มข้อมูลสัตว์เลี้ยง?',
+                  ).show()
+                : CancelPopup(
+                        context: context,
+                        cancelText: 'ยกเลิกการแก้ไขข้อมูลสัตว์เลี้ยง?')
+                    .show();
           },
         ),
         title: Center(
@@ -163,6 +157,7 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
           style: TextStyle(color: red),
         )),
         backgroundColor: const Color.fromRGBO(222, 150, 154, 0.8),
+        elevation: 0,
       ),
       body: Stack(
         children: [
@@ -188,7 +183,9 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
           const SizedBox(height: 25),
           _petName == "-1" ? const SizedBox() : _petTypeField(),
           const SizedBox(height: 20),
-          _petType == "-1" ? const SizedBox() : _factorTypeField(),
+          _petType == "-1" ? const SizedBox() : _petWeightField(),
+          const SizedBox(height: 20),
+          _petWeight == -1 ? const SizedBox() : _factorTypeField(),
           const SizedBox(height: 5),
           _factorType == "factorType"
               ? const SizedBox()
@@ -196,9 +193,7 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
                   ? _petFactorNumberField()
                   : Column(
                       children: [
-                        _petWeightField(),
-                        const SizedBox(height: 20),
-                        _petWeight == -1 ? const SizedBox() : _neuteredField(),
+                        _neuteredField(),
                         const SizedBox(height: 15),
                         _petNeuteringStatus == "-1"
                             ? const SizedBox()
@@ -207,11 +202,11 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
                         _petAgeType == "-1"
                             ? const SizedBox()
                             : _physiologyStatusField(),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 35),
                         _petPhysiologyStatus == "ป่วยหรือมีโรคประจำตัว"
                             ? _petChronicDiseaseType()
                             : const SizedBox(),
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 20),
                         (_petPhysiologyStatus == "ป่วยหรือมีโรคประจำตัว" &&
                                     _petChronicDisease.isNotEmpty) ||
                                 (_petPhysiologyStatus !=
@@ -224,12 +219,12 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
           (_factorType == "customize" && _petFactorNumber != -1)
               ? const SizedBox(height: 150)
               : const SizedBox(),
-          const SizedBox(height: 50),
+          const SizedBox(height: 40),
           (_factorType == "customize" && _petFactorNumber != -1) ||
                   (_factorType == "recommend" && _petActivityType != "-1")
               ? _acceptButton(context)
               : const SizedBox(),
-          const SizedBox(height: 40),
+          const SizedBox(height: 50),
         ],
       ),
     );
@@ -265,10 +260,6 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
         petActivityType: _petActivityType);
   }
 
-  Future<void> fetchHomeData(BuildContext context) async {
-    widget.homeViewModel.getHomeData(userID: widget.userInfo.userID);
-  }
-
   SizedBox _acceptButton(BuildContext context) {
     return SizedBox(
       width: double.infinity,
@@ -300,7 +291,6 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
                             callBack: onUserEditPetProfileCallback,
                             updateInfoText: 'ยืนยันการแก้ไขข้อมูลสัตว์เลี้ยง?',
                             routing: () async {
-                              // onUserEditPetProfileCallback();
                               Navigator.of(context).pop();
                               showDialog(
                                   context: context,
@@ -310,7 +300,7 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
                                       builder: (context, snapshot) {
                                         if (snapshot.connectionState ==
                                             ConnectionState.waiting) {
-                                          return Center(
+                                          return const Center(
                                             child: CircularProgressIndicator(),
                                           );
                                         } else if (snapshot.hasError) {
@@ -321,8 +311,11 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
                                         } else {
                                           Future.delayed(
                                               const Duration(
-                                                  milliseconds: 2000), () {
-                                            Navigator.push(
+                                                  milliseconds: 2800), () {
+                                            Navigator.of(context).pop();
+                                            Navigator.of(context).pop();
+                                            Navigator.of(context).pop();
+                                            Navigator.pushReplacement(
                                               context,
                                               MaterialPageRoute(
                                                 builder: (context) =>
@@ -346,84 +339,28 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
                                                       petActivityType:
                                                           _petActivityType,
                                                       updateRecent: ''),
-                                                  homeViewModel:
-                                                      widget.homeViewModel,
-                                                  index: widget.index,
+                                                  isJustUpdate: true,
                                                 ),
                                               ),
                                             );
                                           });
-                                          return const Center(
-                                            child: Text('Response: yeahhh'),
-                                          );
+                                          WidgetsBinding.instance
+                                              .addPostFrameCallback((_) {
+                                            AwesomeDialog(
+                                              context: context,
+                                              dialogType: DialogType.success,
+                                              animType: AnimType.rightSlide,
+                                              title:
+                                                  'แก้ไขข้อมูลสัตว์เลี้ยงสำเร็จ!!',
+                                              desc: '',
+                                              // btnOkOnPress: () {},
+                                            ).show();
+                                          });
+                                          return const SizedBox();
                                         }
                                       },
                                     );
                                   });
-
-                              // onUserEditPetProfileCallback();
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //     builder: (context) => PetProfileView(
-                              //       userInfo: widget.userInfo,
-                              //       petProfileInfo: PetProfileModel(
-                              //           petID: _petID,
-                              //           petName: _petName,
-                              //           petType: _petType,
-                              //           factorType: _factorType,
-                              //           petFactorNumber: _petFactorNumber,
-                              //           petWeight: _petWeight,
-                              //           petNeuteringStatus: _petNeuteringStatus,
-                              //           petAgeType: _petAgeType,
-                              //           petPhysiologyStatus:
-                              //               _petPhysiologyStatus,
-                              //           petChronicDisease: _petChronicDisease,
-                              //           petActivityType: _petActivityType,
-                              //           updateRecent: ''),
-                              //       homeViewModel: widget.homeViewModel,
-                              //       index: widget.index,
-                              //     ),
-                              //   ),
-                              // );
-
-                              // onUserEditPetProfileCallback().then((_) => {
-                              //       widget.homeViewModel
-                              //           .getHomeData(
-                              //               userID: widget.userInfo.userID)
-                              //           .then((HomeModel homeData) {
-                              //         Navigator.of(context)
-                              //             .popUntil((route) => route.isFirst);
-                              //         Navigator.push(
-                              //           context,
-                              //           MaterialPageRoute(
-                              //             builder: (context) => PetProfileView(
-                              //               userInfo: widget.userInfo,
-                              //               petProfileInfo: PetProfileModel(
-                              //                   petID: _petID,
-                              //                   petName: _petName,
-                              //                   petType: _petType,
-                              //                   factorType: _factorType,
-                              //                   petFactorNumber:
-                              //                       _petFactorNumber,
-                              //                   petWeight: _petWeight,
-                              //                   petNeuteringStatus:
-                              //                       _petNeuteringStatus,
-                              //                   petAgeType: _petAgeType,
-                              //                   petPhysiologyStatus:
-                              //                       _petPhysiologyStatus,
-                              //                   petChronicDisease:
-                              //                       _petChronicDisease,
-                              //                   petActivityType:
-                              //                       _petActivityType,
-                              //                   updateRecent: ''),
-                              //               homeViewModel: widget.homeViewModel,
-                              //               index: widget.index,
-                              //             ),
-                              //           ),
-                              //         );
-                              //       })
-                              //     });
                             },
                           );
                   },
@@ -446,7 +383,7 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
     return DropdownSearch<String>.multiSelection(
       selectedItems: widget.isCreate ? [] : _petChronicDisease,
       key: _petChronicDiseaseKey,
-      popupProps: PopupPropsMultiSelection.dialog(
+      popupProps: PopupPropsMultiSelection.menu(
         selectionWidget: (BuildContext context, String temp, bool isCheck) {
           return Checkbox(
             activeColor: const Color.fromRGBO(202, 102, 108, 1),
@@ -454,13 +391,17 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
             onChanged: (bool? value) {},
           );
         },
-        dialogProps: DialogProps(
-            insetPadding:
-                const EdgeInsets.symmetric(horizontal: 20, vertical: 200),
-            contentPadding: const EdgeInsets.all(5),
+        menuProps: MenuProps(
             backgroundColor: const Color.fromRGBO(254, 245, 245, 1),
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10))),
+        // dialogProps: DialogProps(
+        //     insetPadding:
+        //         const EdgeInsets.symmetric(horizontal: 20, vertical: 200),
+        //     contentPadding: const EdgeInsets.all(5),
+        //     backgroundColor: const Color.fromRGBO(254, 245, 245, 1),
+        //     shape: RoundedRectangleBorder(
+        //         borderRadius: BorderRadius.circular(10))),
         validationWidgetBuilder: (ctx, selectedItems) {
           return Container(
             height: 80,
@@ -990,7 +931,7 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
 
   Container _petTypeField() {
     return Container(
-      height: 60,
+      height: 70,
       margin: const EdgeInsets.only(top: 8),
       child: DropdownSearch<String>(
         selectedItem: widget.isCreate ? "" : _petType,

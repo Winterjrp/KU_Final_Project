@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/hive_models/pet_profile_model.dart';
 import 'package:untitled1/models/user_info_model.dart';
-import 'package:untitled1/modules/normal/home/home_view_model.dart';
+import 'package:untitled1/modules/normal/home/home_view.dart';
 import 'package:untitled1/modules/normal/pet_profile/pet_profile_view_model.dart';
 import 'package:untitled1/modules/normal/pet_profile/widgets/delete_pet_profile_confirm_popup.dart';
 import 'package:untitled1/modules/normal/select_ingredient/select_ingredient_view.dart';
@@ -10,16 +10,14 @@ import 'package:untitled1/modules/normal/update_pet_profile/update_pet_profile_v
 import 'package:untitled1/widgets/background.dart';
 
 class PetProfileView extends StatefulWidget {
-  final HomeViewModel homeViewModel;
   final PetProfileModel petProfileInfo;
   final UserInfoModel userInfo;
-  final int index;
+  final bool isJustUpdate;
 
   const PetProfileView(
       {required this.petProfileInfo,
       required this.userInfo,
-      required this.homeViewModel,
-      required this.index,
+      required this.isJustUpdate,
       Key? key})
       : super(key: key);
 
@@ -62,12 +60,19 @@ class _PetProfileViewState extends State<PetProfileView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: const Color.fromRGBO(194, 190, 241, 1),
       appBar: AppBar(
+        elevation: 0,
         leading: IconButton(
           icon: Icon(Icons.keyboard_backspace_rounded, color: primary),
           onPressed: () {
-            Navigator.of(context).pop();
+            widget.isJustUpdate
+                ? Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) =>
+                            HomeView(userInfo: widget.userInfo)),
+                  )
+                : Navigator.of(context).pop();
           },
         ),
         title: Center(
@@ -96,16 +101,17 @@ class _PetProfileViewState extends State<PetProfileView> {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Column(
         children: [
-          const SizedBox(height: 10),
+          const SizedBox(height: 20),
           Row(
             mainAxisAlignment: MainAxisAlignment.end,
             children: [
               _operationButton(),
             ],
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 20),
           _petNameField(),
           _petTypeField(),
+          _petWeightField(),
           _factorTypeField(),
           _factorType == "factorType"
               ? const SizedBox()
@@ -113,8 +119,7 @@ class _PetProfileViewState extends State<PetProfileView> {
                   ? _factorNumberField()
                   : Column(
                       children: [
-                        _petWeightField(),
-                        _petWeight == -1 ? const SizedBox() : _neuteredField(),
+                        _neuteredField(),
                         _petNeuteringStatus == "-1"
                             ? const SizedBox()
                             : _petAgeField(),
@@ -134,14 +139,14 @@ class _PetProfileViewState extends State<PetProfileView> {
                       ],
                     ),
           (_factorType == "customize" && _petFactorNumber != -1)
-              ? const SizedBox(height: 150)
+              ? const SizedBox(height: 200)
               : const SizedBox(),
-          const SizedBox(height: 20),
+          const SizedBox(height: 80),
           (_factorType == "customize" && _petFactorNumber != -1) ||
                   (_factorType == "recommend" && _petActivityType != "-1")
               ? _searchFoodRecipeButton(context)
               : const SizedBox(),
-          const SizedBox(height: 40),
+          // const SizedBox(height: 40),
         ],
       ),
     );
@@ -204,8 +209,6 @@ class _PetProfileViewState extends State<PetProfileView> {
                       userInfo: widget.userInfo,
                       isCreate: false,
                       petProfileInfo: widget.petProfileInfo,
-                      homeViewModel: widget.homeViewModel,
-                      index: widget.index,
                     )),
           );
         },
@@ -240,13 +243,12 @@ class _PetProfileViewState extends State<PetProfileView> {
               ));
         },
         style: ElevatedButton.styleFrom(
-          backgroundColor: darkYellow,
+          backgroundColor: primary,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
         ),
-        child: const Text('ค้นหาสูตรอาหาร',
-            style: TextStyle(fontSize: 17, fontWeight: FontWeight.bold)),
+        child: const Text('ค้นหาสูตรอาหาร', style: TextStyle(fontSize: 17)),
       ),
     );
   }
