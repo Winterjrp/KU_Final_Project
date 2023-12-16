@@ -36,16 +36,37 @@ class _HomeViewState extends State<HomeView> {
     double height = size.height;
     double width = size.width;
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(199, 232, 229, 1),
+      backgroundColor: Colors.white,
       bottomNavigationBar:
           ProjectNavigationBar(index: 0, userInfo: widget.userInfo),
       body: SafeArea(
-        child: Stack(
+        child: Column(
           children: [
-            const BackGround(
-                topColor: Color.fromRGBO(177, 225, 219, 0.4),
-                bottomColor: Color.fromRGBO(199, 232, 229, 1)),
-            _content(height, width),
+            UserProfileAppBar(
+              userInfo: widget.userInfo,
+            ),
+            const SizedBox(height: 5),
+            Expanded(
+              child: Stack(
+                children: [
+                  Container(
+                    decoration: const BoxDecoration(
+                      color: Color.fromRGBO(177, 225, 219, 0.4),
+                      borderRadius: BorderRadius.only(
+                        topLeft:
+                            Radius.circular(50), // Adjust the radius as needed
+                        topRight:
+                            Radius.circular(50), // Adjust the radius as needed
+                      ),
+                    ),
+                    child: const BackGround(
+                        topColor: Color.fromRGBO(177, 225, 219, 0),
+                        bottomColor: Color.fromRGBO(199, 232, 229, 1)),
+                  ),
+                  _content(height, width),
+                ],
+              ),
+            ),
           ],
         ),
       ),
@@ -61,28 +82,21 @@ class _HomeViewState extends State<HomeView> {
           } else if (snapshot.hasError) {
             return Text('Error: ${snapshot.error}');
           } else if (snapshot.hasData) {
-            return Column(
-              children: [
-                UserProfileAppBar(
-                  userInfo: widget.userInfo,
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      const SizedBox(height: 15),
-                      _header(),
-                      // const SizedBox(height: 10),
-                      _viewModel.homeData.petList.isEmpty
-                          ? _noPetWarn(width)
-                          : _userPetInfo(height: height, context: context),
-                      const SizedBox(height: 5),
-                      _addPetButton()
-                    ],
-                  ),
-                ),
-              ],
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  const SizedBox(height: 30),
+                  _header(),
+                  const SizedBox(height: 5),
+                  _viewModel.homeData.petList.isEmpty
+                      ? _noPetWarn(width)
+                      : _userPetInfo(height: height, context: context),
+                  const SizedBox(height: 15),
+                  _addPetButton()
+                ],
+              ),
             );
           }
           return const Text('No data available');
@@ -151,7 +165,7 @@ class _HomeViewState extends State<HomeView> {
       {required double height, required BuildContext context}) {
     return SingleChildScrollView(
         child: SizedBox(
-      height: height * 0.62,
+      height: height * 0.58,
       child: ListView.builder(
         itemCount: _viewModel.homeData.petList.length,
         itemBuilder: (context, index) {

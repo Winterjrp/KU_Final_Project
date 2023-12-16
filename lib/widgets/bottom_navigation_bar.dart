@@ -16,52 +16,61 @@ class ProjectNavigationBar extends StatelessWidget {
   // final HomeModel homeData;
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       height: 75,
-      decoration: BoxDecoration(
-        color: primary,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(30), // Adjust the radius as needed
-          topRight: Radius.circular(30), // Adjust the radius as needed
-        ),
-      ),
-      child: (userInfo.userRole.isPetFoodManagementAdmin ||
-              userInfo.userRole.isUserManagementAdmin)
-          ? Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildNavItem(
-                    icon: Icons.pets,
-                    // label: 'Home',
-                    navigationIndex: 0,
-                    context: context),
-                _buildNavItem(
-                    icon: Icons.settings_outlined,
-                    // label: 'Settings',
-                    navigationIndex: 1,
-                    context: context),
-                _buildNavItem(
-                    icon: Icons.admin_panel_settings,
-                    // label: 'Admin',
-                    navigationIndex: 2,
-                    context: context),
-              ],
-            )
-          : Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                _buildNavItem(
-                    icon: Icons.pets,
-                    // label: 'Home',
-                    navigationIndex: 0,
-                    context: context),
-                _buildNavItem(
-                    icon: Icons.person,
-                    // label: 'Settings',
-                    navigationIndex: 1,
-                    context: context),
-              ],
+      child: Stack(
+        children: [
+          Container(
+            color: const Color.fromRGBO(199, 232, 229, 1),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              color: primary,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(30), // Adjust the radius as needed
+                topRight: Radius.circular(30), // Adjust the radius as needed
+              ),
             ),
+            child: (userInfo.userRole.isPetFoodManagementAdmin ||
+                    userInfo.userRole.isUserManagementAdmin)
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildNavItem(
+                          icon: Icons.pets,
+                          // label: 'Home',
+                          navigationIndex: 0,
+                          context: context),
+                      _buildNavItem(
+                          icon: Icons.settings_outlined,
+                          // label: 'Settings',
+                          navigationIndex: 1,
+                          context: context),
+                      _buildNavItem(
+                          icon: Icons.admin_panel_settings,
+                          // label: 'Admin',
+                          navigationIndex: 2,
+                          context: context),
+                    ],
+                  )
+                : Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildNavItem(
+                          icon: Icons.pets,
+                          // label: 'Home',
+                          navigationIndex: 0,
+                          context: context),
+                      _buildNavItem(
+                          icon: Icons.person,
+                          // label: 'Settings',
+                          navigationIndex: 1,
+                          context: context),
+                    ],
+                  ),
+          ),
+        ],
+      ),
     );
   }
 

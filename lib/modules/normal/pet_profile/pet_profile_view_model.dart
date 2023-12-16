@@ -1,6 +1,6 @@
-import 'package:untitled1/modules/normal/home/models/home_model.dart';
 import 'package:untitled1/services/pet_profile_services/pet_profile_mock_service.dart';
 import 'package:untitled1/services/pet_profile_services/pet_profile_service_interface.dart';
+import 'package:http/http.dart' as http;
 
 class PetProfileViewModel {
   late PetProfileServiceInterface services;
@@ -9,7 +9,7 @@ class PetProfileViewModel {
     services = PetProfileMockService();
   }
 
-  Future<void> onUserDeletePetProfile({required String petID}) async {
-    await services.deletePetProfile(petID: petID);
+  Future<http.Response> onUserDeletePetProfile({required String petID}) async {
+    return await services.deletePetProfile(petID: petID);
   }
 }

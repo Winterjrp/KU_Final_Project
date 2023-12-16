@@ -1,3 +1,5 @@
+import 'package:http/http.dart' as http;
+
 abstract class PetProfileServiceInterface {
-  Future<void> deletePetProfile({required String petID});
+  Future<http.Response> deletePetProfile({required String petID});
 }

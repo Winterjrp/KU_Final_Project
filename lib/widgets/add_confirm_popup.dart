@@ -4,34 +4,34 @@ import '../constants/color.dart';
 
 typedef CallbackFunction = void Function();
 
-class DeleteConfirmPopup {
+class AddConfirmPopup {
   final BuildContext context;
-  final String cancelText;
+  final String confirmText;
   final CallbackFunction callback;
 
-  DeleteConfirmPopup(
+  AddConfirmPopup(
       {required this.context,
-      required this.cancelText,
+      required this.confirmText,
       required this.callback});
 
   void show() {
     AwesomeDialog(
       context: context,
-      dialogType: DialogType.warning,
+      dialogType: DialogType.question,
       headerAnimationLoop: false,
       animType: AnimType.rightSlide,
       dialogBackgroundColor: const Color.fromRGBO(254, 237, 218, 1),
-      dialogBorderRadius: const BorderRadius.all(Radius.circular(25)),
+      dialogBorderRadius: const BorderRadius.all(Radius.circular(20)),
       body: SizedBox(
-        height: 80,
+        height: 60,
         child: Center(
             child: Text(
-          cancelText,
+          confirmText,
           style: const TextStyle(fontSize: 18),
         )),
       ),
       btnCancel: Container(
-        margin: const EdgeInsets.all(6),
+        margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
         height: 40,
         child: ElevatedButton(
           onPressed: () {
@@ -48,12 +48,11 @@ class DeleteConfirmPopup {
         ),
       ),
       btnOk: Container(
-          margin: const EdgeInsets.all(6),
+          margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 10),
           height: 40,
           child: ElevatedButton(
             onPressed: () async {
-              Navigator.of(context).pop();
-              Navigator.of(context).pop();
+              callback();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: primary,

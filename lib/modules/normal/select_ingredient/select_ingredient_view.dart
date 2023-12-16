@@ -1,6 +1,7 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
+import 'package:untitled1/widgets/background.dart';
 
 class SelectIngredientView extends StatefulWidget {
   const SelectIngredientView({Key? key}) : super(key: key);
@@ -19,12 +20,16 @@ class _SelectIngredientViewState extends State<SelectIngredientView> {
   late Set<String> _nonSelectedIngredientSet;
   late Set<String> _selectedIngredientListSet;
   late Set<String> _nonSelectedIngredientListSet;
+  late bool _isACheck;
+  late bool _isBCheck;
   final double _labelTextSize = 18;
   final double _headerTextSize = 20;
   @override
   void initState() {
     super.initState();
     // _viewModel = AddPetInfoViewModel();
+    _isACheck = false;
+    _isBCheck = false;
     _ingredientList = [
       "เนื้อไก่",
       "เนื้อหมู",
@@ -46,45 +51,109 @@ class _SelectIngredientViewState extends State<SelectIngredientView> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: const Center(child: Text("เลือกวัตถุดิบ       ")),
-          backgroundColor: primary),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
-              _selectedIngredientPart(),
-              const SizedBox(height: 40),
-              _nonSelectedIngredientPart(),
-              const SizedBox(height: 90),
-              Center(
-                child: SizedBox(
-                  width: 450,
-                  height: 55,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      // Navigator.push(
-                      //     context,
-                      //     MaterialPageRoute(
-                      //       builder: (context) => SelectIngredientView(),
-                      //     ));
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromRGBO(58, 180, 106, 1),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.keyboard_backspace_rounded, color: primary),
+            onPressed: () {
+              // widget.isJustUpdate
+              //     ? Navigator.pushReplacement(
+              //   context,
+              //   MaterialPageRoute(
+              //       builder: (context) =>
+              //           HomeView(userInfo: widget.userInfo)),
+              // )
+              //     :
+              Navigator.of(context).pop();
+            },
+          ),
+          title: Center(
+              child: Text("เลือกวัตถุดิบ       ",
+                  style:
+                      TextStyle(color: primary, fontWeight: FontWeight.bold))),
+          backgroundColor: const Color.fromRGBO(194, 190, 241, 0.4)),
+      body: Stack(
+        children: [
+          const BackGround(
+            topColor: Color.fromRGBO(194, 190, 241, 0.4),
+            bottomColor: Color.fromRGBO(72, 70, 109, 0.1),
+          ),
+          SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const SizedBox(height: 20),
+                  _selectedIngredientPart(),
+                  const SizedBox(height: 40),
+                  _nonSelectedIngredientPart(),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: [
+                      Row(
+                        children: [
+                          Checkbox(
+                              activeColor: primary,
+                              value: _isACheck,
+                              onChanged: (bool? value) {
+                                setState(() {});
+                                _isACheck = value!;
+                                _isBCheck = false;
+                              }),
+                          const Text(
+                            "A",
+                            style: TextStyle(fontSize: 18),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(width: 20),
+                      Row(
+                        children: [
+                          Checkbox(
+                              activeColor: primary,
+                              value: _isBCheck,
+                              onChanged: (bool? value) {
+                                setState(() {});
+                                _isBCheck = value!;
+                                _isACheck = false;
+                              }),
+                          const Text(
+                            "B",
+                            style: TextStyle(fontSize: 18),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 350),
+                  Center(
+                    child: SizedBox(
+                      width: 450,
+                      height: 55,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          // Navigator.push(
+                          //     context,
+                          //     MaterialPageRoute(
+                          //       builder: (context) => SelectIngredientView(),
+                          //     ));
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primary,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: const Text('ค้นหาสูตรอาหาร',
+                            style: TextStyle(fontSize: 17)),
                       ),
                     ),
-                    child: const Text('ค้นหาสูตรอาหาร',
-                        style: TextStyle(fontSize: 17)),
                   ),
-                ),
+                ],
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
     );
   }

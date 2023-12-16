@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/models/user_info_model.dart';
 
 class UserProfileAppBar extends StatelessWidget {
@@ -8,7 +7,8 @@ class UserProfileAppBar extends StatelessWidget {
   final UserInfoModel userInfo;
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return Container(
+      color: Colors.white,
       padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
       child: Column(
         children: [

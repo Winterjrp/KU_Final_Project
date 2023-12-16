@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/hive_models/pet_profile_model.dart';
 import 'package:untitled1/models/user_info_model.dart';
-import 'package:untitled1/modules/normal/home/home_view_model.dart';
 import 'package:untitled1/modules/normal/pet_profile/pet_profile_view.dart';
 
 // typedef DeletePetInfoCallBack = void Function({required String petID});
@@ -24,11 +22,12 @@ class UserPetInfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: const EdgeInsets.only(top: 10, bottom: 3),
-      height: 145,
+      margin: const EdgeInsets.only(bottom: 13),
+      height: 130,
       child: ElevatedButton(
         style: ButtonStyle(
-          backgroundColor: MaterialStateProperty.all<Color>(Colors.white),
+          backgroundColor: MaterialStateProperty.all<Color>(
+              const Color.fromRGBO(255, 237, 216, 0.9)),
           shape: MaterialStateProperty.all<RoundedRectangleBorder>(
               RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20.0),
@@ -50,13 +49,17 @@ class UserPetInfoCard extends StatelessWidget {
           child: Row(
             children: [
               Container(
-                width: 120,
-                height: 120,
+                width: 100,
+                height: 100,
                 decoration: BoxDecoration(
-                  color: primary,
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(30),
                 ),
-                child: const Icon(Icons.pets_outlined, size: 70),
+                child: Icon(
+                  Icons.pets_outlined,
+                  size: 70,
+                  color: primary,
+                ),
               ),
               const SizedBox(width: 20),
               Column(
