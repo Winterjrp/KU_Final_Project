@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/hive_models/pet_profile_model.dart';
+import 'package:untitled1/manager/navigation_with_animation_manager.dart';
 import 'package:untitled1/models/user_info_model.dart';
 import 'package:untitled1/modules/normal/pet_profile/pet_profile_view.dart';
 
@@ -35,14 +36,20 @@ class UserPetInfoCard extends StatelessWidget {
         ),
         onPressed: () {
           Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => PetProfileView(
-                      userInfo: userInfo,
-                      petProfileInfo: petProfileInfo,
-                      isJustUpdate: false,
-                    )),
-          );
+              context,
+              NavigationForward(
+                  targetPage: PetProfileView(
+                userInfo: userInfo,
+                petProfileInfo: petProfileInfo,
+                isJustUpdate: false,
+              )));
+          //   MaterialPageRoute(
+          //       builder: (context) => PetProfileView(
+          //             userInfo: userInfo,
+          //             petProfileInfo: petProfileInfo,
+          //             isJustUpdate: false,
+          //           )),
+          // );
         },
         child: SizedBox(
           width: double.infinity,

@@ -1,7 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/hive_models/pet_profile_model.dart';
+import 'package:untitled1/manager/navigation_with_animation_manager.dart';
 import 'package:untitled1/models/user_info_model.dart';
 import 'package:untitled1/modules/normal/home/home_view_model.dart';
 import 'package:untitled1/modules/normal/home/models/home_model.dart';
@@ -51,7 +54,15 @@ class _HomeViewState extends State<HomeView> {
                 children: [
                   Container(
                     decoration: const BoxDecoration(
-                      color: Color.fromRGBO(177, 225, 219, 0.4),
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Color.fromRGBO(177, 225, 219, 0.9), // Top color
+                          Color.fromRGBO(
+                              177, 225, 219, 0.0) // Bottom color with opacity
+                        ],
+                      ),
                       borderRadius: BorderRadius.only(
                         topLeft:
                             Radius.circular(50), // Adjust the radius as needed
@@ -61,7 +72,7 @@ class _HomeViewState extends State<HomeView> {
                     ),
                     child: const BackGround(
                         topColor: Color.fromRGBO(177, 225, 219, 0),
-                        bottomColor: Color.fromRGBO(199, 232, 229, 1)),
+                        bottomColor: Color.fromRGBO(199, 232, 229, 0.5)),
                   ),
                   _content(height, width),
                 ],
@@ -207,24 +218,24 @@ class _HomeViewState extends State<HomeView> {
           onPressed: () async {
             Navigator.push(
               context,
-              MaterialPageRoute(
-                  builder: (context) => UpdatePetProfileView(
-                        userInfo: widget.userInfo,
-                        isCreate: true,
-                        petProfileInfo: PetProfileModel(
-                            petID: "-1",
-                            petName: "-1",
-                            petType: "-1",
-                            factorType: "-1",
-                            petFactorNumber: -1,
-                            petWeight: -1,
-                            petNeuteringStatus: "-1",
-                            petAgeType: "-1",
-                            petPhysiologyStatus: "-1",
-                            petChronicDisease: [],
-                            petActivityType: "-1",
-                            updateRecent: ""),
-                      )),
+              NavigationForward(
+                  targetPage: UpdatePetProfileView(
+                userInfo: widget.userInfo,
+                isCreate: true,
+                petProfileInfo: PetProfileModel(
+                    petId: Random().nextInt(999).toString(),
+                    petName: "-1",
+                    petType: "-1",
+                    factorType: "factorType",
+                    petFactorNumber: -1,
+                    petWeight: -1,
+                    petNeuteringStatus: "-1",
+                    petAgeType: "-1",
+                    petPhysiologyStatus: "-1",
+                    petChronicDisease: [],
+                    petActivityType: "-1",
+                    updateRecent: ""),
+              )),
             );
           },
           style: ElevatedButton.styleFrom(

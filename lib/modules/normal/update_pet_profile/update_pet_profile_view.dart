@@ -1,20 +1,26 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:untitled1/constants/color.dart';
 import 'package:dropdown_search/dropdown_search.dart';
-import 'package:untitled1/constants/pet_activity_enum.dart';
-import 'package:untitled1/constants/pet_age_enum.dart';
+import 'package:untitled1/constants/enum/pet_activity_enum.dart';
+import 'package:untitled1/constants/enum/pet_age_enum.dart';
+import 'package:untitled1/constants/enum/pet_factor_type_enum.dart';
+import 'package:untitled1/constants/enum/pet_neuture_status_enum.dart';
+import 'package:untitled1/constants/pet_physiology_status_list.dart';
 import 'package:untitled1/hive_models/pet_profile_model.dart';
+import 'package:untitled1/manager/navigation_with_animation_manager.dart';
 import 'package:untitled1/models/user_info_model.dart';
 import 'package:untitled1/modules/normal/home/home_view.dart';
 import 'package:untitled1/modules/normal/pet_profile/pet_profile_view.dart';
 import 'package:untitled1/modules/normal/update_pet_profile/update_pet_profile_view_model.dart';
-import 'package:untitled1/widgets/add_confirm_popup.dart';
-import 'package:untitled1/widgets/cancel_popup.dart';
+import 'package:untitled1/widgets/popup/add_confirm_popup.dart';
+import 'package:untitled1/widgets/popup/cancel_popup.dart';
 import 'package:untitled1/widgets/background.dart';
 import 'package:http/http.dart' as http;
-import 'package:untitled1/widgets/success_popup.dart';
+import 'package:untitled1/widgets/dropdown/dropdown.dart';
+import 'package:untitled1/widgets/dropdown/dropdown_search.dart';
+import 'package:untitled1/widgets/dropdown/multiple_dropdown_search.dart';
+import 'package:untitled1/widgets/popup/success_popup.dart';
 
 class UpdatePetProfileView extends StatefulWidget {
   final PetProfileModel petProfileInfo;
@@ -36,7 +42,6 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
   late double _petWeight;
   late List<String> _petChronicDiseaseList;
   late List<String> _petTypeList;
-  late List<String> _physiologyStatusList;
   late List<String> _petChronicDisease;
   late String _petType;
   late String _petActivityType;
@@ -52,12 +57,13 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
   late TextEditingController _petFactorNumberController;
   late TextEditingController _petWeightController;
 
-  final double _labelTextSize = 19;
+  final double _labelTextSize = 18.5;
   final double _inputTextSize = 17;
   final double _choiceTextSize = 17.5;
   final double _textBoxHeight = 65;
-  final ScrollController _controller = ScrollController();
-  final _petChronicDiseaseKey = GlobalKey<DropdownSearchState<String>>();
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey<DropdownSearchState<String>> _petChronicDiseaseKey =
+      GlobalKey<DropdownSearchState<String>>();
 
   @override
   void initState() {
@@ -73,36 +79,22 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
       'ม้า',
     ];
     _petChronicDiseaseList = ["โรคเบาหวาน", "โรคความดัน", "โรคตับ", "โรคไต"];
-    _physiologyStatusList = [
-      "สุขภาพดี",
-      "ตั้งท้อง",
-      "ให้นมลูก",
-      "ป่วยหรือมีโรคประจำตัว"
-    ];
+    _petName = widget.petProfileInfo.petName;
+    _petType = widget.petProfileInfo.petType;
+    _petPhysiologyStatus = widget.petProfileInfo.petPhysiologyStatus;
+    _petNeuteringStatus = widget.petProfileInfo.petNeuteringStatus;
+    _petAgeType = widget.petProfileInfo.petAgeType;
+    _factorType = widget.petProfileInfo.factorType;
+    _petActivityType = widget.petProfileInfo.petActivityType;
+    _petChronicDisease = widget.petProfileInfo.petChronicDisease;
+    _petFactorNumber = widget.petProfileInfo.petFactorNumber;
+    _petWeight = widget.petProfileInfo.petWeight;
+    _petID = widget.petProfileInfo.petId;
     if (widget.isCreate) {
-      _petName = "-1";
-      _petType = "-1";
-      _petPhysiologyStatus = "-1";
-      _petNeuteringStatus = "-1";
-      _petAgeType = "-1";
-      _factorType = "factorType";
-      _petActivityType = "-1";
-      _petChronicDisease = [];
-      _petFactorNumber = -1;
-      _petWeight = -1;
-      _petID = Random().nextInt(999).toString();
+      _petNameController.text = "";
+      _petWeightController.text = "";
+      _petFactorNumberController.text = "";
     } else {
-      _petName = widget.petProfileInfo.petName;
-      _petType = widget.petProfileInfo.petType;
-      _petPhysiologyStatus = widget.petProfileInfo.petPhysiologyStatus;
-      _petNeuteringStatus = widget.petProfileInfo.petNeuteringStatus;
-      _petAgeType = widget.petProfileInfo.petAgeType;
-      _factorType = widget.petProfileInfo.factorType;
-      _petActivityType = widget.petProfileInfo.petActivityType;
-      _petChronicDisease = widget.petProfileInfo.petChronicDisease;
-      _petFactorNumber = widget.petProfileInfo.petFactorNumber;
-      _petWeight = widget.petProfileInfo.petWeight;
-      _petID = widget.petProfileInfo.petID;
       _petNameController.text = _petName;
       _petWeightController.text = _petWeight.toString();
       _petFactorNumberController.text = _petFactorNumber.toString();
@@ -120,11 +112,12 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
       _isEnable = false;
       // print(2);
     }
-    if (_factorType == "customize" && _petFactorNumber == -1) {
+    if (_factorType == PetFactorType.customize.toString().split('.').last &&
+        _petFactorNumber == -1) {
       _isEnable = false;
       // print(3);
     }
-    if (_factorType == "recommend" &&
+    if (_factorType == PetFactorType.recommend.toString().split('.').last &&
         (_petNeuteringStatus == "-1" ||
             _petAgeType == "-1" ||
             _petPhysiologyStatus == "-1" ||
@@ -132,48 +125,53 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
       _isEnable = false;
       // print(4);
     }
-    if (_factorType == "recommend" &&
-        _petPhysiologyStatus == "ป่วยหรือมีโรคประจำตัว" &&
+    if (_factorType == PetFactorType.recommend.toString().split('.').last &&
+        _petPhysiologyStatus == PetPhysiologyStatusList.petSickStatus &&
         _petChronicDisease.isEmpty) {
       _isEnable = false;
       // print(5);
     }
-    return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: Icon(Icons.keyboard_backspace_rounded, color: red),
-          onPressed: () {
-            widget.isCreate
-                ? CancelPopup(
-                    context: context,
-                    cancelText: 'ยกเลิกการเพิ่มข้อมูลสัตว์เลี้ยง?',
-                  ).show()
-                : CancelPopup(
-                        context: context,
-                        cancelText: 'ยกเลิกการแก้ไขข้อมูลสัตว์เลี้ยง?')
-                    .show();
-          },
-        ),
-        title: Center(
-            child: Text(
-          widget.isCreate
-              ? "เพิ่มข้อมูลสัตว์เลี้ยง    "
-              : "แก้ไขข้อมูลสัตว์เลี้ยง    ",
-          style: TextStyle(color: red),
-        )),
-        backgroundColor: const Color.fromRGBO(222, 150, 154, 0.6),
-        elevation: 0,
-      ),
-      body: Stack(
-        children: [
-          const BackGround(
-              topColor: Color.fromRGBO(222, 150, 154, 0.6),
-              bottomColor: Color.fromRGBO(241, 165, 165, 0.4)),
-          SingleChildScrollView(
-            controller: _controller,
-            child: _content(context),
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).requestFocus(FocusNode());
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.keyboard_backspace_rounded, color: red),
+            onPressed: () {
+              widget.isCreate
+                  ? CancelPopup(
+                      context: context,
+                      cancelText: 'ยกเลิกการเพิ่มข้อมูลสัตว์เลี้ยง?',
+                    ).show()
+                  : CancelPopup(
+                          context: context,
+                          cancelText: 'ยกเลิกการแก้ไขข้อมูลสัตว์เลี้ยง?')
+                      .show();
+            },
           ),
-        ],
+          title: Center(
+              child: Text(
+            widget.isCreate
+                ? "เพิ่มข้อมูลสัตว์เลี้ยง    "
+                : "แก้ไขข้อมูลสัตว์เลี้ยง    ",
+            style: TextStyle(color: red),
+          )),
+          backgroundColor: const Color.fromRGBO(222, 150, 154, 0.6),
+          elevation: 0,
+        ),
+        body: Stack(
+          children: [
+            const BackGround(
+                topColor: Color.fromRGBO(222, 150, 154, 0.6),
+                bottomColor: Color.fromRGBO(241, 165, 165, 0.2)),
+            SingleChildScrollView(
+              controller: _scrollController,
+              child: _content(context),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -196,17 +194,18 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
           const SizedBox(height: 20),
           _factorTypeField(),
           const SizedBox(height: 5),
-          _factorType == "customize"
+          _factorType == PetFactorType.customize.toString().split('.').last
               ? _petFactorNumberField()
               : _factorType != "factorType"
                   ? Column(
                       children: [
-                        _neuteredField(),
+                        _petNeuteredField(),
                         const SizedBox(height: 5),
                         _petAgeField(),
                         const SizedBox(height: 20),
-                        _physiologyStatusField(),
-                        _petPhysiologyStatus == "ป่วยหรือมีโรคประจำตัว"
+                        _petPhysiologyStatusField(),
+                        _petPhysiologyStatus ==
+                                PetPhysiologyStatusList.petSickStatus
                             ? _petChronicDiseaseType()
                             : const SizedBox(),
                         const SizedBox(height: 20),
@@ -214,12 +213,16 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
                       ],
                     )
                   : const SizedBox(),
-          (_factorType == "customize" && _petFactorNumber != -1)
-              ? const SizedBox(height: 120)
+          (_factorType == PetFactorType.customize.toString().split('.').last &&
+                  _petFactorNumber != -1)
+              ? const SizedBox(height: 150)
               : const SizedBox(height: 50),
-          const SizedBox(height: 40),
-          (_factorType == "customize" && _petFactorNumber != -1) ||
-                  (_factorType == "recommend" && _petActivityType != "-1")
+          const SizedBox(height: 20),
+          (_factorType == PetFactorType.customize.toString().split('.').last &&
+                      _petFactorNumber != -1) ||
+                  (_factorType ==
+                          PetFactorType.recommend.toString().split('.').last &&
+                      _petActivityType != "-1")
               ? _acceptButton(context)
               : const SizedBox(),
           const SizedBox(height: 40),
@@ -273,10 +276,9 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
       Future.delayed(const Duration(milliseconds: 1800), () {
         Navigator.of(context).popUntil((route) => route.isFirst);
         Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(
-              builder: (context) => HomeView(userInfo: widget.userInfo)),
-        );
+            context,
+            NavigationBackward(
+                targetPage: HomeView(userInfo: widget.userInfo)));
       });
       SuccessPopup(
               context: context, successText: 'เพิ่มข้อมูลสัตว์เลี้ยงสำเร็จ!!')
@@ -302,11 +304,11 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
         Navigator.of(context).popUntil((route) => route.isFirst);
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(
-            builder: (context) => PetProfileView(
+          NavigationBackward(
+            targetPage: PetProfileView(
               userInfo: widget.userInfo,
               petProfileInfo: PetProfileModel(
-                  petID: _petID,
+                  petId: _petID,
                   petName: _petName,
                   petType: _petType,
                   factorType: _factorType,
@@ -373,176 +375,24 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
         children: [
           _headerText(text: "โรคประจำตัว"),
           const SizedBox(height: 5),
-          SizedBox(
-            child: DropdownSearch<String>.multiSelection(
-              selectedItems: widget.isCreate ? [] : _petChronicDisease,
-              key: _petChronicDiseaseKey,
-              popupProps: PopupPropsMultiSelection.menu(
-                selectionWidget:
-                    (BuildContext context, String temp, bool isCheck) {
-                  return Checkbox(
-                    activeColor: const Color.fromRGBO(202, 102, 108, 1),
-                    value: isCheck,
-                    onChanged: (bool? value) {},
-                  );
-                },
-                menuProps: MenuProps(
-                    backgroundColor: const Color.fromRGBO(254, 245, 245, 1),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10))),
-                validationWidgetBuilder: (ctx, selectedItems) {
-                  return Container(
-                    height: 80,
-                    alignment: Alignment.bottomRight,
-                    margin: const EdgeInsets.only(right: 5, bottom: 5),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: red,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: const Text(
-                        'OK',
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      onPressed: () {
-                        _petChronicDiseaseKey.currentState?.popupOnValidate();
-                      },
-                    ),
-                  );
-                },
-                itemBuilder:
-                    (BuildContext context, String item, bool isSelect) {
-                  return Row(
-                    children: [
-                      const SizedBox(width: 10),
-                      Text(
-                        item,
-                        style: TextStyle(
-                            fontSize: 16,
-                            color: isSelect
-                                ? const Color.fromRGBO(202, 102, 108, 1)
-                                : Colors.black),
-                      ),
-                    ],
-                  );
-                },
-                showSearchBox: true,
-                showSelectedItems: true,
-                searchFieldProps: TextFieldProps(
-                    decoration: InputDecoration(
-                  floatingLabelStyle: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 22,
-                    height: 0.9,
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  suffixIcon: const Icon(Icons.search),
-                  labelText: "ค้นหาโรคประจำตัว",
-                  labelStyle: const TextStyle(fontSize: 16, height: 1),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0),
-                    borderSide: const BorderSide(color: Colors.black, width: 2),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(20.0),
-                    borderSide: const BorderSide(color: Colors.black, width: 2),
-                  ),
-                )),
-              ),
-              dropdownBuilder:
-                  (BuildContext context, List<String> selectedItems) {
-                if (selectedItems.isEmpty) {
-                  return const SizedBox();
-                }
-
-                return Wrap(
-                  children: selectedItems.map((e) {
-                    return Container(
-                        margin:
-                            const EdgeInsets.only(right: 8, top: 5, bottom: 5),
-                        decoration: BoxDecoration(
-                            color: const Color.fromRGBO(202, 102, 108, 1),
-                            borderRadius: BorderRadius.circular(10)),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 5),
-                        child: IntrinsicWidth(
-                          child: Row(
-                            children: [
-                              Text(
-                                e,
-                                style: const TextStyle(
-                                    fontSize: 15, color: Colors.white),
-                              ),
-                              const SizedBox(width: 8),
-                              Transform.scale(
-                                scale: 1.8,
-                                child: SizedBox(
-                                  width: 15,
-                                  height: 15,
-                                  child: IconButton(
-                                    onPressed: () {
-                                      setState(() {});
-                                      selectedItems.remove(e);
-                                      _petChronicDisease = selectedItems;
-                                    },
-                                    icon: const Icon(Icons.close),
-                                    padding: EdgeInsets.zero,
-                                    constraints: const BoxConstraints(),
-                                    iconSize: 10,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                              )
-                            ],
-                          ),
-                        ));
-                  }).toList(),
-                );
-              },
-              dropdownDecoratorProps: DropDownDecoratorProps(
-                  dropdownSearchDecoration: InputDecoration(
-                floatingLabelStyle: const TextStyle(
-                  color: Colors.black,
-                  fontSize: 22,
-                  height: 0.9,
-                ),
-                fillColor: Colors.white,
-                filled: true,
-                contentPadding: const EdgeInsets.only(
-                    left: 15, right: 15, bottom: 15, top: 5),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15.0),
-                  borderSide: const BorderSide(color: Colors.black, width: 2),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(15.0),
-                  borderSide: const BorderSide(color: Colors.black, width: 2),
-                ),
-              )),
-              items: _petChronicDiseaseList,
-              onChanged: (value) {
-                setState(() {
-                  _petChronicDisease = value;
-                });
-                _controller.animateTo(
-                  1000.0,
-                  duration: const Duration(seconds: 1),
-                  curve: Curves.ease,
-                );
-              },
-            ),
-          ),
+          CustomMultipleDropdownSearch(
+            primaryColor: red,
+            isCreate: widget.isCreate,
+            value: _petChronicDisease,
+            choiceItemList: _petChronicDiseaseList,
+            updateValueCallback: ({required List<String> value}) {
+              _petChronicDisease = value;
+              setState(() {});
+            },
+            dropdownKey: _petChronicDiseaseKey,
+            scrollController: _scrollController,
+          )
         ],
       ),
     );
   }
 
-  Widget _physiologyStatusField() {
+  Widget _petPhysiologyStatusField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -550,91 +400,16 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
         const SizedBox(height: 5),
         SizedBox(
           height: _textBoxHeight,
-          child: DropdownSearch<String>(
-            selectedItem: widget.isCreate || _petPhysiologyStatus == "-1"
-                ? null
-                : _petPhysiologyStatus,
-            popupProps: PopupProps.menu(
-              itemBuilder: (BuildContext context, String item, bool isSelect) {
-                return Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      item != _petPhysiologyStatus
-                          ? Container(
-                              margin: const EdgeInsets.symmetric(vertical: 10),
-                              child: Text(
-                                item,
-                                style: TextStyle(
-                                    fontSize: 16,
-                                    color: item == _petPhysiologyStatus
-                                        ? const Color.fromRGBO(202, 102, 108, 1)
-                                        : Colors.black),
-                              ),
-                            )
-                          : Row(
-                              children: [
-                                Container(
-                                  margin:
-                                      const EdgeInsets.symmetric(vertical: 10),
-                                  child: Text(
-                                    item,
-                                    style: TextStyle(
-                                        fontSize: 16,
-                                        color: item == _petPhysiologyStatus
-                                            ? const Color.fromRGBO(
-                                                202, 102, 108, 1)
-                                            : Colors.black),
-                                  ),
-                                ),
-                                const Spacer(),
-                                const Icon(Icons.pets,
-                                    color: Color.fromRGBO(202, 102, 108, 1))
-                              ],
-                            ),
-                    ],
-                  ),
-                );
-              },
-              menuProps: MenuProps(
-                  backgroundColor: const Color.fromRGBO(254, 245, 245, 1),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15))),
-            ),
-            dropdownDecoratorProps: DropDownDecoratorProps(
-                baseStyle: TextStyle(fontSize: _inputTextSize),
-                dropdownSearchDecoration: InputDecoration(
-                  floatingLabelStyle: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 22,
-                    height: 0.9,
-                  ),
-                  fillColor: Colors.white,
-                  filled: true,
-                  hintText: "สถานะทางสรีระ",
-                  hintStyle: TextStyle(fontSize: _labelTextSize),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15.0),
-                    borderSide: const BorderSide(color: Colors.black, width: 2),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15.0),
-                    borderSide: const BorderSide(color: Colors.black, width: 2),
-                  ),
-                )),
-            items: _physiologyStatusList,
-            onChanged: (value) {
-              setState(() {
-                _petPhysiologyStatus = value!;
-              });
-              _controller.animateTo(
-                1000.0,
-                duration: const Duration(seconds: 1),
-                curve: Curves.ease,
-              );
+          child: CustomDropdown(
+            primaryColor: red,
+            isCreate: widget.isCreate,
+            value: _petPhysiologyStatus,
+            inputTextSize: _inputTextSize,
+            labelTextSize: _labelTextSize,
+            choiceItemList: PetPhysiologyStatusList.petPhysiologyStatusList,
+            updateValueCallback: ({required String value}) {
+              _petPhysiologyStatus = value;
+              setState(() {});
             },
           ),
         ),
@@ -648,102 +423,102 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
       children: [
         Text("อายุ", style: TextStyle(fontSize: _labelTextSize)),
         RadioListTile(
-          title: Text("น้อยกว่า 1 ปี",
+          title: Text(PetAgeTypeEnum.petAgeChoice1,
               style: TextStyle(fontSize: _choiceTextSize)),
           groupValue: _petAgeType,
           onChanged: (value) {
             setState(() {
               _petAgeType = value!;
             });
-            _controller.animateTo(
+            _scrollController.animateTo(
               1000.0,
               duration: const Duration(seconds: 1),
               curve: Curves.ease,
             );
           },
           activeColor: Colors.black,
-          value: getPetAgeType(description: "น้อยกว่า 1 ปี")
-              .toString()
-              .split('.')
-              .last,
+          value: PetAgeTypeEnum()
+              .getPetAgeType(description: PetAgeTypeEnum.petAgeChoice1),
         ),
         RadioListTile(
-          title: Text("1 - 7 ปี", style: TextStyle(fontSize: _choiceTextSize)),
+          title: Text(PetAgeTypeEnum.petAgeChoice2,
+              style: TextStyle(fontSize: _choiceTextSize)),
           groupValue: _petAgeType,
           onChanged: (value) {
             setState(() {
               _petAgeType = value!;
             });
-            _controller.animateTo(
+            _scrollController.animateTo(
               1000.0,
               duration: const Duration(seconds: 1),
               curve: Curves.ease,
             );
           },
           activeColor: Colors.black,
-          value:
-              getPetAgeType(description: "1 - 7 ปี").toString().split('.').last,
+          value: PetAgeTypeEnum()
+              .getPetAgeType(description: PetAgeTypeEnum.petAgeChoice2),
         ),
         RadioListTile(
-          title:
-              Text("มากกว่า 7 ปี", style: TextStyle(fontSize: _choiceTextSize)),
-          groupValue: _petAgeType,
-          onChanged: (value) {
-            setState(() {
-              _petAgeType = value!;
-            });
-            _controller.animateTo(
-              1000.0,
-              duration: const Duration(seconds: 1),
-              curve: Curves.ease,
-            );
-          },
-          activeColor: Colors.black,
-          value: getPetAgeType(description: "มากกว่า 7 ปี")
-              .toString()
-              .split('.')
-              .last,
-        ),
+            title: Text(PetAgeTypeEnum.petAgeChoice3,
+                style: TextStyle(fontSize: _choiceTextSize)),
+            groupValue: _petAgeType,
+            onChanged: (value) {
+              setState(() {
+                _petAgeType = value!;
+              });
+              _scrollController.animateTo(
+                1000.0,
+                duration: const Duration(seconds: 1),
+                curve: Curves.ease,
+              );
+            },
+            activeColor: Colors.black,
+            value: PetAgeTypeEnum()
+                .getPetAgeType(description: PetAgeTypeEnum.petAgeChoice3)),
       ],
     );
   }
 
-  Column _neuteredField() {
+  Column _petNeuteredField() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text("การทำหมัน", style: TextStyle(fontSize: _labelTextSize)),
         RadioListTile(
-          title: Text("ทำหมัน", style: TextStyle(fontSize: _choiceTextSize)),
+          title: Text(PetNeuterStatusEnum.neuterStatusChoice1,
+              style: TextStyle(fontSize: _choiceTextSize)),
           groupValue: _petNeuteringStatus,
           onChanged: (value) {
             setState(() {
               _petNeuteringStatus = value!;
             });
-            _controller.animateTo(
+            _scrollController.animateTo(
               1000.0,
               duration: const Duration(seconds: 1),
               curve: Curves.ease,
             );
           },
           activeColor: Colors.black,
-          value: "neutered",
+          value: PetNeuterStatusEnum().getPetNeuterStatus(
+              description: PetNeuterStatusEnum.neuterStatusChoice1),
         ),
         RadioListTile(
-          title: Text("ไม่ทำหมัน", style: TextStyle(fontSize: _choiceTextSize)),
+          title: Text(PetNeuterStatusEnum.neuterStatusChoice2,
+              style: TextStyle(fontSize: _choiceTextSize)),
           groupValue: _petNeuteringStatus,
           onChanged: (value) {
             setState(() {
               _petNeuteringStatus = value!;
             });
-            _controller.animateTo(
+            _scrollController.animateTo(
               1000.0,
               duration: const Duration(seconds: 1),
               curve: Curves.ease,
             );
           },
           activeColor: Colors.black,
-          value: "unneutered",
+          value: PetNeuterStatusEnum().getPetNeuterStatus(
+              description: PetNeuterStatusEnum.neuterStatusChoice2),
         ),
       ],
     );
@@ -755,64 +530,53 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
       children: [
         Text("กิจกรรมต่อวัน", style: TextStyle(fontSize: _labelTextSize)),
         RadioListTile(
-          title: const Text(
-              "อยู่นิ่งๆ เคลื่อนตัวเพื่อไปกินอาหาร/น้ำ, ขับถ่ายหรือออกกำลังกายน้อยกว่า 1 ชม./วัน (Inactive)"),
-          groupValue: _petActivityType,
-          onChanged: (value) {
-            setState(() {
-              _petActivityType = value!;
-            });
-            _controller.animateTo(
-              1000.0,
-              duration: const Duration(seconds: 1),
-              curve: Curves.ease,
-            );
-          },
-          activeColor: Colors.black,
-          value: getActivityLevel(
-                  "อยู่นิ่งๆ เคลื่อนตัวเพื่อไปกินอาหาร/น้ำ, ขับถ่ายหรือออกกำลังกายน้อยกว่า 1 ชม./วัน (Inactive)")
-              .toString()
-              .split('.')
-              .last,
-        ),
+            title: const Text(PetActivityLevelEnum.activityLevelChoice1),
+            groupValue: _petActivityType,
+            onChanged: (value) {
+              setState(() {
+                _petActivityType = value!;
+              });
+              _scrollController.animateTo(
+                1000.0,
+                duration: const Duration(seconds: 1),
+                curve: Curves.ease,
+              );
+            },
+            activeColor: Colors.black,
+            value: PetActivityLevelEnum()
+                .getActivityLevel(PetActivityLevelEnum.activityLevelChoice1)),
         RadioListTile(
-          title: const Text("ออกกำลังกาย 1 - 3 ชม./วัน (Moderate active)"),
-          groupValue: _petActivityType,
-          onChanged: (value) {
-            setState(() {
-              _petActivityType = value!;
-            });
-            _controller.animateTo(
-              1000.0,
-              duration: const Duration(seconds: 1),
-              curve: Curves.ease,
-            );
-          },
-          activeColor: Colors.black,
-          value: getActivityLevel("ออกกำลังกาย 1 - 3 ชม./วัน (Moderate active)")
-              .toString()
-              .split('.')
-              .last,
-        ),
+            title: const Text(PetActivityLevelEnum.activityLevelChoice2),
+            groupValue: _petActivityType,
+            onChanged: (value) {
+              setState(() {
+                _petActivityType = value!;
+              });
+              _scrollController.animateTo(
+                1000.0,
+                duration: const Duration(seconds: 1),
+                curve: Curves.ease,
+              );
+            },
+            activeColor: Colors.black,
+            value: PetActivityLevelEnum()
+                .getActivityLevel(PetActivityLevelEnum.activityLevelChoice2)),
         RadioListTile(
-          title: const Text("ออกกำลังกายมากกว่า 3 ชม./วัน (Very active)"),
-          groupValue: _petActivityType,
-          onChanged: (value) {
-            setState(() {
-              _petActivityType = value!;
-            });
-            _controller.animateTo(
-              1000.0,
-              duration: const Duration(seconds: 1),
-              curve: Curves.ease,
-            );
-          },
-          activeColor: Colors.black,
-          value: getActivityLevel("ออกกำลังกายมากกว่า 3 ชม./วัน (Very active)")
-              .toString()
-              .split('.')
-              .last,
-        ),
+            title: const Text(PetActivityLevelEnum.activityLevelChoice3),
+            groupValue: _petActivityType,
+            onChanged: (value) {
+              setState(() {
+                _petActivityType = value!;
+              });
+              _scrollController.animateTo(
+                1000.0,
+                duration: const Duration(seconds: 1),
+                curve: Curves.ease,
+              );
+            },
+            activeColor: Colors.black,
+            value: PetActivityLevelEnum()
+                .getActivityLevel(PetActivityLevelEnum.activityLevelChoice3)),
       ],
     );
   }
@@ -824,7 +588,7 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
         _headerText(text: "น้ำหนัก (BW)"),
         const SizedBox(height: 5),
         SizedBox(
-          width: 140,
+          width: 130,
           height: _textBoxHeight,
           child: TextField(
             onTap: () {
@@ -945,7 +709,7 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
       children: [
         Text("เลือกใช้ factor", style: TextStyle(fontSize: _labelTextSize)),
         RadioListTile(
-          title: Text("ให้ระบบเลือกให้ (แนะนำ)",
+          title: Text("${PetFactorTypeEnum.petFactorTypeChoice2} (แนะนำ)",
               style: TextStyle(fontSize: _choiceTextSize)),
           groupValue: _factorType,
           onChanged: (value) {
@@ -954,10 +718,12 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
             });
           },
           activeColor: Colors.black,
-          value: "recommend",
+          value: PetFactorTypeEnum().getPetFactorType(
+              description: PetFactorTypeEnum.petFactorTypeChoice2),
         ),
         RadioListTile(
-          title: Text("กำหนดเอง (สำหรับผู้เชี่ยวชาญ)",
+          title: Text(
+              "${PetFactorTypeEnum.petFactorTypeChoice1} (สำหรับผู้เชี่ยวชาญ)",
               style: TextStyle(fontSize: _choiceTextSize)),
           groupValue: _factorType,
           onChanged: (value) {
@@ -966,7 +732,8 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
             });
           },
           activeColor: Colors.black,
-          value: "customize",
+          value: PetFactorTypeEnum().getPetFactorType(
+              description: PetFactorTypeEnum.petFactorTypeChoice1),
         ),
       ],
     );
@@ -981,116 +748,16 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
           const SizedBox(height: 5),
           SizedBox(
             height: _textBoxHeight,
-            child: DropdownSearch<String>(
-              selectedItem: widget.isCreate ? null : _petType,
-              popupProps: PopupProps.menu(
-                itemBuilder:
-                    (BuildContext context, String item, bool isSelect) {
-                  return Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 15),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        item != _petType
-                            ? Container(
-                                margin:
-                                    const EdgeInsets.symmetric(vertical: 10),
-                                child: Text(
-                                  item,
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      color: item == _petType
-                                          ? const Color.fromRGBO(
-                                              202, 102, 108, 1)
-                                          : Colors.black),
-                                ),
-                              )
-                            : Row(
-                                children: [
-                                  Container(
-                                    margin: const EdgeInsets.symmetric(
-                                        vertical: 10),
-                                    child: Text(
-                                      item,
-                                      style: TextStyle(
-                                          fontSize: 16,
-                                          color: item == _petPhysiologyStatus
-                                              ? const Color.fromRGBO(
-                                                  202, 102, 108, 1)
-                                              : Colors.black),
-                                    ),
-                                  ),
-                                  const Spacer(),
-                                  const Icon(Icons.pets,
-                                      color: Color.fromRGBO(202, 102, 108, 1))
-                                ],
-                              ),
-                      ],
-                    ),
-                  );
-                },
-                menuProps: MenuProps(
-                    backgroundColor: const Color.fromRGBO(254, 245, 245, 1),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15))),
-                showSearchBox: true,
-                showSelectedItems: true,
-                searchFieldProps: TextFieldProps(
-                    decoration: InputDecoration(
-                  floatingLabelStyle: const TextStyle(
-                    color: Colors.black,
-                    fontSize: 20,
-                    height: 0.9,
-                  ),
-                  filled: true,
-                  fillColor: Colors.white,
-                  suffixIcon: const Icon(Icons.search),
-                  labelText: "ค้นหาชนิดสัตว์เลี้ยง",
-                  labelStyle: const TextStyle(fontSize: 16),
-                  contentPadding:
-                      const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15.0),
-                    borderSide:
-                        const BorderSide(color: Colors.black, width: 1.8),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(15.0),
-                    borderSide:
-                        const BorderSide(color: Colors.black, width: 1.8),
-                  ),
-                )),
-              ),
-              dropdownDecoratorProps: DropDownDecoratorProps(
-                  baseStyle: TextStyle(fontSize: _inputTextSize),
-                  dropdownSearchDecoration: InputDecoration(
-                    floatingLabelStyle: const TextStyle(
-                      color: Colors.black,
-                      fontSize: 22,
-                      height: 0.9,
-                    ),
-                    fillColor: Colors.white,
-                    filled: true,
-                    hintText: "ชนิดสัตว์เลี้ยง",
-                    hintStyle: TextStyle(fontSize: _labelTextSize),
-                    contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 15, vertical: 20),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15.0),
-                      borderSide:
-                          const BorderSide(color: Colors.black, width: 2),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(15.0),
-                      borderSide:
-                          const BorderSide(color: Colors.black, width: 2),
-                    ),
-                  )),
-              items: _petTypeList,
-              onChanged: (value) {
-                setState(() {
-                  _petType = value!;
-                });
+            child: CustomDropdownSearch(
+              primaryColor: red,
+              isCreate: widget.isCreate,
+              value: _petType,
+              inputTextSize: _inputTextSize,
+              labelTextSize: _labelTextSize,
+              choiceItemList: _petTypeList,
+              updateValueCallback: ({required String value}) {
+                _petType = value;
+                setState(() {});
               },
             ),
           ),

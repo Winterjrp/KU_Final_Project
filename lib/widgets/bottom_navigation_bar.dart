@@ -21,7 +21,7 @@ class ProjectNavigationBar extends StatelessWidget {
       child: Stack(
         children: [
           Container(
-            color: const Color.fromRGBO(199, 232, 229, 1),
+            color: const Color.fromRGBO(199, 232, 229, 0.65),
           ),
           Container(
             decoration: BoxDecoration(

@@ -17,7 +17,7 @@ class PetProfileModelAdapter extends TypeAdapter<PetProfileModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return PetProfileModel(
-      petID: fields[0] as String,
+      petId: fields[0] as String,
       petName: fields[1] as String,
       petType: fields[2] as String,
       factorType: fields[3] as String,
@@ -37,7 +37,7 @@ class PetProfileModelAdapter extends TypeAdapter<PetProfileModel> {
     writer
       ..writeByte(12)
       ..writeByte(0)
-      ..write(obj.petID)
+      ..write(obj.petId)
       ..writeByte(1)
       ..write(obj.petName)
       ..writeByte(2)

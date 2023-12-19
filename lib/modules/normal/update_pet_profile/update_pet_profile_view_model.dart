@@ -22,7 +22,7 @@ class AddPetProfileViewModel {
       required List<String> petChronicDisease,
       required String petActivityType}) async {
     PetProfileModel petInfo = PetProfileModel(
-        petID: petID,
+        petId: petID,
         petName: petName,
         petType: petType,
         factorType: factorType,
@@ -50,7 +50,7 @@ class AddPetProfileViewModel {
       required List<String> petChronicDisease,
       required String petActivityType}) async {
     PetProfileModel petInfo = PetProfileModel(
-        petID: petID,
+        petId: petID,
         petName: petName,
         petType: petType,
         factorType: factorType,

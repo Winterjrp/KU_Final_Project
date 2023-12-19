@@ -14,22 +14,35 @@ class BackGround extends StatelessWidget {
       children: [
         Container(
           alignment: Alignment.bottomRight,
-          color: topColor,
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                topColor,
+                topColor.withOpacity(0.38),
+              ],
+            ),
+          ),
         ),
-        Transform.translate(
-          offset: const Offset(0, 150),
-          child: Transform.scale(
-            scale: 2,
-            child: Container(
-              decoration: BoxDecoration(
-                color: bottomColor,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(500), // Adjust the radius as needed
-                  topRight: Radius.circular(500), // Adjust the radius as needed
+        ClipRect(
+          child: Transform.translate(
+            offset: const Offset(0, 150),
+            child: Transform.scale(
+              scale: 2,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: bottomColor,
+                  borderRadius: const BorderRadius.only(
+                    topLeft:
+                        Radius.circular(500), // Adjust the radius as needed
+                    topRight:
+                        Radius.circular(500), // Adjust the radius as needed
+                  ),
                 ),
+                alignment: Alignment.bottomRight,
+                height: 300,
               ),
-              alignment: Alignment.bottomRight,
-              height: 300,
             ),
           ),
         ),

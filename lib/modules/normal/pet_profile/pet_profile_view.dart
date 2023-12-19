@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
-import 'package:untitled1/constants/pet_activity_enum.dart';
-import 'package:untitled1/constants/pet_age_enum.dart';
+import 'package:untitled1/constants/enum/pet_activity_enum.dart';
+import 'package:untitled1/constants/enum/pet_age_enum.dart';
+import 'package:untitled1/constants/enum/pet_factor_type_enum.dart';
+import 'package:untitled1/constants/enum/pet_neuture_status_enum.dart';
+import 'package:untitled1/constants/pet_physiology_status_list.dart';
 import 'package:untitled1/hive_models/pet_profile_model.dart';
+import 'package:untitled1/manager/navigation_with_animation_manager.dart';
 import 'package:untitled1/models/user_info_model.dart';
 import 'package:untitled1/modules/normal/home/home_view.dart';
 import 'package:untitled1/modules/normal/pet_profile/pet_profile_view_model.dart';
@@ -10,8 +14,8 @@ import 'package:untitled1/modules/normal/select_ingredient/select_ingredient_vie
 import 'package:untitled1/modules/normal/update_pet_profile/update_pet_profile_view.dart';
 import 'package:untitled1/widgets/background.dart';
 import 'package:http/http.dart' as http;
-import 'package:untitled1/widgets/delete_confirm_popup.dart';
-import 'package:untitled1/widgets/success_popup.dart';
+import 'package:untitled1/widgets/popup/delete_confirm_popup.dart';
+import 'package:untitled1/widgets/popup/success_popup.dart';
 
 class PetProfileView extends StatefulWidget {
   final PetProfileModel petProfileInfo;
@@ -43,7 +47,7 @@ class _PetProfileViewState extends State<PetProfileView> {
   late PetProfileViewModel _viewModel;
 
   final double _labelTextSize = 18.5;
-  final double _blockSize = 40;
+  final double _blockSize = 45;
 
   @override
   void initState() {
@@ -72,9 +76,8 @@ class _PetProfileViewState extends State<PetProfileView> {
             widget.isJustUpdate
                 ? Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) =>
-                            HomeView(userInfo: widget.userInfo)),
+                    NavigationBackward(
+                        targetPage: HomeView(userInfo: widget.userInfo)),
                   )
                 : Navigator.of(context).pop();
           },
@@ -84,13 +87,13 @@ class _PetProfileViewState extends State<PetProfileView> {
           "ข้อมูลสัตว์เลี้ยง      ",
           style: TextStyle(color: primary, fontWeight: FontWeight.bold),
         )),
-        backgroundColor: const Color.fromRGBO(194, 190, 241, 0.4),
+        backgroundColor: const Color.fromRGBO(194, 190, 241, 0.8),
       ),
       body: Stack(
         children: [
           const BackGround(
-            topColor: Color.fromRGBO(194, 190, 241, 0.4),
-            bottomColor: Color.fromRGBO(72, 70, 109, 0.1),
+            topColor: Color.fromRGBO(194, 190, 241, 0.8),
+            bottomColor: Color.fromRGBO(72, 70, 109, 0.06),
           ),
           SingleChildScrollView(
             child: _content(context),
@@ -118,42 +121,36 @@ class _PetProfileViewState extends State<PetProfileView> {
           _petTypeField(),
           _petWeightField(),
           _factorTypeField(),
-          _factorType == "factorType"
-              ? const SizedBox()
-              : _factorType == "customize"
-                  ? _factorNumberField()
-                  : Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _neuteredField(),
-                        _petNeuteringStatus == "-1"
-                            ? const SizedBox()
-                            : _petAgeField(),
-                        _petAgeType == "-1"
-                            ? const SizedBox()
-                            : _physiologyStatusField(),
-                        _petPhysiologyStatus == "ป่วยหรือมีโรคประจำตัว"
-                            ? _petChronicDiseaseType()
-                            : const SizedBox(),
-                        (_petPhysiologyStatus == "ป่วยหรือมีโรคประจำตัว" &&
-                                    _petChronicDisease.isNotEmpty) ||
-                                (_petPhysiologyStatus !=
-                                        "ป่วยหรือมีโรคประจำตัว" &&
-                                    _petPhysiologyStatus != "-1")
-                            ? _petActivityLevelField()
-                            : const SizedBox(),
-                      ],
-                    ),
-          (_factorType == "customize" && _petFactorNumber != -1)
-              ? const SizedBox(height: 300)
+          _factorNumberField(),
+          _factorType == PetFactorType.customize.toString().split('.').last
+              ? const SizedBox(height: 80)
+              : Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    _neuteredField(),
+                    _petAgeField(),
+                    _physiologyStatusField(),
+                    _petPhysiologyStatus ==
+                            PetPhysiologyStatusList.petSickStatus
+                        ? _petChronicDiseaseType()
+                        : const SizedBox(),
+                    _petActivityLevelField()
+                  ],
+                ),
+          (_factorType == PetFactorType.customize.toString().split('.').last &&
+                  _petFactorNumber != -1)
+              ? const SizedBox(height: 260)
               : const SizedBox(),
-          const SizedBox(height: 40),
-          (_petPhysiologyStatus == "ป่วยหรือมีโรคประจำตัว" &&
+          const SizedBox(height: 50),
+          (_petPhysiologyStatus == PetPhysiologyStatusList.petSickStatus &&
                   _petChronicDisease.isNotEmpty)
               ? const SizedBox()
-              : const SizedBox(height: 160),
-          (_factorType == "customize" && _petFactorNumber != -1) ||
-                  (_factorType == "recommend" && _petActivityType != "-1")
+              : const SizedBox(height: 100),
+          (_factorType == PetFactorType.customize.toString().split('.').last &&
+                      _petFactorNumber != -1) ||
+                  (_factorType ==
+                          PetFactorType.recommend.toString().split('.').last &&
+                      _petActivityType != "-1")
               ? _searchFoodRecipeButton(context)
               : const SizedBox(),
           const SizedBox(height: 40),
@@ -172,8 +169,35 @@ class _PetProfileViewState extends State<PetProfileView> {
     );
   }
 
-  Future<http.Response> onUserDeletePetProfile({required String petId}) async {
-    return _viewModel.onUserDeletePetProfile(petID: petId);
+  Future<http.Response> onUserDeletePetProfileCallback() async {
+    return _viewModel.onUserDeletePetProfile(
+        petID: widget.petProfileInfo.petId);
+  }
+
+  Future<void> _handleDeletePetProfile() async {
+    Navigator.pop(context);
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return const Center(child: CircularProgressIndicator());
+        });
+    try {
+      await onUserDeletePetProfileCallback();
+      if (!context.mounted) return;
+      Navigator.pop(context);
+      Future.delayed(const Duration(milliseconds: 1800), () {
+        Navigator.of(context).popUntil((route) => route.isFirst);
+        Navigator.pushReplacement(
+            context,
+            NavigationBackward(
+                targetPage: HomeView(userInfo: widget.userInfo)));
+      });
+      SuccessPopup(context: context, successText: 'ลบข้อมูลสัตว์เลี้ยงสำเร็จ!!')
+          .show();
+    } catch (e) {
+      print(e);
+    }
   }
 
   Widget _deletePetProfileButton() {
@@ -185,50 +209,7 @@ class _PetProfileViewState extends State<PetProfileView> {
               context: context,
               cancelText: "ยืนยันการลบข้อมูลสัตว์เลี้ยง",
               callback: () {
-                Navigator.of(context).pop();
-                showDialog(
-                    barrierDismissible: false,
-                    context: context,
-                    builder: (context) {
-                      onUserDeletePetProfile(
-                          petId: widget.petProfileInfo.petID);
-                      return FutureBuilder<http.Response>(
-                        future: onUserDeletePetProfile(
-                            petId: widget.petProfileInfo.petID),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          } else if (snapshot.hasError) {
-                            return Center(
-                              child: Text('Error: ${snapshot.error}'),
-                            );
-                          } else {
-                            Future.delayed(const Duration(milliseconds: 1800),
-                                () {
-                              Navigator.of(context)
-                                  .popUntil((route) => route.isFirst);
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) =>
-                                        HomeView(userInfo: widget.userInfo)),
-                              );
-                            });
-                            WidgetsBinding.instance.addPostFrameCallback((_) {
-                              SuccessPopup(
-                                      context: context,
-                                      successText:
-                                          'ลบข้อมูลสัตว์เลี้ยงสำเร็จ!!')
-                                  .show();
-                            });
-                            return const SizedBox();
-                          }
-                        },
-                      );
-                    });
+                _handleDeletePetProfile();
               }).show();
         },
         style: ElevatedButton.styleFrom(
@@ -256,14 +237,13 @@ class _PetProfileViewState extends State<PetProfileView> {
       child: ElevatedButton(
         onPressed: () async {
           Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => UpdatePetProfileView(
-                      userInfo: widget.userInfo,
-                      isCreate: false,
-                      petProfileInfo: widget.petProfileInfo,
-                    )),
-          );
+              context,
+              NavigationForward(
+                  targetPage: UpdatePetProfileView(
+                userInfo: widget.userInfo,
+                isCreate: false,
+                petProfileInfo: widget.petProfileInfo,
+              )));
         },
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -289,11 +269,8 @@ class _PetProfileViewState extends State<PetProfileView> {
       height: 55,
       child: ElevatedButton(
         onPressed: () async {
-          Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const SelectIngredientView(),
-              ));
+          Navigator.push(context,
+              NavigationForward(targetPage: const SelectIngredientView()));
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: primary,
@@ -359,7 +336,7 @@ class _PetProfileViewState extends State<PetProfileView> {
                 fontSize: _labelTextSize, fontWeight: FontWeight.bold),
           ),
           Text(
-            getPetAgeTypeName(petAgeType: _petAgeType),
+            PetAgeTypeEnum().getPetAgeTypeName(petAgeType: _petAgeType),
             style: TextStyle(fontSize: _labelTextSize),
           )
         ],
@@ -379,39 +356,12 @@ class _PetProfileViewState extends State<PetProfileView> {
                 fontSize: _labelTextSize, fontWeight: FontWeight.bold),
           ),
           Text(
-            _petNeuteringStatus,
+            PetNeuterStatusEnum()
+                .getPetNeuterStatusName(petNeuterStatus: _petNeuteringStatus),
             style: TextStyle(fontSize: _labelTextSize),
           )
         ],
       ),
-    );
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text("การทำหมัน", style: TextStyle(fontSize: _labelTextSize)),
-        RadioListTile(
-          title: const Text("ทำหมัน"),
-          groupValue: _petNeuteringStatus,
-          onChanged: (value) {
-            setState(() {
-              _petNeuteringStatus = value!;
-            });
-          },
-          activeColor: Colors.black,
-          value: "neutered",
-        ),
-        RadioListTile(
-          title: const Text("ไม่ทำหมัน"),
-          groupValue: _petNeuteringStatus,
-          onChanged: (value) {
-            setState(() {
-              _petNeuteringStatus = value!;
-            });
-          },
-          activeColor: Colors.black,
-          value: "unneutered",
-        ),
-      ],
     );
   }
 
@@ -427,7 +377,7 @@ class _PetProfileViewState extends State<PetProfileView> {
                 fontSize: _labelTextSize, fontWeight: FontWeight.bold),
           ),
           Text(
-            " - ${getActivityLevelName(_petActivityType)}",
+            " - ${PetActivityLevelEnum().getActivityLevelName(_petActivityType)}",
             style: TextStyle(fontSize: _labelTextSize),
           )
         ],
@@ -487,41 +437,11 @@ class _PetProfileViewState extends State<PetProfileView> {
                 fontSize: _labelTextSize, fontWeight: FontWeight.bold),
           ),
           Text(
-            _factorType,
+            "แบบ${PetFactorTypeEnum().getPetFactorTypeName(petFactorType: _factorType)}",
             style: TextStyle(fontSize: _labelTextSize),
           )
         ],
       ),
-    );
-    Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text("เลือกใช้ factor", style: TextStyle(fontSize: _labelTextSize)),
-        RadioListTile(
-          selected: _factorType == "recommend" ? true : false,
-          title: const Text("ระบบแนะนำ"),
-          groupValue: _factorType,
-          onChanged: (value) {
-            setState(() {
-              _factorType = value!;
-            });
-          },
-          activeColor: Colors.black,
-          value: "recommend",
-        ),
-        RadioListTile(
-          selected: true,
-          title: const Text("กำหนดเอง (สำหรับผู้เชี่ยวชาญ)"),
-          groupValue: _factorType,
-          onChanged: (value) {
-            setState(() {
-              _factorType = value!;
-            });
-          },
-          activeColor: Colors.black,
-          value: "customize",
-        ),
-      ],
     );
   }
 

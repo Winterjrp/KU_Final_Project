@@ -4,7 +4,7 @@ part 'pet_profile_model.g.dart';
 @HiveType(typeId: 0)
 class PetProfileModel {
   @HiveField(0)
-  String petID;
+  String petId;
 
   @HiveField(1)
   String petName;
@@ -40,7 +40,7 @@ class PetProfileModel {
   String updateRecent;
 
   PetProfileModel({
-    required this.petID,
+    required this.petId,
     required this.petName,
     required this.petType,
     required this.factorType,
@@ -56,7 +56,7 @@ class PetProfileModel {
 
   factory PetProfileModel.fromJson(Map<String, dynamic> json) =>
       PetProfileModel(
-        petID: json["petID"],
+        petId: json["petID"],
         petName: json["petName"],
         petType: json["petType"],
         factorType: json["factorType"],
@@ -72,7 +72,7 @@ class PetProfileModel {
       );
 
   Map<String, dynamic> toJson() => {
-        "petID": petID,
+        "petID": petId,
         "petName": petName,
         "petType": petType,
         "factorType": factorType,

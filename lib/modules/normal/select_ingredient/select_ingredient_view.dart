@@ -85,8 +85,6 @@ class _SelectIngredientViewState extends State<SelectIngredientView> {
                 children: [
                   const SizedBox(height: 20),
                   _selectedIngredientPart(),
-                  const SizedBox(height: 40),
-                  _nonSelectedIngredientPart(),
                   const SizedBox(height: 20),
                   Row(
                     children: [
@@ -125,7 +123,7 @@ class _SelectIngredientViewState extends State<SelectIngredientView> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 350),
+                  const SizedBox(height: 480),
                   Center(
                     child: SizedBox(
                       width: 450,
@@ -158,73 +156,73 @@ class _SelectIngredientViewState extends State<SelectIngredientView> {
     );
   }
 
-  Column _nonSelectedIngredientPart() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text("เลือกวัตถุดิบที่ไม่ต้องการ",
-            style: TextStyle(
-                fontSize: _headerTextSize, fontWeight: FontWeight.bold)),
-        const SizedBox(height: 10),
-        DropdownSearch<String>.multiSelection(
-          popupProps: PopupPropsMultiSelection.menu(
-            showSearchBox: true,
-            showSelectedItems: true,
-            searchFieldProps: TextFieldProps(
-                decoration: InputDecoration(
-              suffixIcon: const Icon(Icons.search),
-              labelText: "ค้นหาวัตถุดิบ",
-              labelStyle: const TextStyle(fontSize: 16, height: 1),
-              contentPadding: const EdgeInsets.only(left: 15),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide: BorderSide(color: tGrey),
-              ),
-            )),
-          ),
-          dropdownDecoratorProps: DropDownDecoratorProps(
-              dropdownSearchDecoration: InputDecoration(
-            fillColor: Colors.white,
-            filled: true,
-            hintText: "วัตถุดิบที่ไม่ต้องการ",
-            hintStyle: TextStyle(fontSize: _labelTextSize, height: 1),
-            contentPadding:
-                const EdgeInsets.only(left: 15, top: 20, bottom: 20, right: 15),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(color: tGrey),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(color: tGrey),
-            ),
-          )),
-          items: _nonSelectedIngredientList,
-          onChanged: (value) {
-            setState(() {
-              _nonSelectedIngredient = value;
-              _selectedIngredientListSet = Set.from(_selectedIngredientList);
-              _nonSelectedIngredientSet = Set.from(_nonSelectedIngredient);
-              _selectedIngredientList = (_selectedIngredientListSet
-                      .difference(_nonSelectedIngredientSet))
-                  .toList();
-            });
-            // _controller.animateTo(
-            //   1000.0,
-            //   duration: const Duration(seconds: 1),
-            //   curve: Curves.ease,
-            // );
-          },
-        ),
-      ],
-    );
-  }
+  // Column _nonSelectedIngredientPart() {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       Text("เลือกวัตถุดิบที่ไม่ต้องการ",
+  //           style: TextStyle(
+  //               fontSize: _headerTextSize, fontWeight: FontWeight.bold)),
+  //       const SizedBox(height: 10),
+  //       DropdownSearch<String>.multiSelection(
+  //         popupProps: PopupPropsMultiSelection.menu(
+  //           showSearchBox: true,
+  //           showSelectedItems: true,
+  //           searchFieldProps: TextFieldProps(
+  //               decoration: InputDecoration(
+  //             suffixIcon: const Icon(Icons.search),
+  //             labelText: "ค้นหาวัตถุดิบ",
+  //             labelStyle: const TextStyle(fontSize: 16, height: 1),
+  //             contentPadding: const EdgeInsets.only(left: 15),
+  //             enabledBorder: OutlineInputBorder(
+  //               borderRadius: BorderRadius.circular(10.0),
+  //               borderSide: BorderSide(color: tGrey),
+  //             ),
+  //           )),
+  //         ),
+  //         dropdownDecoratorProps: DropDownDecoratorProps(
+  //             dropdownSearchDecoration: InputDecoration(
+  //           fillColor: Colors.white,
+  //           filled: true,
+  //           hintText: "วัตถุดิบที่ไม่ต้องการ",
+  //           hintStyle: TextStyle(fontSize: _labelTextSize, height: 1),
+  //           contentPadding:
+  //               const EdgeInsets.only(left: 15, top: 20, bottom: 20, right: 15),
+  //           enabledBorder: OutlineInputBorder(
+  //             borderRadius: BorderRadius.circular(10.0),
+  //             borderSide: BorderSide(color: tGrey),
+  //           ),
+  //           focusedBorder: OutlineInputBorder(
+  //             borderRadius: BorderRadius.circular(10.0),
+  //             borderSide: BorderSide(color: tGrey),
+  //           ),
+  //         )),
+  //         items: _nonSelectedIngredientList,
+  //         onChanged: (value) {
+  //           setState(() {
+  //             _nonSelectedIngredient = value;
+  //             _selectedIngredientListSet = Set.from(_selectedIngredientList);
+  //             _nonSelectedIngredientSet = Set.from(_nonSelectedIngredient);
+  //             _selectedIngredientList = (_selectedIngredientListSet
+  //                     .difference(_nonSelectedIngredientSet))
+  //                 .toList();
+  //           });
+  //           // _controller.animateTo(
+  //           //   1000.0,
+  //           //   duration: const Duration(seconds: 1),
+  //           //   curve: Curves.ease,
+  //           // );
+  //         },
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Column _selectedIngredientPart() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("เลือกวัตถุดิบที่ต้องการ",
+        Text("เลือกวัตถุดิบที่ต้องการในสูตรอาหาร",
             style: TextStyle(
                 fontSize: _headerTextSize, fontWeight: FontWeight.bold)),
         const SizedBox(height: 10),

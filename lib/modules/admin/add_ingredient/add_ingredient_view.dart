@@ -5,7 +5,7 @@ import 'package:untitled1/modules/admin/add_ingredient/add_ingredient_view_model
 import 'package:untitled1/modules/admin/add_ingredient/widgets/add_ingredient_cancel_popup.dart';
 import 'package:untitled1/modules/admin/add_ingredient/widgets/add_ingredient_confirm_popup.dart';
 import 'package:untitled1/modules/admin/add_ingredient/widgets/add_ingredient_table_cell.dart';
-import 'package:untitled1/widgets/cancel_popup.dart';
+import 'package:untitled1/widgets/popup/cancel_popup.dart';
 
 class AddIngredientView extends StatefulWidget {
   const AddIngredientView({required this.userInfo, Key? key}) : super(key: key);

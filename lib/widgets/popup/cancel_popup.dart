@@ -1,18 +1,12 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
-import '../constants/color.dart';
+import '../../constants/color.dart';
 
-typedef CallbackFunction = void Function();
-
-class AddConfirmPopup {
+class CancelPopup {
   final BuildContext context;
-  final String confirmText;
-  final CallbackFunction callback;
+  final String cancelText;
 
-  AddConfirmPopup(
-      {required this.context,
-      required this.confirmText,
-      required this.callback});
+  CancelPopup({required this.context, required this.cancelText});
 
   void show() {
     AwesomeDialog(
@@ -26,7 +20,7 @@ class AddConfirmPopup {
         height: 60,
         child: Center(
             child: Text(
-          confirmText,
+          cancelText,
           style: const TextStyle(fontSize: 18),
         )),
       ),
@@ -52,7 +46,8 @@ class AddConfirmPopup {
           height: 40,
           child: ElevatedButton(
             onPressed: () async {
-              callback();
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: primary,

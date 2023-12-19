@@ -26,7 +26,7 @@ class AddPetProfileMockService implements AddPetProfileServiceInterface {
   Future<http.Response> updatePetInfo(
       {required PetProfileModel petInfo}) async {
     Box petInfoListBox = Hive.box<PetProfileModel>('petProfileListBox');
-    petInfoListBox.put(petInfo.petID, petInfo);
+    petInfoListBox.put(petInfo.petId, petInfo);
     final response = await http.post(
         Uri.parse('https://jsonplaceholder.typicode.com/albums'),
         headers: <String, String>{

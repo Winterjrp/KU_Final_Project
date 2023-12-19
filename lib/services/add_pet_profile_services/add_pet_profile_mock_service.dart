@@ -10,7 +10,7 @@ class AddPetProfileMockService implements AddPetProfileServiceInterface {
     await Future.delayed(const Duration(milliseconds: 2000), () {});
     http.Response mockResponse = http.Response('{"name": "Mock Data"}', 200);
     Box petProfileListBox = Hive.box<PetProfileModel>('petProfileListBox');
-    await petProfileListBox.put(petProfile.petID, petProfile);
+    await petProfileListBox.put(petProfile.petId, petProfile);
     return mockResponse;
   }
 
@@ -20,7 +20,7 @@ class AddPetProfileMockService implements AddPetProfileServiceInterface {
     await Future.delayed(const Duration(milliseconds: 2000), () {});
     http.Response mockResponse = http.Response('{"name": "Mock Data"}', 200);
     Box petInfoListBox = Hive.box<PetProfileModel>('petProfileListBox');
-    await petInfoListBox.put(petInfo.petID, petInfo);
+    await petInfoListBox.put(petInfo.petId, petInfo);
     return mockResponse;
   }
 }
