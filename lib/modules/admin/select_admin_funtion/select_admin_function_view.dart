@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/models/user_info_model.dart';
 import 'package:untitled1/modules/admin/add_recipes/add_recipe_view.dart';
+import 'package:untitled1/modules/admin/admin_drawer.dart';
 import 'package:untitled1/modules/admin/ingredient_management/ingredient_management_view.dart';
 import 'package:untitled1/modules/admin/pet_type_info_management/pet_type_info_management_view.dart';
 import 'package:untitled1/modules/admin/recipes_management/recipes_management_view.dart';
@@ -17,9 +18,12 @@ class SelectAdminFunctionView extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        drawer: const AdminDrawer(),
         appBar: AppBar(
-          title: const Center(child: Text("ฟังก์ชันสำหรับผู้ดูแลระบบ")),
-          backgroundColor: primary,
+          elevation: 0,
+          // title: const Center(child: Text("ฟังก์ชันสำหรับผู้ดูแลระบบ")),
+          iconTheme: const IconThemeData(color: Colors.black),
+          backgroundColor: Colors.white,
         ),
         bottomNavigationBar: ProjectNavigationBar(index: 2, userInfo: userInfo),
         body: Padding(

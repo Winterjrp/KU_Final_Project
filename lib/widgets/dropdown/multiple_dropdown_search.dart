@@ -9,17 +9,21 @@ class CustomMultipleDropdownSearch extends StatelessWidget {
   final bool isCreate;
   final List<String> value;
   final List<String> choiceItemList;
+  final double labelTextSize;
+  final String hintText;
+  final String searchText;
   final UpdateValueCallbackFunction updateValueCallback;
   final GlobalKey<DropdownSearchState<String>> dropdownKey;
-  final ScrollController scrollController;
   const CustomMultipleDropdownSearch(
       {required this.primaryColor,
       required this.isCreate,
       required this.value,
       required this.choiceItemList,
+      required this.labelTextSize,
+      required this.searchText,
+      required this.hintText,
       required this.updateValueCallback,
       required this.dropdownKey,
-      required this.scrollController,
       Key? key})
       : super(key: key);
 
@@ -80,7 +84,7 @@ class CustomMultipleDropdownSearch extends StatelessWidget {
           filled: true,
           fillColor: Colors.white,
           suffixIcon: Icon(Icons.search, color: primaryColor),
-          labelText: "ค้นหาโรคประจำตัว",
+          labelText: searchText,
           labelStyle: const TextStyle(fontSize: 16, height: 1),
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
@@ -102,6 +106,8 @@ class CustomMultipleDropdownSearch extends StatelessWidget {
       },
       dropdownDecoratorProps: DropDownDecoratorProps(
           dropdownSearchDecoration: InputDecoration(
+        hintText: hintText,
+        hintStyle: TextStyle(fontSize: labelTextSize),
         floatingLabelStyle: const TextStyle(
           color: Colors.black,
           fontSize: 22,
@@ -123,11 +129,6 @@ class CustomMultipleDropdownSearch extends StatelessWidget {
       items: choiceItemList,
       onChanged: (val) {
         updateValueCallback(value: val);
-        scrollController.animateTo(
-          1000.0,
-          duration: const Duration(seconds: 1),
-          curve: Curves.ease,
-        );
       },
     );
   }
@@ -151,8 +152,7 @@ class CustomMultipleDropdownSearch extends StatelessWidget {
         return Container(
             margin: const EdgeInsets.only(right: 8, top: 5, bottom: 5),
             decoration: BoxDecoration(
-                color: const Color.fromRGBO(202, 102, 108, 1),
-                borderRadius: BorderRadius.circular(10)),
+                color: primaryColor, borderRadius: BorderRadius.circular(10)),
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
             child: IntrinsicWidth(
               child: Row(

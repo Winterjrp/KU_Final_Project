@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:untitled1/constants/color.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:untitled1/constants/enum/pet_activity_enum.dart';
-import 'package:untitled1/constants/enum/pet_age_enum.dart';
+import 'package:untitled1/constants/enum/pet_age_type_enum.dart';
 import 'package:untitled1/constants/enum/pet_factor_type_enum.dart';
 import 'package:untitled1/constants/enum/pet_neuture_status_enum.dart';
 import 'package:untitled1/constants/pet_physiology_status_list.dart';
@@ -156,7 +156,7 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
             widget.isCreate
                 ? "เพิ่มข้อมูลสัตว์เลี้ยง    "
                 : "แก้ไขข้อมูลสัตว์เลี้ยง    ",
-            style: TextStyle(color: red),
+            style: TextStyle(color: red, fontWeight: FontWeight.bold),
           )),
           backgroundColor: const Color.fromRGBO(222, 150, 154, 0.6),
           elevation: 0,
@@ -232,6 +232,19 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
   }
 
   Future<http.Response> onUserAddPetProfileCallback() async {
+    _petFactorNumber =
+        _factorType == PetFactorType.customize.toString().split('.').last
+            ? _petFactorNumber
+            : _viewModel.calculatePetFactorNumber(
+                petID: _petID,
+                petName: _petName,
+                petType: _petType,
+                petWeight: _petWeight,
+                petNeuteringStatus: _petNeuteringStatus,
+                petAgeType: _petAgeType,
+                petPhysiologyStatus: _petPhysiologyStatus,
+                petChronicDisease: _petChronicDisease,
+                petActivityType: _petActivityType);
     return await _viewModel.onUserAddPetProfile(
         petID: _petID,
         petName: _petName,
@@ -247,6 +260,19 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
   }
 
   Future<http.Response> onUserEditPetProfileCallback() async {
+    _petFactorNumber =
+        _factorType == PetFactorType.customize.toString().split('.').last
+            ? _petFactorNumber
+            : _viewModel.calculatePetFactorNumber(
+                petID: _petID,
+                petName: _petName,
+                petType: _petType,
+                petWeight: _petWeight,
+                petNeuteringStatus: _petNeuteringStatus,
+                petAgeType: _petAgeType,
+                petPhysiologyStatus: _petPhysiologyStatus,
+                petChronicDisease: _petChronicDisease,
+                petActivityType: _petActivityType);
     return await _viewModel.onUserEditPetProfile(
         petID: _petID,
         petName: _petName,
@@ -345,6 +371,19 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
                       context: context,
                       confirmText: 'ยืนยันการเพิ่มข้อมูลสัตว์เลี้ยง?',
                       callback: () {
+                        _petFactorNumber = _factorType ==
+                                PetFactorTypeEnum.petFactorTypeChoice1
+                            ? _petFactorNumber
+                            : _viewModel.calculatePetFactorNumber(
+                                petID: _petID,
+                                petName: _petName,
+                                petType: _petType,
+                                petWeight: _petWeight,
+                                petNeuteringStatus: _petNeuteringStatus,
+                                petAgeType: _petAgeType,
+                                petPhysiologyStatus: _petPhysiologyStatus,
+                                petChronicDisease: _petChronicDisease,
+                                petActivityType: _petActivityType);
                         _handleAddPetProfile();
                       }).show()
                   : AddConfirmPopup(
@@ -383,9 +422,16 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
             updateValueCallback: ({required List<String> value}) {
               _petChronicDisease = value;
               setState(() {});
+              _scrollController.animateTo(
+                700,
+                duration: const Duration(seconds: 1),
+                curve: Curves.ease,
+              );
             },
             dropdownKey: _petChronicDiseaseKey,
-            scrollController: _scrollController,
+            labelTextSize: _labelTextSize,
+            searchText: 'ค้นหาโรคประจำตัวสัตว์เลี้ยง',
+            hintText: 'เลือกโรคประจำตัวสัตว์เลี้ยง',
           )
         ],
       ),
@@ -421,7 +467,7 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("อายุ", style: TextStyle(fontSize: _labelTextSize)),
+        _headerText(text: "อายุ"),
         RadioListTile(
           title: Text(PetAgeTypeEnum.petAgeChoice1,
               style: TextStyle(fontSize: _choiceTextSize)),
@@ -431,12 +477,12 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
               _petAgeType = value!;
             });
             _scrollController.animateTo(
-              1000.0,
+              500,
               duration: const Duration(seconds: 1),
               curve: Curves.ease,
             );
           },
-          activeColor: Colors.black,
+          activeColor: red,
           value: PetAgeTypeEnum()
               .getPetAgeType(description: PetAgeTypeEnum.petAgeChoice1),
         ),
@@ -449,12 +495,12 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
               _petAgeType = value!;
             });
             _scrollController.animateTo(
-              1000.0,
+              500,
               duration: const Duration(seconds: 1),
               curve: Curves.ease,
             );
           },
-          activeColor: Colors.black,
+          activeColor: red,
           value: PetAgeTypeEnum()
               .getPetAgeType(description: PetAgeTypeEnum.petAgeChoice2),
         ),
@@ -467,12 +513,12 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
                 _petAgeType = value!;
               });
               _scrollController.animateTo(
-                1000.0,
+                500,
                 duration: const Duration(seconds: 1),
                 curve: Curves.ease,
               );
             },
-            activeColor: Colors.black,
+            activeColor: red,
             value: PetAgeTypeEnum()
                 .getPetAgeType(description: PetAgeTypeEnum.petAgeChoice3)),
       ],
@@ -483,7 +529,7 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("การทำหมัน", style: TextStyle(fontSize: _labelTextSize)),
+        _headerText(text: "การทำหมัน"),
         RadioListTile(
           title: Text(PetNeuterStatusEnum.neuterStatusChoice1,
               style: TextStyle(fontSize: _choiceTextSize)),
@@ -493,12 +539,12 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
               _petNeuteringStatus = value!;
             });
             _scrollController.animateTo(
-              1000.0,
+              300,
               duration: const Duration(seconds: 1),
               curve: Curves.ease,
             );
           },
-          activeColor: Colors.black,
+          activeColor: red,
           value: PetNeuterStatusEnum().getPetNeuterStatus(
               description: PetNeuterStatusEnum.neuterStatusChoice1),
         ),
@@ -511,12 +557,12 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
               _petNeuteringStatus = value!;
             });
             _scrollController.animateTo(
-              1000.0,
+              300,
               duration: const Duration(seconds: 1),
               curve: Curves.ease,
             );
           },
-          activeColor: Colors.black,
+          activeColor: red,
           value: PetNeuterStatusEnum().getPetNeuterStatus(
               description: PetNeuterStatusEnum.neuterStatusChoice2),
         ),
@@ -528,7 +574,7 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("กิจกรรมต่อวัน", style: TextStyle(fontSize: _labelTextSize)),
+        _headerText(text: "กิจกรรมต่อวัน"),
         RadioListTile(
             title: const Text(PetActivityLevelEnum.activityLevelChoice1),
             groupValue: _petActivityType,
@@ -537,12 +583,12 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
                 _petActivityType = value!;
               });
               _scrollController.animateTo(
-                1000.0,
+                900,
                 duration: const Duration(seconds: 1),
                 curve: Curves.ease,
               );
             },
-            activeColor: Colors.black,
+            activeColor: red,
             value: PetActivityLevelEnum()
                 .getActivityLevel(PetActivityLevelEnum.activityLevelChoice1)),
         RadioListTile(
@@ -553,12 +599,12 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
                 _petActivityType = value!;
               });
               _scrollController.animateTo(
-                1000.0,
+                900,
                 duration: const Duration(seconds: 1),
                 curve: Curves.ease,
               );
             },
-            activeColor: Colors.black,
+            activeColor: red,
             value: PetActivityLevelEnum()
                 .getActivityLevel(PetActivityLevelEnum.activityLevelChoice2)),
         RadioListTile(
@@ -569,12 +615,12 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
                 _petActivityType = value!;
               });
               _scrollController.animateTo(
-                1000.0,
+                900,
                 duration: const Duration(seconds: 1),
                 curve: Curves.ease,
               );
             },
-            activeColor: Colors.black,
+            activeColor: red,
             value: PetActivityLevelEnum()
                 .getActivityLevel(PetActivityLevelEnum.activityLevelChoice3)),
       ],
@@ -642,7 +688,9 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
   }
 
   Text _headerText({required String text}) {
-    return Text(text, style: TextStyle(fontSize: _labelTextSize));
+    return Text(text,
+        style:
+            TextStyle(fontSize: _labelTextSize, fontWeight: FontWeight.bold));
   }
 
   Widget _petFactorNumberField() {
@@ -707,7 +755,7 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("เลือกใช้ factor", style: TextStyle(fontSize: _labelTextSize)),
+        _headerText(text: "เลือกใช้ factor"),
         RadioListTile(
           title: Text("${PetFactorTypeEnum.petFactorTypeChoice2} (แนะนำ)",
               style: TextStyle(fontSize: _choiceTextSize)),
@@ -716,8 +764,13 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
             setState(() {
               _factorType = value!;
             });
+            _scrollController.animateTo(
+              100,
+              duration: const Duration(milliseconds: 800),
+              curve: Curves.ease,
+            );
           },
-          activeColor: Colors.black,
+          activeColor: red,
           value: PetFactorTypeEnum().getPetFactorType(
               description: PetFactorTypeEnum.petFactorTypeChoice2),
         ),
@@ -731,7 +784,7 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
               _factorType = value!;
             });
           },
-          activeColor: Colors.black,
+          activeColor: red,
           value: PetFactorTypeEnum().getPetFactorType(
               description: PetFactorTypeEnum.petFactorTypeChoice1),
         ),

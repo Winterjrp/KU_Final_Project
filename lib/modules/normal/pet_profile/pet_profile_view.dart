@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/constants/enum/pet_activity_enum.dart';
-import 'package:untitled1/constants/enum/pet_age_enum.dart';
+import 'package:untitled1/constants/enum/pet_age_type_enum.dart';
 import 'package:untitled1/constants/enum/pet_factor_type_enum.dart';
 import 'package:untitled1/constants/enum/pet_neuture_status_enum.dart';
 import 'package:untitled1/constants/pet_physiology_status_list.dart';

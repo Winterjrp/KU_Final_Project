@@ -20,7 +20,7 @@ class BackGround extends StatelessWidget {
               end: Alignment.bottomCenter,
               colors: [
                 topColor,
-                topColor.withOpacity(0.38),
+                topColor.withOpacity(0.35),
               ],
             ),
           ),

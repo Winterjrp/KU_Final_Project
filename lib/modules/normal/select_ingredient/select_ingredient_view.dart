@@ -1,7 +1,10 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
+import 'package:untitled1/constants/enum/select_ingredient_type_enum.dart';
+import 'package:untitled1/modules/normal/select_ingredient/select_ingredient_view_model.dart';
 import 'package:untitled1/widgets/background.dart';
+import 'package:untitled1/widgets/dropdown/multiple_dropdown_search.dart';
 
 class SelectIngredientView extends StatefulWidget {
   const SelectIngredientView({Key? key}) : super(key: key);
@@ -12,24 +15,24 @@ class SelectIngredientView extends StatefulWidget {
 
 class _SelectIngredientViewState extends State<SelectIngredientView> {
   late List<String> _ingredientList;
-  late List<String> _selectedIngredient;
-  late List<String> _nonSelectedIngredient;
-  late List<String> _selectedIngredientList;
-  late List<String> _nonSelectedIngredientList;
-  late Set<String> _selectedIngredientSet;
-  late Set<String> _nonSelectedIngredientSet;
-  late Set<String> _selectedIngredientListSet;
-  late Set<String> _nonSelectedIngredientListSet;
-  late bool _isACheck;
-  late bool _isBCheck;
+  late SelectIngredientViewModel _viewModel;
+  late String _selectIngredientType;
+  // late List<String> _selectedIngredientList;
+  // late List<String> _nonSelectedIngredientList;
+  // late Set<String> _selectedIngredientSet;
+  // late Set<String> _nonSelectedIngredientListSet;
   final double _labelTextSize = 18;
   final double _headerTextSize = 20;
+  final double _choiceTextSize = 17.5;
+  final Color _primaryColor = primary;
+  final GlobalKey<DropdownSearchState<String>> _selectIngredientKey =
+      GlobalKey<DropdownSearchState<String>>();
+
   @override
   void initState() {
     super.initState();
-    // _viewModel = AddPetInfoViewModel();
-    _isACheck = false;
-    _isBCheck = false;
+    _viewModel = SelectIngredientViewModel();
+    _selectIngredientType = "";
     _ingredientList = [
       "เนื้อไก่",
       "เนื้อหมู",
@@ -41,10 +44,8 @@ class _SelectIngredientViewState extends State<SelectIngredientView> {
       "มะเขือเทศ",
       "เนื้อปลา"
     ];
-    _selectedIngredient = [];
-    _nonSelectedIngredient = [];
-    _selectedIngredientList = _ingredientList;
-    _nonSelectedIngredientList = _ingredientList;
+    // _selectedIngredientList = _ingredientList;
+    // _nonSelectedIngredientList = _ingredientList;
   }
 
   @override
@@ -83,70 +84,13 @@ class _SelectIngredientViewState extends State<SelectIngredientView> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 10),
                   _selectedIngredientPart(),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: [
-                      Row(
-                        children: [
-                          Checkbox(
-                              activeColor: primary,
-                              value: _isACheck,
-                              onChanged: (bool? value) {
-                                setState(() {});
-                                _isACheck = value!;
-                                _isBCheck = false;
-                              }),
-                          const Text(
-                            "A",
-                            style: TextStyle(fontSize: 18),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(width: 20),
-                      Row(
-                        children: [
-                          Checkbox(
-                              activeColor: primary,
-                              value: _isBCheck,
-                              onChanged: (bool? value) {
-                                setState(() {});
-                                _isBCheck = value!;
-                                _isACheck = false;
-                              }),
-                          const Text(
-                            "B",
-                            style: TextStyle(fontSize: 18),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 480),
-                  Center(
-                    child: SizedBox(
-                      width: 450,
-                      height: 55,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          // Navigator.push(
-                          //     context,
-                          //     MaterialPageRoute(
-                          //       builder: (context) => SelectIngredientView(),
-                          //     ));
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: primary,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
-                        child: const Text('ค้นหาสูตรอาหาร',
-                            style: TextStyle(fontSize: 17)),
-                      ),
-                    ),
-                  ),
+                  const SizedBox(height: 30),
+                  _selectIngredientTypePart(),
+                  const SizedBox(height: 290),
+                  _searchFoodRecipesButton(),
+                  const SizedBox(height: 30),
                 ],
               ),
             ),
@@ -156,126 +100,89 @@ class _SelectIngredientViewState extends State<SelectIngredientView> {
     );
   }
 
-  // Column _nonSelectedIngredientPart() {
-  //   return Column(
-  //     crossAxisAlignment: CrossAxisAlignment.start,
-  //     children: [
-  //       Text("เลือกวัตถุดิบที่ไม่ต้องการ",
-  //           style: TextStyle(
-  //               fontSize: _headerTextSize, fontWeight: FontWeight.bold)),
-  //       const SizedBox(height: 10),
-  //       DropdownSearch<String>.multiSelection(
-  //         popupProps: PopupPropsMultiSelection.menu(
-  //           showSearchBox: true,
-  //           showSelectedItems: true,
-  //           searchFieldProps: TextFieldProps(
-  //               decoration: InputDecoration(
-  //             suffixIcon: const Icon(Icons.search),
-  //             labelText: "ค้นหาวัตถุดิบ",
-  //             labelStyle: const TextStyle(fontSize: 16, height: 1),
-  //             contentPadding: const EdgeInsets.only(left: 15),
-  //             enabledBorder: OutlineInputBorder(
-  //               borderRadius: BorderRadius.circular(10.0),
-  //               borderSide: BorderSide(color: tGrey),
-  //             ),
-  //           )),
-  //         ),
-  //         dropdownDecoratorProps: DropDownDecoratorProps(
-  //             dropdownSearchDecoration: InputDecoration(
-  //           fillColor: Colors.white,
-  //           filled: true,
-  //           hintText: "วัตถุดิบที่ไม่ต้องการ",
-  //           hintStyle: TextStyle(fontSize: _labelTextSize, height: 1),
-  //           contentPadding:
-  //               const EdgeInsets.only(left: 15, top: 20, bottom: 20, right: 15),
-  //           enabledBorder: OutlineInputBorder(
-  //             borderRadius: BorderRadius.circular(10.0),
-  //             borderSide: BorderSide(color: tGrey),
-  //           ),
-  //           focusedBorder: OutlineInputBorder(
-  //             borderRadius: BorderRadius.circular(10.0),
-  //             borderSide: BorderSide(color: tGrey),
-  //           ),
-  //         )),
-  //         items: _nonSelectedIngredientList,
-  //         onChanged: (value) {
-  //           setState(() {
-  //             _nonSelectedIngredient = value;
-  //             _selectedIngredientListSet = Set.from(_selectedIngredientList);
-  //             _nonSelectedIngredientSet = Set.from(_nonSelectedIngredient);
-  //             _selectedIngredientList = (_selectedIngredientListSet
-  //                     .difference(_nonSelectedIngredientSet))
-  //                 .toList();
-  //           });
-  //           // _controller.animateTo(
-  //           //   1000.0,
-  //           //   duration: const Duration(seconds: 1),
-  //           //   curve: Curves.ease,
-  //           // );
-  //         },
-  //       ),
-  //     ],
-  //   );
-  // }
+  Center _searchFoodRecipesButton() {
+    return Center(
+      child: SizedBox(
+        width: 450,
+        height: 55,
+        child: ElevatedButton(
+          onPressed: () async {
+            _selectIngredientType == "" ? null : print("dpfgk");
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: primary,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+          child: const Text('ค้นหาสูตรอาหาร', style: TextStyle(fontSize: 17)),
+        ),
+      ),
+    );
+  }
+
+  Column _selectIngredientTypePart() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _headerText(text: "เลือกประเภทสูตรอาหารที่ต้องการ"),
+        RadioListTile(
+          title: Text(SelectIngredientTypeEnum.selectIngredientTypeChoice1,
+              style: TextStyle(fontSize: _choiceTextSize)),
+          groupValue: _selectIngredientType,
+          onChanged: (value) {
+            setState(() {
+              _selectIngredientType = value!;
+            });
+          },
+          activeColor: _primaryColor,
+          value: SelectIngredientTypeEnum().getSelectIngredientType(
+              description:
+                  SelectIngredientTypeEnum.selectIngredientTypeChoice2),
+        ),
+        RadioListTile(
+          title: Text(SelectIngredientTypeEnum.selectIngredientTypeChoice2,
+              style: TextStyle(fontSize: _choiceTextSize)),
+          groupValue: _selectIngredientType,
+          onChanged: (value) {
+            setState(() {
+              _selectIngredientType = value!;
+            });
+          },
+          activeColor: _primaryColor,
+          value: SelectIngredientTypeEnum().getSelectIngredientType(
+              description:
+                  SelectIngredientTypeEnum.selectIngredientTypeChoice1),
+        ),
+      ],
+    );
+  }
+
+  Text _headerText({required String text}) {
+    return Text(text,
+        style:
+            TextStyle(fontSize: _labelTextSize, fontWeight: FontWeight.bold));
+  }
 
   Column _selectedIngredientPart() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("เลือกวัตถุดิบที่ต้องการในสูตรอาหาร",
-            style: TextStyle(
-                fontSize: _headerTextSize, fontWeight: FontWeight.bold)),
+        _headerText(text: "เลือกวัตถุดิบที่ต้องการในสูตรอาหาร"),
         const SizedBox(height: 10),
-        DropdownSearch<String>.multiSelection(
-          popupProps: PopupPropsMultiSelection.menu(
-            showSearchBox: true,
-            showSelectedItems: true,
-            searchFieldProps: TextFieldProps(
-                decoration: InputDecoration(
-              suffixIcon: const Icon(Icons.search),
-              labelText: "ค้นหาวัตถุดิบ",
-              labelStyle: const TextStyle(fontSize: 16, height: 1),
-              contentPadding: const EdgeInsets.only(left: 15),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide: BorderSide(color: tGrey),
-              ),
-            )),
-          ),
-          dropdownDecoratorProps: DropDownDecoratorProps(
-              dropdownSearchDecoration: InputDecoration(
-            fillColor: Colors.white,
-            filled: true,
-            hintText: "วัตถุดิบที่ต้องการ",
-            hintStyle: TextStyle(fontSize: _labelTextSize, height: 1),
-            contentPadding:
-                const EdgeInsets.only(left: 15, top: 20, bottom: 20, right: 15),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(color: tGrey),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(10.0),
-              borderSide: BorderSide(color: tGrey),
-            ),
-          )),
-          items: _selectedIngredientList,
-          onChanged: (value) {
-            setState(() {
-              _selectedIngredient = value;
-              _nonSelectedIngredientListSet =
-                  Set.from(_nonSelectedIngredientList);
-              _selectedIngredientSet = Set.from(_selectedIngredient);
-              _nonSelectedIngredientList = (_nonSelectedIngredientListSet
-                      .difference(_selectedIngredientSet))
-                  .toList();
-            });
-            // _controller.animateTo(
-            //   1000.0,
-            //   duration: const Duration(seconds: 1),
-            //   curve: Curves.ease,
-            // );
+        CustomMultipleDropdownSearch(
+          primaryColor: _primaryColor,
+          isCreate: true,
+          value: _viewModel.selectedIngredient,
+          choiceItemList: _ingredientList,
+          updateValueCallback: ({required List<String> value}) {
+            _viewModel.selectedIngredient = value;
+            setState(() {});
           },
+          dropdownKey: _selectIngredientKey,
+          labelTextSize: _labelTextSize,
+          searchText: 'ค้นหาวัตถุดิบ',
+          hintText: 'เลือกวัตถุดิบ',
         ),
       ],
     );
