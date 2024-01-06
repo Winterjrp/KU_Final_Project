@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:untitled1/models/user_info_model.dart';
 import 'package:untitled1/modules/admin/pet_type_info/pet_type_info_view.dart';
 import 'package:untitled1/modules/admin/pet_type_info_management/pet_type_info_management_view_model.dart';
 
@@ -11,19 +10,14 @@ class PetTypeInfoManagementCard extends StatelessWidget {
   final BuildContext context;
   final int index;
   final PetTypeInfoManagementViewModel viewModel;
-  final UserInfoModel userInfo;
 
   const PetTypeInfoManagementCard({
     required this.deletePetTypeInfoCallBack,
     required this.context,
     required this.index,
     required this.viewModel,
-    required this.userInfo,
-    // required this.deletePetInfoCallBack,
     Key? key,
   }) : super(key: key);
-
-  // final DeletePetInfoCallBack deletePetInfoCallBack;
 
   @override
   Widget build(BuildContext context) {
@@ -43,7 +37,6 @@ class PetTypeInfoManagementCard extends StatelessWidget {
             context,
             MaterialPageRoute(
                 builder: (context) => PetTypeInfoView(
-                      userInfo: userInfo,
                       petTypeInfo: viewModel.petTypeInfo[index],
                       deletePetTypeInfoCallBack: deletePetTypeInfoCallBack,
                     )),

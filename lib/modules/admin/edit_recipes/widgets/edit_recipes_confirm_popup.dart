@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:untitled1/models/user_info_model.dart';
 import 'package:untitled1/modules/admin/recipes_management/recipes_management_view.dart';
 
 typedef EditRecipesCallBack = void Function();
 
 class EditRecipesConfirmPopup extends StatelessWidget {
   final EditRecipesCallBack editRecipesCallBack;
-  final UserInfoModel userInfo;
 
   const EditRecipesConfirmPopup({
-    required this.userInfo,
     required this.editRecipesCallBack,
     Key? key,
   }) : super(key: key);
@@ -64,8 +61,7 @@ class EditRecipesConfirmPopup extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                    builder: (context) =>
-                        RecipesManagementView(userInfo: userInfo)),
+                    builder: (context) => const RecipesManagementView()),
               );
             },
             style: ElevatedButton.styleFrom(

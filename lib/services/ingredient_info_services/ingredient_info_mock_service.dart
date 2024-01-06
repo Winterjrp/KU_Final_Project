@@ -4,8 +4,9 @@ import 'package:untitled1/services/ingredient_info_services/ingredient_info_serv
 
 class IngredientInfoMockService implements IngredientInfoServiceInterface {
   @override
-  Future<void> deleteIngredientInfo({required String ingredientID}) async {
+  Future<void> deleteIngredientInfo({required String ingredientId}) async {
+    await Future.delayed(const Duration(milliseconds: 1200), () {});
     Box ingredientListBox = Hive.box<IngredientModel>('ingredientListBox');
-    await ingredientListBox.delete(ingredientID);
+    await ingredientListBox.delete(ingredientId);
   }
 }

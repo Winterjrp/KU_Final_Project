@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:untitled1/hive_models/pet_type_info_model.dart';
-import 'package:untitled1/models/user_info_model.dart';
 
 class PetChronicDiseaseCard extends StatelessWidget {
   final BuildContext context;
   final int index;
-  final UserInfoModel userInfo;
   final PetChronicDiseaseModel petChronicDiseaseData;
   const PetChronicDiseaseCard({
     required this.context,
     required this.index,
-    required this.userInfo,
     required this.petChronicDiseaseData,
     Key? key,
   }) : super(key: key);

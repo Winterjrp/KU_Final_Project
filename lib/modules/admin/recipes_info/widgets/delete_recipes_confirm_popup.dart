@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:untitled1/models/user_info_model.dart';
 import 'package:untitled1/modules/admin/recipes_management/recipes_management_view.dart';
 
 typedef DeleteRecipesCallBack = void Function({required String recipeID});
 
 class DeleteRecipesConfirmPopup extends StatelessWidget {
   final DeleteRecipesCallBack deleteRecipesCallBack;
-  final UserInfoModel userInfo;
   final String recipeID;
 
   const DeleteRecipesConfirmPopup({
     required this.deleteRecipesCallBack,
-    required this.userInfo,
     required this.recipeID,
     Key? key,
   }) : super(key: key);
@@ -65,8 +62,7 @@ class DeleteRecipesConfirmPopup extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                    builder: (context) =>
-                        RecipesManagementView(userInfo: userInfo)),
+                    builder: (context) => const RecipesManagementView()),
               );
             },
             style: ElevatedButton.styleFrom(

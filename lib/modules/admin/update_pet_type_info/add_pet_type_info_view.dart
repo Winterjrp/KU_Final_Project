@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
-import 'package:untitled1/models/user_info_model.dart';
 import 'package:untitled1/modules/admin/add_pet_chronic_disease/add_pet_chronic_disease_view.dart';
 import 'package:untitled1/hive_models/nutrient_limit_info_model.dart';
 import 'package:untitled1/hive_models/pet_type_info_model.dart';
@@ -8,14 +7,11 @@ import 'package:untitled1/modules/admin/update_pet_type_info/add_pet_type_info_v
 import 'package:untitled1/modules/admin/update_pet_type_info/widgets/add_pet_type_info_cancel_popup.dart';
 import 'package:untitled1/modules/admin/update_pet_type_info/widgets/add_pet_type_info_card.dart';
 import 'package:untitled1/modules/admin/update_pet_type_info/widgets/add_pet_type_info_confirm_popup.dart';
-import 'package:untitled1/widgets/user_profile_app_bar.dart';
-import 'package:untitled1/widgets/bottom_navigation_bar.dart';
+import 'package:untitled1/modules/normal/widgets/bottom_navigation_bar.dart';
 
 class AddPetTypeInfoView extends StatefulWidget {
-  const AddPetTypeInfoView({required this.userInfo, Key? key})
-      : super(key: key);
+  const AddPetTypeInfoView({Key? key}) : super(key: key);
 
-  final UserInfoModel userInfo;
   @override
   State<AddPetTypeInfoView> createState() => _AddPetTypeInfoViewState();
 }
@@ -39,15 +35,15 @@ class _AddPetTypeInfoViewState extends State<AddPetTypeInfoView> {
     return WillPopScope(
       onWillPop: () async {
         bool confirm = await showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return const AddPetTypeInfoCancelPopup();
-            });
+          context: context,
+          builder: (BuildContext context) {
+            return const AddPetTypeInfoCancelPopup();
+          },
+        );
         return confirm;
       },
       child: Scaffold(
-        bottomNavigationBar:
-            ProjectNavigationBar(index: 0, userInfo: widget.userInfo),
+        bottomNavigationBar: const ProjectNavigationBar(index: 0),
         body: SafeArea(
           child: FutureBuilder<List<PetChronicDiseaseModel>>(
               future: _viewModel.petChronicDiseaseListData,
@@ -60,9 +56,6 @@ class _AddPetTypeInfoViewState extends State<AddPetTypeInfoView> {
                 } else if (snapshot.hasData) {
                   return Column(
                     children: [
-                      UserProfileAppBar(
-                        userInfo: widget.userInfo,
-                      ),
                       Expanded(
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -159,7 +152,6 @@ class _AddPetTypeInfoViewState extends State<AddPetTypeInfoView> {
             index: index,
             context: context,
             viewModel: _viewModel,
-            userInfo: widget.userInfo,
           );
         },
       ),
@@ -209,7 +201,6 @@ class _AddPetTypeInfoViewState extends State<AddPetTypeInfoView> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => AddPetChronicDiseaseView(
-                          userInfo: widget.userInfo,
                           addPetChronicDiseaseCallBack:
                               onUserAddPetChronicDiseaseCallBack,
                           petTypeName: _petTypeNameController.text)),
@@ -249,7 +240,6 @@ class _AddPetTypeInfoViewState extends State<AddPetTypeInfoView> {
                 context: context,
                 builder: (context) {
                   return AddPetTypeInfoConfirmPopup(
-                      userInfo: widget.userInfo,
                       petTypeName: _petTypeNameController.text,
                       onUserAddPetTypeInfoCallBack:
                           onUserAddPetTypeInfoCallBack);

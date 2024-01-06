@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:untitled1/models/user_info_model.dart';
 import 'package:untitled1/modules/admin/ingredient_info/ingredient_info_view_model.dart';
 import 'package:untitled1/modules/admin/ingredient_management/ingredient_management_view.dart';
 
@@ -8,13 +7,11 @@ import 'package:untitled1/modules/admin/ingredient_management/ingredient_managem
 class DeleteIngredientConfirmPopup extends StatelessWidget {
   const DeleteIngredientConfirmPopup({
     required this.viewModel,
-    required this.userInfo,
     required this.ingredientID,
     Key? key,
   }) : super(key: key);
 
   final IngredientInfoViewModel viewModel;
-  final UserInfoModel userInfo;
   final String ingredientID;
 
   @override
@@ -66,8 +63,7 @@ class DeleteIngredientConfirmPopup extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                    builder: (context) =>
-                        IngredientManagementView(userInfo: userInfo)),
+                    builder: (context) => const IngredientManagementView()),
               );
             },
             style: ElevatedButton.styleFrom(

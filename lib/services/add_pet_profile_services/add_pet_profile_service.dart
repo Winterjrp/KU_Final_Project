@@ -4,18 +4,19 @@ import 'package:untitled1/hive_models/pet_profile_model.dart';
 import 'package:untitled1/services/add_pet_profile_services/add_pet_info_service_interface.dart';
 import 'package:http/http.dart' as http;
 
-class AddPetProfileMockService implements AddPetProfileServiceInterface {
+class AddPetProfileService implements AddPetProfileServiceInterface {
   @override
   Future<http.Response> addPetInfo(
       {required PetProfileModel petProfile}) async {
-    final response = await http.post(
-        Uri.parse('https://jsonplaceholder.typicode.com/albums'),
-        headers: <String, String>{
-          'Accept': 'application/json',
-          'Content-Type': 'application/json; charset=UTF-8',
-          HttpHeaders.authorizationHeader: 'Bearer token',
-        },
-        body: petProfile.toJson());
+    final response = await http
+        .post(Uri.parse('https://jsonplaceholder.typicode.com/albums'),
+            headers: <String, String>{
+              'Accept': 'application/json',
+              'Content-Type': 'application/json; charset=UTF-8',
+              HttpHeaders.authorizationHeader: 'Bearer token',
+            },
+            body: petProfile.toJson())
+        .timeout(const Duration(seconds: 30));
     if (response.statusCode == 200) {
     } else if (response.statusCode == 500) {
       throw Exception('Internal Server Error. Please try again later.');

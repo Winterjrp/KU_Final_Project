@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
-import 'package:untitled1/models/user_info_model.dart';
 import 'package:untitled1/modules/admin/add_pet_chronic_disease/add_pet_chronic_view_model.dart';
 import 'package:untitled1/hive_models/nutrient_limit_info_model.dart';
 import 'package:untitled1/modules/admin/add_pet_chronic_disease/widgets/add_pet_chronic_disease_cancel_popup.dart';
@@ -13,12 +12,10 @@ typedef OnUserAddPetChronicDiseaseCallBack = void Function(
     required String petChronicDiseaseName});
 
 class AddPetChronicDiseaseView extends StatefulWidget {
-  final UserInfoModel userInfo;
   final OnUserAddPetChronicDiseaseCallBack addPetChronicDiseaseCallBack;
   final String petTypeName;
   const AddPetChronicDiseaseView(
-      {required this.userInfo,
-      required this.addPetChronicDiseaseCallBack,
+      {required this.addPetChronicDiseaseCallBack,
       required this.petTypeName,
       Key? key})
       : super(key: key);
@@ -97,7 +94,6 @@ class _AddPetChronicDiseaseViewState extends State<AddPetChronicDiseaseView> {
                 builder: (context) {
                   return AddPetChronicDiseaseConfirmPopup(
                       viewModel: _viewModel,
-                      userInfo: widget.userInfo,
                       petChronicDiseaseName:
                           _petChronicDiseaseNameController.text,
                       addPetChronicDiseaseCallBack:

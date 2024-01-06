@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:untitled1/models/user_info_model.dart';
-import 'package:untitled1/widgets/bottom_navigation_bar.dart';
+import 'package:untitled1/modules/normal/widgets/bottom_navigation_bar.dart';
 
 class SettingView extends StatefulWidget {
-  const SettingView({required this.userInfo, Key? key}) : super(key: key);
-
-  final UserInfoModel userInfo;
+  const SettingView({Key? key}) : super(key: key);
 
   @override
   State<SettingView> createState() => _SettingViewState();
@@ -16,8 +13,7 @@ class _SettingViewState extends State<SettingView> {
   Widget build(BuildContext context) {
     return SafeArea(
         child: Scaffold(
-            bottomNavigationBar:
-                ProjectNavigationBar(index: 1, userInfo: widget.userInfo),
+            bottomNavigationBar: const ProjectNavigationBar(index: 1),
             body: Padding(
               padding: const EdgeInsets.only(
                   left: 20, right: 20, top: 30, bottom: 30),

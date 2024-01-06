@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:untitled1/modules/admin/pet_type_info_management/pet_type_info_management_view.dart';
-// import 'package:untitled1/modules/home/home_view.dart';
 
 class EditPetTypeInfoCancelPopup extends StatelessWidget {
   const EditPetTypeInfoCancelPopup({
-    // required this.userID,
     Key? key,
   }) : super(key: key);
-
-  // final String userID;
 
   @override
   Widget build(BuildContext context) {

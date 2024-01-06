@@ -10,6 +10,10 @@ class IngredientInfoViewModel {
 
   Future<void> onUserDeleteIngredientInfo(
       {required String ingredientID}) async {
-    await services.deleteIngredientInfo(ingredientID: ingredientID);
+    try {
+      await services.deleteIngredientInfo(ingredientId: ingredientID);
+    } catch (_) {
+      rethrow;
+    }
   }
 }

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:untitled1/models/user_info_model.dart';
 import 'package:untitled1/modules/admin/pet_type_info_management/pet_type_info_management_view.dart';
 
 typedef DeletePetTypeInfoCallBack = void Function(
@@ -7,12 +6,10 @@ typedef DeletePetTypeInfoCallBack = void Function(
 
 class DeletePetTypeInfoConfirmPopup extends StatelessWidget {
   final DeletePetTypeInfoCallBack deletePetTypeInfoCallBack;
-  final UserInfoModel userInfo;
   final String petTypeInfoID;
 
   const DeletePetTypeInfoConfirmPopup({
     required this.deletePetTypeInfoCallBack,
-    required this.userInfo,
     required this.petTypeInfoID,
     Key? key,
   }) : super(key: key);
@@ -66,8 +63,7 @@ class DeletePetTypeInfoConfirmPopup extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                    builder: (context) =>
-                        PetTypeInfoManagementView(userInfo: userInfo)),
+                    builder: (context) => const PetTypeInfoManagementView()),
               );
             },
             style: ElevatedButton.styleFrom(

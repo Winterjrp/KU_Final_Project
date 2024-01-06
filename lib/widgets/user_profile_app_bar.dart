@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:untitled1/models/user_info_model.dart';
 
 class UserProfileAppBar extends StatelessWidget {
-  const UserProfileAppBar({required this.userInfo, Key? key}) : super(key: key);
+  final UserInfoModel? userInfo;
+  const UserProfileAppBar({
+    required this.userInfo,
+    Key? key,
+  }) : super(key: key);
 
-  final UserInfoModel userInfo;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -37,8 +40,8 @@ class UserProfileAppBar extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(userInfo.username, style: const TextStyle(fontSize: 18)),
-        Text(userInfo.userID),
+        Text(userInfo!.username, style: const TextStyle(fontSize: 18)),
+        Text(userInfo!.userID),
       ],
     );
   }

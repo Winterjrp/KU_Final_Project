@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:untitled1/models/user_info_model.dart';
 import 'package:untitled1/modules/admin/edit_pet_type_info/edit_pet_type_info_view_model.dart';
 
 // typedef DeletePetInfoCallBack = void Function({required String petID});
@@ -9,7 +8,6 @@ class EditPetTypeInfoCard extends StatelessWidget {
     required this.context,
     required this.index,
     required this.viewModel,
-    required this.userInfo,
     // required this.deletePetInfoCallBack,
     Key? key,
   }) : super(key: key);
@@ -17,7 +15,6 @@ class EditPetTypeInfoCard extends StatelessWidget {
   final BuildContext context;
   final int index;
   final EditPetTypeInfoViewModel viewModel;
-  final UserInfoModel userInfo;
   // final DeletePetInfoCallBack deletePetInfoCallBack;
 
   @override

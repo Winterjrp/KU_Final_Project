@@ -6,6 +6,7 @@ class IngredientManagementViewModel {
   late IngredientManagementServiceInterface services;
   late Future<List<IngredientModel>> ingredientListData;
   late List<IngredientModel> ingredientList;
+  late List<IngredientModel> filterIngredientList;
 
   IngredientManagementViewModel() {
     services = IngredientManagementMockService();
@@ -14,5 +15,19 @@ class IngredientManagementViewModel {
   Future<void> getIngredientData() async {
     ingredientListData = services.getIngredientListData();
     ingredientList = await ingredientListData;
+    filterIngredientList = ingredientList;
+  }
+
+  void onUserSearchIngredient({required String searchText}) async {
+    searchText = searchText.toLowerCase();
+    if (searchText == '') {
+      filterIngredientList = ingredientList;
+    } else {
+      filterIngredientList = ingredientList
+          .where((ingredientData) =>
+              ingredientData.ingredientID.toLowerCase().contains(searchText) ||
+              ingredientData.ingredientName.toLowerCase().contains(searchText))
+          .toList();
+    }
   }
 }

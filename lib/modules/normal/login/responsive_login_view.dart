@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:untitled1/modules/admin/ingredient_management/ingredient_management_view.dart';
-import 'package:untitled1/modules/admin/select_admin_funtion/select_admin_function_view.dart';
-import 'package:untitled1/modules/normal/home/home_view.dart';
+import 'package:untitled1/modules/admin/admin_home/admin_home_view.dart';
 import 'package:untitled1/modules/normal/login/desktop_login_view.dart';
 import 'package:untitled1/modules/normal/login/login_view_model.dart';
 import 'package:untitled1/modules/normal/login/mobile_login_view.dart';
+import 'package:untitled1/modules/normal/my_pet/my_pet_view.dart';
 import 'package:untitled1/provider/authentication_provider.dart';
 
 class LoginView extends StatefulWidget {
@@ -36,24 +35,36 @@ class LoginViewState extends State<LoginView> {
   Future<void> login() async {
     // bool isCredentialsValid = validateCredentials(username, password);
     bool isCredentialsValid = true;
+    try {
+      await _viewModel.login(
+          username: _usernameController.text,
+          password: _passwordController.text);
+    } catch (e) {
+      print(e);
+    }
     if (isCredentialsValid) {
-      _viewModel.getUserInfo(
+      _viewModel.login(
           username: _usernameController.text,
           password: _passwordController.text);
       if (_isMobile) {
-        _viewModel.userInfoData.userRole.isUserManagementAdmin = false;
-        _viewModel.userInfoData.userRole.isPetFoodManagementAdmin = false;
+        if (!context.mounted) return;
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const MyPetView(),
+          ),
+        );
+        // _viewModel.userInfoData.userRole.isUserManagementAdmin = false;
+        // _viewModel.userInfoData.userRole.isPetFoodManagementAdmin = false;
+      } else {
+        if (!context.mounted) return;
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (context) => const AdminHomeView(),
+          ),
+        );
       }
-      await Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => HomeView(userInfo: _viewModel.userInfoData),
-        ),
-        // context,
-        // MaterialPageRoute(
-        //     builder: (context) =>
-        //         SelectAdminFunctionView(userInfo: _viewModel.userInfoData)),
-      );
     } else {
       if (_usernameController.text == '') {
         context

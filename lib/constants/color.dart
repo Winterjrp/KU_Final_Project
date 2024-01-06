@@ -9,3 +9,5 @@ Color tGrey = const Color.fromRGBO(116, 111, 111, 1);
 Color darkYellow = const Color.fromRGBO(254, 210, 165, 1);
 Color red = const Color.fromRGBO(181, 72, 74, 1);
 Color darkGreen = const Color.fromRGBO(177, 225, 219, 1);
+Color flesh = const Color.fromRGBO(246, 228, 184, 1);
+Color acceptButtonBackground = const Color.fromRGBO(72, 143, 114, 1.0);

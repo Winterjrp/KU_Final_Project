@@ -1,7 +1,5 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:untitled1/models/user_info_model.dart';
-import 'package:untitled1/modules/admin/add_pet_chronic_disease/add_pet_chronic_view_model.dart';
 import 'package:untitled1/modules/admin/pet_type_info_management/pet_type_info_management_view.dart';
 
 typedef OnUserAddPetTypeInfoCallBack = void Function(
@@ -9,11 +7,9 @@ typedef OnUserAddPetTypeInfoCallBack = void Function(
 
 class AddPetTypeInfoConfirmPopup extends StatelessWidget {
   final OnUserAddPetTypeInfoCallBack onUserAddPetTypeInfoCallBack;
-  final UserInfoModel userInfo;
   final String petTypeName;
 
   const AddPetTypeInfoConfirmPopup({
-    required this.userInfo,
     required this.petTypeName,
     required this.onUserAddPetTypeInfoCallBack,
     Key? key,
@@ -71,9 +67,7 @@ class AddPetTypeInfoConfirmPopup extends StatelessWidget {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => PetTypeInfoManagementView(
-                      userInfo: userInfo,
-                    ),
+                    builder: (context) => const PetTypeInfoManagementView(),
                   ));
             },
             style: ElevatedButton.styleFrom(

@@ -1,40 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:untitled1/hive_models/pet_type_info_model.dart';
-import 'package:untitled1/models/user_info_model.dart';
 import 'package:untitled1/modules/admin/edit_pet_type_info/edit_pet_type_info_view.dart';
 import 'package:untitled1/modules/admin/pet_type_info/widgets/delete_pet_type_info_confirm_popup.dart';
 import 'package:untitled1/modules/admin/pet_type_info/widgets/pet_chronic_disease_card.dart';
-import 'package:untitled1/widgets/user_profile_app_bar.dart';
-import 'package:untitled1/widgets/bottom_navigation_bar.dart';
 
 typedef DeletePetTypeInfoCallBack = void Function(
     {required String petTypeInfoID});
 
 class PetTypeInfoView extends StatelessWidget {
   final DeletePetTypeInfoCallBack deletePetTypeInfoCallBack;
-  final UserInfoModel userInfo;
   final PetTypeInfoModel petTypeInfo;
-  PetTypeInfoView(
-      {required this.userInfo,
-      required this.petTypeInfo,
+  const PetTypeInfoView(
+      {required this.petTypeInfo,
       required this.deletePetTypeInfoCallBack,
       Key? key})
       : super(key: key);
-
-  late double height;
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     double height = size.height;
     return Scaffold(
-      bottomNavigationBar: ProjectNavigationBar(index: 0, userInfo: userInfo),
       body: SafeArea(
         child: Column(
           children: [
-            UserProfileAppBar(
-              userInfo: userInfo,
-            ),
             Expanded(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 30),
@@ -85,7 +74,6 @@ class PetTypeInfoView extends StatelessWidget {
             context: context,
             builder: (context) {
               return DeletePetTypeInfoConfirmPopup(
-                userInfo: userInfo,
                 deletePetTypeInfoCallBack: deletePetTypeInfoCallBack,
                 petTypeInfoID: petTypeInfo.petTypeID,
               );
@@ -119,8 +107,8 @@ class PetTypeInfoView extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => EditPetTypeInfoView(
-                    userInfo: userInfo, petTypeInfo: petTypeInfo)),
+                builder: (context) =>
+                    EditPetTypeInfoView(petTypeInfo: petTypeInfo)),
           );
         },
         style: ElevatedButton.styleFrom(
@@ -165,7 +153,6 @@ class PetTypeInfoView extends StatelessWidget {
           return PetChronicDiseaseCard(
             index: index,
             context: context,
-            userInfo: userInfo,
             petChronicDiseaseData: petTypeInfo.petChronicDisease[index],
           );
         },

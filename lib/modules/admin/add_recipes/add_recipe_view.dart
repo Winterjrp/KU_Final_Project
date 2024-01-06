@@ -1,10 +1,8 @@
 import 'dart:math';
-
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/hive_models/pet_type_info_model.dart';
-import 'package:untitled1/models/user_info_model.dart';
 import 'package:untitled1/modules/admin/add_recipes/add_recipes_view_model.dart';
 import 'package:untitled1/modules/admin/add_recipes/widgets/add_recipes_cancel_popup.dart';
 import 'package:untitled1/modules/admin/add_recipes/widgets/add_recipes_confirm_popup.dart';
@@ -13,9 +11,8 @@ import 'package:untitled1/modules/admin/add_recipes/widgets/nutrient_table_cell.
 import 'package:untitled1/hive_models/ingredient_model.dart';
 
 class AddRecipesView extends StatefulWidget {
-  const AddRecipesView({required this.userInfo, Key? key}) : super(key: key);
+  const AddRecipesView({Key? key}) : super(key: key);
 
-  final UserInfoModel userInfo;
   @override
   State<AddRecipesView> createState() => _AddRecipesViewState();
 }
@@ -279,7 +276,6 @@ class _AddRecipesViewState extends State<AddRecipesView> {
                 context: context,
                 builder: (context) {
                   return AddRecipesConfirmPopup(
-                    userInfo: widget.userInfo,
                     addRecipesCallBack: onUserAddRecipesCallBack,
                   );
                 },

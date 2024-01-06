@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:untitled1/models/user_info_model.dart';
 import 'package:untitled1/modules/admin/recipes_management/recipes_management_view.dart';
 
 typedef AddRecipesCallBack = void Function();
 
 class AddRecipesConfirmPopup extends StatelessWidget {
   final AddRecipesCallBack addRecipesCallBack;
-  final UserInfoModel userInfo;
 
   const AddRecipesConfirmPopup({
-    required this.userInfo,
     required this.addRecipesCallBack,
     Key? key,
   }) : super(key: key);
@@ -63,8 +60,7 @@ class AddRecipesConfirmPopup extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                    builder: (context) =>
-                        RecipesManagementView(userInfo: userInfo)),
+                    builder: (context) => const RecipesManagementView()),
               );
             },
             style: ElevatedButton.styleFrom(

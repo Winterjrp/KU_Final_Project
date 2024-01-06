@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:untitled1/constants/main_page_index_constants.dart';
 import 'package:untitled1/hive_models/pet_type_info_model.dart';
-import 'package:untitled1/models/user_info_model.dart';
+import 'package:untitled1/modules/admin/widgets/admin_drawer.dart';
 import 'package:untitled1/modules/admin/pet_type_info_management/pet_type_info_management_view_model.dart';
 import 'package:untitled1/modules/admin/pet_type_info_management/widgets/pet_type_info_management_card.dart';
 import 'package:untitled1/modules/admin/update_pet_type_info/add_pet_type_info_view.dart';
-import 'package:untitled1/widgets/user_profile_app_bar.dart';
-import 'package:untitled1/widgets/bottom_navigation_bar.dart';
 
 class PetTypeInfoManagementView extends StatefulWidget {
-  const PetTypeInfoManagementView({required this.userInfo, Key? key})
-      : super(key: key);
+  const PetTypeInfoManagementView({Key? key}) : super(key: key);
 
-  final UserInfoModel userInfo;
   @override
   State<PetTypeInfoManagementView> createState() =>
       _PetTypeInfoManagementViewState();
@@ -33,8 +30,26 @@ class _PetTypeInfoManagementViewState extends State<PetTypeInfoManagementView> {
     final size = MediaQuery.of(context).size;
     double height = size.height;
     return Scaffold(
-      bottomNavigationBar:
-          ProjectNavigationBar(index: 0, userInfo: widget.userInfo),
+      drawer: const AdminDrawer(
+          currentIndex: MainPageIndexConstants.petTypeManagementIndex),
+      appBar: AppBar(
+        elevation: 0,
+        leading: Builder(
+          builder: (context) => // Ensure Scaffold is in context
+              IconButton(
+            icon: const Icon(
+              Icons.menu,
+            ),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+          ),
+        ),
+
+        // title: const Center(child: Text("ฟังก์ชันสำหรับผู้ดูแลระบบ")),
+        iconTheme: const IconThemeData(color: Colors.black),
+        backgroundColor: Colors.white,
+      ),
       body: SafeArea(
         child: FutureBuilder<List<PetTypeInfoModel>>(
             future: _viewModel.petTypeInfoData,
@@ -47,9 +62,6 @@ class _PetTypeInfoManagementViewState extends State<PetTypeInfoManagementView> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    UserProfileAppBar(
-                      userInfo: widget.userInfo,
-                    ),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 25),
                       child: Column(
@@ -104,7 +116,6 @@ class _PetTypeInfoManagementViewState extends State<PetTypeInfoManagementView> {
             index: index,
             context: context,
             viewModel: _viewModel,
-            userInfo: widget.userInfo,
             deletePetTypeInfoCallBack: deletePetTypeDataCallback,
           );
         },
@@ -143,8 +154,7 @@ class _PetTypeInfoManagementViewState extends State<PetTypeInfoManagementView> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          AddPetTypeInfoView(userInfo: widget.userInfo)),
+                      builder: (context) => const AddPetTypeInfoView()),
                 );
               },
               child: const Row(

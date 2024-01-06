@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:untitled1/models/user_info_model.dart';
 import 'package:untitled1/modules/admin/update_pet_type_info/add_pet_type_info_view_model.dart';
 
 class UpdatePetTypeInfoCard extends StatelessWidget {
@@ -7,7 +6,6 @@ class UpdatePetTypeInfoCard extends StatelessWidget {
     required this.context,
     required this.index,
     required this.viewModel,
-    required this.userInfo,
     // required this.deletePetInfoCallBack,
     Key? key,
   }) : super(key: key);
@@ -15,7 +13,6 @@ class UpdatePetTypeInfoCard extends StatelessWidget {
   final BuildContext context;
   final int index;
   final AddPetTypeInfoViewModel viewModel;
-  final UserInfoModel userInfo;
   // final DeletePetInfoCallBack deletePetInfoCallBack;
 
   @override

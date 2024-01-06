@@ -1,18 +1,22 @@
+import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:untitled1/models/user_info_model.dart';
-import 'package:untitled1/modules/admin/add_ingredient/add_ingredient_view.dart';
+import 'package:untitled1/constants/color.dart';
+import 'package:untitled1/constants/main_page_index_constants.dart';
+import 'package:untitled1/constants/nutrient_list.dart';
+import 'package:untitled1/modules/admin/admin_home/admin_home_view.dart';
+import 'package:untitled1/modules/admin/update_ingredient/update_ingredient_view.dart';
+import 'package:untitled1/modules/admin/widgets/admin_appbar.dart';
+import 'package:untitled1/modules/admin/widgets/admin_drawer.dart';
 import 'package:untitled1/modules/admin/ingredient_management/ingredient_management_view_model.dart';
-import 'package:untitled1/modules/admin/ingredient_management/widgets/ingredient_info_card.dart';
 import 'package:untitled1/hive_models/ingredient_model.dart';
+import 'package:untitled1/modules/admin/ingredient_management/widgets/ingredient_management_table_cell.dart';
 import 'package:untitled1/modules/admin/user_management/widgets/filter_search_bar.dart';
-import 'package:untitled1/widgets/user_profile_app_bar.dart';
-import 'package:untitled1/widgets/bottom_navigation_bar.dart';
+import 'package:untitled1/modules/admin/widgets/admin_loading_screen_with_text.dart';
+import 'package:untitled1/utility/navigation_with_animation.dart';
 
 class IngredientManagementView extends StatefulWidget {
-  const IngredientManagementView({required this.userInfo, Key? key})
-      : super(key: key);
-
-  final UserInfoModel userInfo;
+  const IngredientManagementView({Key? key}) : super(key: key);
 
   @override
   State<IngredientManagementView> createState() =>
@@ -22,8 +26,18 @@ class IngredientManagementView extends StatefulWidget {
 class _IngredientManagementViewState extends State<IngredientManagementView> {
   late double height;
   late IngredientManagementViewModel _viewModel;
-
   late TextEditingController _searchTextEditingController;
+
+  final TextStyle _headerTextStyle =
+      const TextStyle(fontSize: 17, color: Colors.white);
+  final Map<int, TableColumnWidth> _tableColumnWidth =
+      const <int, TableColumnWidth>{
+    0: FlexColumnWidth(0.07),
+    1: FlexColumnWidth(0.2),
+    2: FlexColumnWidth(1),
+  };
+  final double _tableHeaderPadding = 12;
+  Timer? _debounce;
 
   @override
   void initState() {
@@ -34,39 +48,53 @@ class _IngredientManagementViewState extends State<IngredientManagementView> {
   }
 
   @override
+  void dispose() {
+    _searchTextEditingController.dispose();
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     double height = size.height;
-    return Scaffold(
-      bottomNavigationBar:
-          ProjectNavigationBar(index: 2, userInfo: widget.userInfo),
-      body: SafeArea(
-        child: FutureBuilder<List<IngredientModel>>(
+    return WillPopScope(
+      onWillPop: () async {
+        Completer<bool> completer = Completer<bool>();
+        Navigator.pushReplacement(
+          context,
+          NavigationDownward(targetPage: const AdminHomeView()),
+        );
+        return completer.future;
+      },
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        drawer: const AdminDrawer(
+            currentIndex: MainPageIndexConstants.ingredientManagementIndex),
+        appBar: const AdminAppBar(),
+        body: FutureBuilder<List<IngredientModel>>(
           future: _viewModel.ingredientListData,
           builder: (context, AsyncSnapshot<List<IngredientModel>> snapshot) {
             if (snapshot.connectionState != ConnectionState.done) {
-              return _loadingScreen();
+              return const AdminLoadingScreenWithText();
             } else if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             } else if (snapshot.hasData) {
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  UserProfileAppBar(
-                    userInfo: widget.userInfo,
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 15),
-                        _header(),
-                        const SizedBox(height: 15),
-                        _ingredientInfo(height: height, context: context),
-                        const SizedBox(height: 15),
-                        _addIngredientButton()
-                      ],
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 30),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _header(),
+                          const SizedBox(height: 15),
+                          _ingredientListTable(height, context),
+                          const SizedBox(height: 20),
+                        ],
+                      ),
                     ),
                   ),
                 ],
@@ -79,119 +107,184 @@ class _IngredientManagementViewState extends State<IngredientManagementView> {
     );
   }
 
+  Widget _ingredientListTable(double height, BuildContext context) {
+    return Expanded(
+      child: Column(
+        children: [
+          _tableHeader(),
+          _tableBody(height: height, context: context),
+        ],
+      ),
+    );
+  }
+
+  Table _tableHeader() {
+    return Table(
+      columnWidths: _tableColumnWidth,
+      border: TableBorder.symmetric(
+        inside: const BorderSide(
+          width: 1,
+          // color: primary,
+        ),
+      ),
+      children: [
+        TableRow(
+          decoration: const BoxDecoration(
+            color: Color.fromRGBO(16, 16, 29, 1),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(10),
+              topRight: Radius.circular(10),
+            ),
+          ),
+          children: [
+            TableCell(
+              child: Padding(
+                padding: EdgeInsets.all(_tableHeaderPadding),
+                child: Center(
+                  child: Text(
+                    'ลำดับที่',
+                    style: _headerTextStyle,
+                  ),
+                ),
+              ),
+            ),
+            TableCell(
+              child: Padding(
+                padding: EdgeInsets.all(_tableHeaderPadding),
+                child: Center(
+                  child: Text(
+                    'รหัสวัตุดิบ',
+                    style: _headerTextStyle,
+                  ),
+                ),
+              ),
+            ),
+            TableCell(
+              child: Padding(
+                padding: EdgeInsets.all(_tableHeaderPadding),
+                child: Center(
+                  child: Text(
+                    'ชื่อวัตถุดิบ',
+                    style: _headerTextStyle,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   Widget _header() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(
           child: Text(
-            "จัดการวัตถุดิบ",
+            "จัดการข้อมูลวัตถุดิบ",
             style: TextStyle(
               fontWeight: FontWeight.bold,
-              fontSize: 42,
+              fontSize: 36,
               // color: kPrimaryDarkColor,
             ),
           ),
         ),
-        const SizedBox(height: 10),
-        SizedBox(
-          height: 60,
-          width: 600,
-          child: _searchBar(),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            SizedBox(
+              width: 600,
+              child: _searchBar(),
+            ),
+            const Spacer(),
+            _addIngredientButton(),
+          ],
         ),
       ],
     );
   }
 
-  Widget _searchBar() {
-    void onSearchTextChanged({required String searchText}) {
-      setState(() {
-        // onUserSearchShopGroup(searchText);
-      });
-    }
+  void _onSearchTextChanged({required String searchText}) {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      _viewModel.onUserSearchIngredient(searchText: searchText);
+      setState(() {});
+    });
+  }
 
-    return SizedBox(
-      // width: _screenWidth * 0.3,
-      height: 35,
-      child: FilterSearchBar(
-        onSearch: onSearchTextChanged,
-        textEditingController: _searchTextEditingController,
-      ),
+  Widget _searchBar() {
+    return FilterSearchBar(
+      onSearch: _onSearchTextChanged,
+      searchTextEditingController: _searchTextEditingController,
+      labelText: "ค้นหาวัตถุดิบ",
     );
   }
 
-  SingleChildScrollView _ingredientInfo(
-      {required double height, required BuildContext context}) {
-    // Future<void> onUserDeleteCallBack({required String petID}) async {
-    //   setState(() {});
-    //   _viewModel.onUserDeletePetInfo(petID: petID);
-    //   Navigator.of(context).pop();
-    //   _viewModel.getHomeData(userID: widget.userID);
-    // }
+  Widget _tableBody({required double height, required BuildContext context}) {
+    return Expanded(
+      child: _viewModel.filterIngredientList.isEmpty
+          ? Container(
+              width: double.infinity,
+              color: Colors.grey.shade200,
+              child: const Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "ไม่มีข้อมูลวัตถุดิบ",
+                    style: TextStyle(fontSize: 18),
+                  ),
+                  SizedBox(height: 50)
+                ],
+              ),
+            )
+          : ListView.builder(
+              itemCount: _viewModel.filterIngredientList.length,
+              itemBuilder: (context, index) {
+                return IngredientTableCell(
+                    index: index,
+                    tableColumnWidth: _tableColumnWidth,
+                    ingredientInfo: _viewModel.filterIngredientList[index]);
+              },
+            ),
+    );
+  }
 
-    return SingleChildScrollView(
-        child: Container(
-      constraints: BoxConstraints(maxHeight: height * 0.72),
-      height: 75.0 * _viewModel.ingredientList.length,
-      child: ListView.builder(
-        itemCount: _viewModel.ingredientList.length,
-        itemBuilder: (context, index) {
-          return IngredientInfoCard(
-            index: index,
-            context: context,
-            userInfo: widget.userInfo,
-            ingredientList: _viewModel.ingredientList,
-            // deletePetInfoCallBack: onUserDeleteCallBack
+  Widget _addIngredientButton() {
+    return SizedBox(
+      height: 43,
+      child: ElevatedButton(
+        onPressed: () async {
+          Navigator.push(
+            context,
+            NavigationUpward(
+              targetPage: UpdateIngredientView(
+                isCreate: true,
+                ingredientInfo: IngredientModel(
+                    ingredientID: Random().nextInt(999).toString(),
+                    ingredientName: "",
+                    nutrient: nutrientList),
+              ),
+              durationInMilliSec: 500,
+            ),
           );
         },
-      ),
-    ));
-  }
-
-  Widget _loadingScreen() {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CircularProgressIndicator(
-            strokeWidth: 3.5,
+        style: ElevatedButton.styleFrom(
+          backgroundColor: flesh,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
           ),
-          SizedBox(
-            height: 30,
-          ),
-          Text(
-            "กำลังโหลดข้อมูล กรุณารอสักครู่...",
-            style: TextStyle(fontSize: 20),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Padding _addIngredientButton() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: GestureDetector(
-            onTap: () async {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) =>
-                        AddIngredientView(userInfo: widget.userInfo)),
-              );
-            },
-            child: const Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.add_circle_outline, size: 50),
-                Text(
-                  " เพิ่มข้อมูลวัตถุดิบ",
-                  style: TextStyle(fontSize: 16),
-                )
-              ],
-            )),
+        ),
+        child: const Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(Icons.add_rounded, size: 36, color: Colors.black),
+            Text(
+              " เพิ่มข้อมูลวัตถุดิบ",
+              style: TextStyle(fontSize: 18, color: Colors.black),
+            )
+          ],
+        ),
       ),
     );
   }

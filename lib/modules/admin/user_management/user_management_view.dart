@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
+import 'package:untitled1/constants/main_page_index_constants.dart';
 import 'package:untitled1/models/user_info_model.dart';
+import 'package:untitled1/modules/admin/widgets/admin_drawer.dart';
 import 'package:untitled1/modules/admin/user_management/user_management_view_model.dart';
 import 'package:untitled1/modules/admin/user_management/widgets/filter_search_bar.dart';
 import 'package:untitled1/modules/admin/user_management/widgets/user_management_table_cell.dart';
@@ -38,6 +40,26 @@ class _UserManagementViewState extends State<UserManagementView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      drawer: const AdminDrawer(
+          currentIndex: MainPageIndexConstants.userManagementIndex),
+      appBar: AppBar(
+        elevation: 0,
+        leading: Builder(
+          builder: (context) => // Ensure Scaffold is in context
+              IconButton(
+            icon: const Icon(
+              Icons.menu,
+            ),
+            onPressed: () {
+              Scaffold.of(context).openDrawer();
+            },
+          ),
+        ),
+
+        // title: const Center(child: Text("ฟังก์ชันสำหรับผู้ดูแลระบบ")),
+        iconTheme: const IconThemeData(color: Colors.black),
+        backgroundColor: Colors.white,
+      ),
       backgroundColor: backgroundColor,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
@@ -86,7 +108,8 @@ class _UserManagementViewState extends State<UserManagementView> {
       height: 35,
       child: FilterSearchBar(
         onSearch: onSearchTextChanged,
-        textEditingController: _searchTextEditingController,
+        searchTextEditingController: _searchTextEditingController,
+        labelText: '',
       ),
     );
   }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:untitled1/constants/color.dart';
-import 'package:untitled1/modules/admin/add_ingredient/add_ingredient_view_model.dart';
+import 'package:untitled1/modules/admin/update_ingredient/update_ingredient_view_model.dart';
 
 typedef MinAmountChangeCallback = void Function(
     {required int index, required double amount});
@@ -32,18 +32,20 @@ class _AddPetChronicDiseaseTableCellState
     extends State<AddPetChronicDiseaseTableCell> {
   late TextEditingController _maxAmountController;
   late TextEditingController _minAmountController;
-  late AddIngredientViewModel _viewModel;
+  late UpdateIngredientViewModel _viewModel;
 
   @override
   void initState() {
     super.initState();
     _maxAmountController = TextEditingController();
     _minAmountController = TextEditingController();
-    _viewModel = AddIngredientViewModel();
-    _maxAmountController.text =
-        _viewModel.nutrientList[widget.index].amount.toString();
-    _minAmountController.text =
-        _viewModel.nutrientList[widget.index].amount.toString();
+    // _viewModel = AddIngredientViewModel();
+    // _maxAmountController.text =
+    //     _viewModel.nutrientList[widget.index].amount.toString();
+    // _minAmountController.text =
+    //     _viewModel.nutrientList[widget.index].amount.toString();
+    _maxAmountController.text = "0";
+    _minAmountController.text = "0";
   }
 
   @override
@@ -91,7 +93,8 @@ class _AddPetChronicDiseaseTableCellState
       child: Padding(
         padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
         child: Text(
-          _viewModel.nutrientList[widget.index].nutrientName,
+          "",
+          // _viewModel.nutrientList[widget.index].nutrientName,
           style: const TextStyle(fontSize: 17),
         ),
       ),

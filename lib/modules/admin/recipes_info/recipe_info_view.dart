@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/hive_models/recipes_model.dart';
-import 'package:untitled1/models/user_info_model.dart';
 import 'package:untitled1/modules/admin/edit_recipes/edit_recipe_view.dart';
 import 'package:untitled1/modules/admin/recipes_info/widgets/delete_recipes_confirm_popup.dart';
 import 'package:untitled1/modules/admin/recipes_info/widgets/nutrient_info_table_cell.dart';
@@ -10,13 +9,11 @@ import 'package:untitled1/modules/admin/recipes_info/widgets/recipes_info_table_
 typedef DeleteRecipesCallBack = void Function({required String recipeID});
 
 class RecipesInfoView extends StatelessWidget {
-  final UserInfoModel userInfo;
   final RecipesModel recipesData;
   final DeleteRecipesCallBack deleteRecipesCallBack;
 
   RecipesInfoView(
-      {required this.userInfo,
-      required this.recipesData,
+      {required this.recipesData,
       required this.deleteRecipesCallBack,
       Key? key})
       : super(key: key);
@@ -34,7 +31,6 @@ class RecipesInfoView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    double height = size.height;
     double width = size.width;
     _recipesName = recipesData.recipesName;
     _petTypeName = recipesData.petTypeName;
@@ -79,7 +75,6 @@ class RecipesInfoView extends StatelessWidget {
             context: context,
             builder: (context) {
               return DeleteRecipesConfirmPopup(
-                userInfo: userInfo,
                 recipeID: recipesData.recipesID,
                 deleteRecipesCallBack: deleteRecipesCallBack,
               );
@@ -113,8 +108,7 @@ class RecipesInfoView extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-                builder: (context) => EditRecipesView(
-                    userInfo: userInfo, recipeData: recipesData)),
+                builder: (context) => EditRecipesView(recipeData: recipesData)),
           );
         },
         style: ElevatedButton.styleFrom(

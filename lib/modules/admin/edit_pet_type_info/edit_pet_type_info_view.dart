@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
-import 'package:untitled1/models/user_info_model.dart';
 import 'package:untitled1/modules/admin/add_pet_chronic_disease/add_pet_chronic_disease_view.dart';
 import 'package:untitled1/hive_models/nutrient_limit_info_model.dart';
 import 'package:untitled1/hive_models/pet_type_info_model.dart';
@@ -8,14 +7,10 @@ import 'package:untitled1/modules/admin/edit_pet_type_info/edit_pet_type_info_vi
 import 'package:untitled1/modules/admin/edit_pet_type_info/widgets/edit_pet_type_info_cancel_popup.dart';
 import 'package:untitled1/modules/admin/edit_pet_type_info/widgets/edit_pet_type_info_card.dart';
 import 'package:untitled1/modules/admin/edit_pet_type_info/widgets/edit_pet_type_info_confirm_popup.dart';
-import 'package:untitled1/widgets/user_profile_app_bar.dart';
-import 'package:untitled1/widgets/bottom_navigation_bar.dart';
 
 class EditPetTypeInfoView extends StatefulWidget {
-  final UserInfoModel userInfo;
   final PetTypeInfoModel petTypeInfo;
-  const EditPetTypeInfoView(
-      {required this.userInfo, required this.petTypeInfo, Key? key})
+  const EditPetTypeInfoView({required this.petTypeInfo, Key? key})
       : super(key: key);
 
   @override
@@ -26,7 +21,6 @@ class _EditPetTypeInfoViewState extends State<EditPetTypeInfoView> {
   late double height;
   late EditPetTypeInfoViewModel _viewModel;
   late TextEditingController _petTypeNameController;
-  // late String _petTypeName;
 
   @override
   void initState() {
@@ -35,8 +29,6 @@ class _EditPetTypeInfoViewState extends State<EditPetTypeInfoView> {
     _petTypeNameController = TextEditingController();
     _petTypeNameController.text = widget.petTypeInfo.petTypeName;
     _viewModel.petChronicDiseaseList = widget.petTypeInfo.petChronicDisease;
-    // _petTypeName = '';
-    // _viewModel.getHomeData(userID: widget.userInfo.userID);
   }
 
   @override
@@ -53,43 +45,38 @@ class _EditPetTypeInfoViewState extends State<EditPetTypeInfoView> {
           return confirm;
         },
         child: Scaffold(
-            bottomNavigationBar:
-                ProjectNavigationBar(index: 0, userInfo: widget.userInfo),
             body: SafeArea(
                 child: Column(
-              children: [
-                UserProfileAppBar(
-                  userInfo: widget.userInfo,
-                ),
-                Expanded(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 25),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 15),
-                        _header(),
-                        const SizedBox(height: 5),
-                        _petTypeNamePart(),
-                        const SizedBox(height: 15),
-                        Expanded(
-                          child: Column(
-                            children: [
-                              _petTypeInfo(height: height, context: context),
-                              const SizedBox(height: 15),
-                              _addPetChronicDiseaseButton(),
-                              const SizedBox(height: 10),
-                            ],
-                          ),
-                        ),
-                        _acceptButton(context),
-                        const SizedBox(height: 25),
-                      ],
+          children: [
+            Expanded(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 25),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const SizedBox(height: 15),
+                    _header(),
+                    const SizedBox(height: 5),
+                    _petTypeNamePart(),
+                    const SizedBox(height: 15),
+                    Expanded(
+                      child: Column(
+                        children: [
+                          _petTypeInfo(height: height, context: context),
+                          const SizedBox(height: 15),
+                          _addPetChronicDiseaseButton(),
+                          const SizedBox(height: 10),
+                        ],
+                      ),
                     ),
-                  ),
+                    _acceptButton(context),
+                    const SizedBox(height: 25),
+                  ],
                 ),
-              ],
-            ))));
+              ),
+            ),
+          ],
+        ))));
   }
 
   Widget _header() {
@@ -150,7 +137,6 @@ class _EditPetTypeInfoViewState extends State<EditPetTypeInfoView> {
             index: index,
             context: context,
             viewModel: _viewModel,
-            userInfo: widget.userInfo,
             // deletePetInfoCallBack: onUserDeleteCallBack
           );
         },
@@ -169,25 +155,25 @@ class _EditPetTypeInfoViewState extends State<EditPetTypeInfoView> {
         petChronicDiseaseName: petChronicDiseaseName);
   }
 
-  Widget _loadingScreen() {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CircularProgressIndicator(
-            strokeWidth: 3.5,
-          ),
-          SizedBox(
-            height: 30,
-          ),
-          Text(
-            "กำลังโหลดข้อมูล กรุณารอสักครู่...",
-            style: TextStyle(fontSize: 20),
-          ),
-        ],
-      ),
-    );
-  }
+  // Widget _loadingScreen() {
+  //   return const Center(
+  //     child: Column(
+  //       mainAxisAlignment: MainAxisAlignment.center,
+  //       children: [
+  //         CircularProgressIndicator(
+  //           strokeWidth: 3.5,
+  //         ),
+  //         SizedBox(
+  //           height: 30,
+  //         ),
+  //         Text(
+  //           "กำลังโหลดข้อมูล กรุณารอสักครู่...",
+  //           style: TextStyle(fontSize: 20),
+  //         ),
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _addPetChronicDiseaseButton() {
     return Center(
@@ -201,7 +187,6 @@ class _EditPetTypeInfoViewState extends State<EditPetTypeInfoView> {
                   context,
                   MaterialPageRoute(
                       builder: (context) => AddPetChronicDiseaseView(
-                          userInfo: widget.userInfo,
                           addPetChronicDiseaseCallBack:
                               onUserAddPetChronicDiseaseCallBack,
                           petTypeName: _petTypeNameController.text)),
@@ -241,7 +226,6 @@ class _EditPetTypeInfoViewState extends State<EditPetTypeInfoView> {
                 context: context,
                 builder: (context) {
                   return EditPetTypeInfoConfirmPopup(
-                      userInfo: widget.userInfo,
                       petTypeName: _petTypeNameController.text,
                       onUserAddPetTypeInfoCallBack:
                           onUserEditPetTypeInfoCallBack,

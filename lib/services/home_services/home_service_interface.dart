@@ -1,5 +1,5 @@
-import 'package:untitled1/modules/normal/home/models/home_model.dart';
+import 'package:untitled1/modules/normal/my_pet/models/home_model.dart';
 
 abstract class HomeServiceInterface {
-  Future<HomeModel> getPetListData({required String userID});
+  Future<MyPetModel> getPetListData({required String userID});
 }

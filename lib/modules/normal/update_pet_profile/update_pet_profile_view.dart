@@ -8,29 +8,24 @@ import 'package:untitled1/constants/enum/pet_factor_type_enum.dart';
 import 'package:untitled1/constants/enum/pet_neuture_status_enum.dart';
 import 'package:untitled1/constants/pet_physiology_status_list.dart';
 import 'package:untitled1/hive_models/pet_profile_model.dart';
-import 'package:untitled1/manager/navigation_with_animation_manager.dart';
-import 'package:untitled1/models/user_info_model.dart';
-import 'package:untitled1/modules/normal/home/home_view.dart';
+import 'package:untitled1/modules/normal/widgets/popup/add_confirm_popup.dart';
+import 'package:untitled1/modules/normal/widgets/popup/cancel_confirm_popup.dart';
+import 'package:untitled1/modules/normal/widgets/popup/success_popup.dart';
+import 'package:untitled1/utility/navigation_with_animation.dart';
+import 'package:untitled1/modules/normal/my_pet/my_pet_view.dart';
 import 'package:untitled1/modules/normal/pet_profile/pet_profile_view.dart';
 import 'package:untitled1/modules/normal/update_pet_profile/update_pet_profile_view_model.dart';
-import 'package:untitled1/widgets/popup/add_confirm_popup.dart';
-import 'package:untitled1/widgets/popup/cancel_popup.dart';
-import 'package:untitled1/widgets/background.dart';
+import 'package:untitled1/modules/normal/widgets/background.dart';
 import 'package:http/http.dart' as http;
 import 'package:untitled1/widgets/dropdown/dropdown.dart';
 import 'package:untitled1/widgets/dropdown/dropdown_search.dart';
 import 'package:untitled1/widgets/dropdown/multiple_dropdown_search.dart';
-import 'package:untitled1/widgets/popup/success_popup.dart';
 
 class UpdatePetProfileView extends StatefulWidget {
   final PetProfileModel petProfileInfo;
-  final UserInfoModel userInfo;
   final bool isCreate;
   const UpdatePetProfileView(
-      {required this.userInfo,
-      required this.isCreate,
-      required this.petProfileInfo,
-      Key? key})
+      {required this.isCreate, required this.petProfileInfo, Key? key})
       : super(key: key);
 
   @override
@@ -90,6 +85,7 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
     _petFactorNumber = widget.petProfileInfo.petFactorNumber;
     _petWeight = widget.petProfileInfo.petWeight;
     _petID = widget.petProfileInfo.petId;
+
     if (widget.isCreate) {
       _petNameController.text = "";
       _petWeightController.text = "";
@@ -99,6 +95,14 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
       _petWeightController.text = _petWeight.toString();
       _petFactorNumberController.text = _petFactorNumber.toString();
     }
+  }
+
+  @override
+  void dispose() {
+    _petNameController.dispose();
+    _petFactorNumberController.dispose();
+    _petWeightController.dispose();
+    super.dispose();
   }
 
   @override
@@ -231,7 +235,7 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
     );
   }
 
-  Future<http.Response> onUserAddPetProfileCallback() async {
+  Future<http.Response> onUserAddPetProfile() async {
     _petFactorNumber =
         _factorType == PetFactorType.customize.toString().split('.').last
             ? _petFactorNumber
@@ -259,7 +263,7 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
         petActivityType: _petActivityType);
   }
 
-  Future<http.Response> onUserEditPetProfileCallback() async {
+  Future<http.Response> onUserEditPetProfile() async {
     _petFactorNumber =
         _factorType == PetFactorType.customize.toString().split('.').last
             ? _petFactorNumber
@@ -296,15 +300,13 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
           return const Center(child: CircularProgressIndicator());
         });
     try {
-      await onUserAddPetProfileCallback();
+      await onUserAddPetProfile();
       if (!context.mounted) return;
       Navigator.pop(context);
       Future.delayed(const Duration(milliseconds: 1800), () {
         Navigator.of(context).popUntil((route) => route.isFirst);
         Navigator.pushReplacement(
-            context,
-            NavigationBackward(
-                targetPage: HomeView(userInfo: widget.userInfo)));
+            context, NavigationBackward(targetPage: const MyPetView()));
       });
       SuccessPopup(
               context: context, successText: 'เพิ่มข้อมูลสัตว์เลี้ยงสำเร็จ!!')
@@ -323,7 +325,7 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
           return const Center(child: CircularProgressIndicator());
         });
     try {
-      await onUserEditPetProfileCallback();
+      await onUserEditPetProfile();
       if (!context.mounted) return;
       Navigator.pop(context);
       Future.delayed(const Duration(milliseconds: 1800), () {
@@ -332,7 +334,6 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
           context,
           NavigationBackward(
             targetPage: PetProfileView(
-              userInfo: widget.userInfo,
               petProfileInfo: PetProfileModel(
                   petId: _petID,
                   petName: _petName,

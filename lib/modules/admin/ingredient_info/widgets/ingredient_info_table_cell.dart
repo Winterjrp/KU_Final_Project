@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/hive_models/ingredient_model.dart';
 
-// typedef OnShopGroupRemoveCallback = void Function(String shopGroupID);
 typedef IngredientAmountChangeCallback = void Function();
 
 class IngredientInfoTableCell extends StatelessWidget {
@@ -16,6 +15,8 @@ class IngredientInfoTableCell extends StatelessWidget {
   final Map<int, TableColumnWidth> tableColumnWidth;
   final NutrientModel nutrientInfo;
   final int index;
+  static const EdgeInsets tableCellPaddingInset =
+      EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10);
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +25,7 @@ class IngredientInfoTableCell extends StatelessWidget {
       children: [
         TableRow(
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: index % 2 == 1 ? Colors.white : Colors.grey.shade100,
             border: Border(
               bottom: BorderSide(
                 width: 1,
@@ -45,7 +46,7 @@ class IngredientInfoTableCell extends StatelessWidget {
   TableCell _number() {
     return TableCell(
       child: Padding(
-        padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
+        padding: tableCellPaddingInset,
         child: Center(
           child: Text(
             (index + 1).toString(),
@@ -59,7 +60,7 @@ class IngredientInfoTableCell extends StatelessWidget {
   TableCell _nutrient() {
     return TableCell(
       child: Padding(
-        padding: const EdgeInsets.only(left: 20, right: 20, top: 20),
+        padding: tableCellPaddingInset,
         child: Text(
           nutrientInfo.nutrientName,
           style: const TextStyle(fontSize: 17),
@@ -71,8 +72,7 @@ class IngredientInfoTableCell extends StatelessWidget {
   TableCell _amount() {
     return TableCell(
       child: Padding(
-        padding:
-            const EdgeInsets.only(left: 20, right: 20, top: 20, bottom: 20),
+        padding: tableCellPaddingInset,
         child: Center(
           child: Text(
             nutrientInfo.amount.toString(),

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/hive_models/pet_type_info_model.dart';
 import 'package:untitled1/hive_models/recipes_model.dart';
-import 'package:untitled1/models/user_info_model.dart';
 import 'package:untitled1/modules/admin/add_recipes/widgets/nutrient_table_cell.dart';
 import 'package:untitled1/modules/admin/edit_recipes/edit_recipes_view_model.dart';
 import 'package:untitled1/modules/admin/edit_recipes/widgets/edit_recipes_cancel_popup.dart';
@@ -11,11 +10,8 @@ import 'package:untitled1/modules/admin/edit_recipes/widgets/edit_recipes_confir
 import 'package:untitled1/modules/admin/edit_recipes/widgets/edit_recipes_table_cell.dart';
 
 class EditRecipesView extends StatefulWidget {
-  final UserInfoModel userInfo;
   final RecipesModel recipeData;
-  const EditRecipesView(
-      {required this.userInfo, required this.recipeData, Key? key})
-      : super(key: key);
+  const EditRecipesView({required this.recipeData, Key? key}) : super(key: key);
 
   @override
   State<EditRecipesView> createState() => _EditRecipesViewState();
@@ -282,7 +278,6 @@ class _EditRecipesViewState extends State<EditRecipesView> {
                 context: context,
                 builder: (context) {
                   return EditRecipesConfirmPopup(
-                    userInfo: widget.userInfo,
                     editRecipesCallBack: onUserEditRecipesCallBack,
                   );
                 },

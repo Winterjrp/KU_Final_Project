@@ -1,7 +1,5 @@
-import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:untitled1/hive_models/pet_type_info_model.dart';
-import 'package:untitled1/models/user_info_model.dart';
 import 'package:untitled1/modules/admin/pet_type_info_management/pet_type_info_management_view.dart';
 
 typedef OnUserEditPetTypeInfoCallBack = void Function(
@@ -9,12 +7,10 @@ typedef OnUserEditPetTypeInfoCallBack = void Function(
 
 class EditPetTypeInfoConfirmPopup extends StatelessWidget {
   final OnUserEditPetTypeInfoCallBack onUserAddPetTypeInfoCallBack;
-  final UserInfoModel userInfo;
   final String petTypeName;
   final PetTypeInfoModel petTypeInfo;
 
   const EditPetTypeInfoConfirmPopup({
-    required this.userInfo,
     required this.petTypeName,
     required this.onUserAddPetTypeInfoCallBack,
     required this.petTypeInfo,
@@ -73,9 +69,7 @@ class EditPetTypeInfoConfirmPopup extends StatelessWidget {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => PetTypeInfoManagementView(
-                      userInfo: userInfo,
-                    ),
+                    builder: (context) => const PetTypeInfoManagementView(),
                   ));
             },
             style: ElevatedButton.styleFrom(

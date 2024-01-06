@@ -1,9 +1,7 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:untitled1/models/user_info_model.dart';
 import 'package:untitled1/modules/admin/add_pet_chronic_disease/add_pet_chronic_view_model.dart';
 import 'package:untitled1/hive_models/nutrient_limit_info_model.dart';
-import 'package:untitled1/modules/admin/ingredient_management/ingredient_management_view.dart';
 
 typedef OnUserAddPetChronicDiseaseCallBack = void Function(
     {required List<NutrientLimitInfoModel> nutrientLimitInfo,
@@ -13,12 +11,10 @@ typedef OnUserAddPetChronicDiseaseCallBack = void Function(
 class AddPetChronicDiseaseConfirmPopup extends StatelessWidget {
   final AddPetChronicDiseaseViewModel viewModel;
   final OnUserAddPetChronicDiseaseCallBack addPetChronicDiseaseCallBack;
-  final UserInfoModel userInfo;
   final String petChronicDiseaseName;
 
   const AddPetChronicDiseaseConfirmPopup({
     required this.viewModel,
-    required this.userInfo,
     required this.petChronicDiseaseName,
     required this.addPetChronicDiseaseCallBack,
     Key? key,

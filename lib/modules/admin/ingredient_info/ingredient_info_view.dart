@@ -1,41 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
-import 'package:untitled1/models/user_info_model.dart';
-import 'package:untitled1/modules/admin/edit_ingredient/edit_ingredient_view.dart';
 import 'package:untitled1/modules/admin/ingredient_info/ingredient_info_view_model.dart';
-import 'package:untitled1/modules/admin/ingredient_info/widgets/delete_ingredient_confirm_popup.dart';
 import 'package:untitled1/modules/admin/ingredient_info/widgets/ingredient_info_table_cell.dart';
 import 'package:untitled1/hive_models/ingredient_model.dart';
+import 'package:untitled1/modules/admin/ingredient_management/ingredient_management_view.dart';
+import 'package:untitled1/modules/admin/update_ingredient/update_ingredient_view.dart';
+import 'package:untitled1/modules/admin/widgets/admin_loading_screen.dart';
+import 'package:untitled1/modules/admin/widgets/popup/admin_delete_confirm_popup.dart';
+import 'package:untitled1/modules/admin/widgets/popup/admin_success_popup.dart';
+import 'package:untitled1/utility/navigation_with_animation.dart';
 
 class IngredientInfoView extends StatelessWidget {
-  const IngredientInfoView({
-    required this.userInfo,
+  IngredientInfoView({
     required this.ingredientInfo,
-    required this.nutrientListLength,
     Key? key,
   }) : super(key: key);
 
-  final UserInfoModel userInfo;
-  final double _tableHeaderPadding = 20;
+  final double _tableHeaderPadding = 12;
   final IngredientModel ingredientInfo;
-  final int nutrientListLength;
-
   final Map<int, TableColumnWidth> _tableColumnWidth =
       const <int, TableColumnWidth>{
     0: FlexColumnWidth(0.1),
     1: FlexColumnWidth(0.5),
     2: FlexColumnWidth(0.2),
   };
+  final TextStyle _headerTextStyle =
+      const TextStyle(fontSize: 17, color: Colors.white);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: backgroundColor,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            _routingGuide(),
+            const SizedBox(height: 5),
             _header(),
             _operationButton(context: context),
             const SizedBox(height: 15),
@@ -43,6 +44,13 @@ class IngredientInfoView extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Text _routingGuide() {
+    return const Text(
+      "จัดการข้อมูลวัตถุดิบ / ข้อมูลวัตถุดิบ",
+      style: TextStyle(color: Colors.grey, fontSize: 20),
     );
   }
 
@@ -57,33 +65,65 @@ class IngredientInfoView extends StatelessWidget {
     );
   }
 
+  BuildContext? storedContext;
+
+  Future<void> _handleDeleteIngredient() async {
+    if (storedContext == null) {
+      return;
+    }
+
+    Navigator.pop(storedContext!);
+    showDialog(
+        barrierDismissible: false,
+        context: storedContext!,
+        builder: (context) {
+          return const Center(child: AdminLoadingScreen());
+        });
+    try {
+      IngredientInfoViewModel viewModel = IngredientInfoViewModel();
+      await viewModel.onUserDeleteIngredientInfo(
+          ingredientID: ingredientInfo.ingredientID);
+      if (!storedContext!.mounted) return;
+      Navigator.pop(storedContext!);
+      Future.delayed(const Duration(milliseconds: 1800), () {
+        Navigator.of(storedContext!).popUntil((route) => route.isFirst);
+        Navigator.pushReplacement(
+          storedContext!,
+          NavigationDownward(
+            targetPage: const IngredientManagementView(),
+          ),
+        );
+      });
+      AdminSuccessPopup(
+              context: storedContext!, successText: 'ลบข้อมูลวัตถุดิบสำเร็จ!!')
+          .show();
+    } catch (e) {
+      print(e);
+    }
+  }
+
   Widget _deleteIngredientInfoButton({required BuildContext context}) {
-    IngredientInfoViewModel viewModel = IngredientInfoViewModel();
+    storedContext = context;
     return SizedBox(
       height: 40,
       child: ElevatedButton(
         onPressed: () async {
-          showDialog(
+          AdminDeleteConfirmPopup(
             context: context,
-            builder: (context) {
-              return DeleteIngredientConfirmPopup(
-                viewModel: viewModel,
-                userInfo: userInfo,
-                ingredientID: ingredientInfo.ingredientID,
-              );
-            },
-          );
+            deleteText: 'ยืนยันการลบข้อมูลวัตถุดิบ?',
+            callback: _handleDeleteIngredient,
+          ).show();
         },
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 10),
-          backgroundColor: Colors.red,
+          backgroundColor: red,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
         ),
         child: const Row(
           children: [
-            Icon(Icons.delete_rounded, color: Colors.white),
+            Icon(Icons.delete_forever_outlined, color: Colors.white),
             SizedBox(width: 5),
             Text('ลบข้อมูล',
                 style: TextStyle(fontSize: 17, color: Colors.white)),
@@ -99,16 +139,19 @@ class IngredientInfoView extends StatelessWidget {
       child: ElevatedButton(
         onPressed: () async {
           Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) => EditIngredientView(
-                        userInfo: userInfo,
-                        ingredientInfo: ingredientInfo,
-                      )));
+            context,
+            NavigationUpward(
+              targetPage: UpdateIngredientView(
+                ingredientInfo: ingredientInfo,
+                isCreate: false,
+              ),
+              durationInMilliSec: 450,
+            ),
+          );
         },
         style: ElevatedButton.styleFrom(
           padding: const EdgeInsets.symmetric(horizontal: 10),
-          backgroundColor: Colors.blueAccent,
+          backgroundColor: const Color.fromRGBO(252, 135, 119, 1),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10),
           ),
@@ -117,7 +160,8 @@ class IngredientInfoView extends StatelessWidget {
           children: [
             Icon(Icons.edit, color: Colors.white),
             SizedBox(width: 10),
-            Text('แก้ไข', style: TextStyle(fontSize: 17, color: Colors.white)),
+            Text('แก้ไขข้อมูล',
+                style: TextStyle(fontSize: 17, color: Colors.white)),
           ],
         ),
       ),
@@ -129,7 +173,7 @@ class IngredientInfoView extends StatelessWidget {
       "ข้อมูลวัตถุดิบ: ${ingredientInfo.ingredientName}",
       style: const TextStyle(
         fontWeight: FontWeight.bold,
-        fontSize: 42,
+        fontSize: 36,
         // color: kPrimaryDarkColor,
       ),
     );
@@ -152,18 +196,15 @@ class IngredientInfoView extends StatelessWidget {
       border: TableBorder.symmetric(
         inside: const BorderSide(
           width: 1,
-          // color: primary,
         ),
       ),
       children: [
         TableRow(
           decoration: BoxDecoration(
-            color: primary,
+            color: const Color.fromRGBO(16, 16, 29, 1),
             border: Border.all(
               width: 1,
-              // color: primary,
             ),
-            // color: kColorLightBlueBTN,
             borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(10),
               topRight: Radius.circular(10),
@@ -173,10 +214,10 @@ class IngredientInfoView extends StatelessWidget {
             TableCell(
               child: Padding(
                 padding: EdgeInsets.all(_tableHeaderPadding),
-                child: const Center(
+                child: Center(
                   child: Text(
                     'ลำดับที่',
-                    style: TextStyle(fontSize: 17),
+                    style: _headerTextStyle,
                   ),
                 ),
               ),
@@ -184,10 +225,10 @@ class IngredientInfoView extends StatelessWidget {
             TableCell(
               child: Padding(
                 padding: EdgeInsets.all(_tableHeaderPadding),
-                child: const Center(
+                child: Center(
                   child: Text(
                     'สารอาหาร',
-                    style: TextStyle(fontSize: 17),
+                    style: _headerTextStyle,
                   ),
                 ),
               ),
@@ -195,10 +236,10 @@ class IngredientInfoView extends StatelessWidget {
             TableCell(
               child: Padding(
                 padding: EdgeInsets.all(_tableHeaderPadding),
-                child: const Center(
+                child: Center(
                   child: Text(
                     'ปริมาณสารอาหาร',
-                    style: TextStyle(fontSize: 17),
+                    style: _headerTextStyle,
                   ),
                 ),
               ),
@@ -235,7 +276,7 @@ class IngredientInfoView extends StatelessWidget {
           ),
         ),
         child: ListView.builder(
-          itemCount: nutrientListLength,
+          itemCount: ingredientInfo.nutrient.length,
           itemBuilder: (context, index) {
             return IngredientInfoTableCell(
               index: index,

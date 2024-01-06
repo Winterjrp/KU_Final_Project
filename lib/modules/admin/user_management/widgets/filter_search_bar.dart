@@ -4,68 +4,89 @@ typedef SearchCallback = void Function({required String searchText});
 
 class FilterSearchBar extends StatelessWidget {
   final SearchCallback onSearch;
-  final TextEditingController textEditingController;
+  final TextEditingController searchTextEditingController;
+  final String labelText;
 
   const FilterSearchBar({
     Key? key,
     required this.onSearch,
-    required this.textEditingController,
+    required this.searchTextEditingController,
+    required this.labelText,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return TextField(
+      onTap: () {
+        searchTextEditingController.selection = TextSelection(
+          baseOffset: 0,
+          extentOffset: searchTextEditingController.text.length,
+        );
+      },
       onChanged: (searchText) {
         onSearch(searchText: searchText);
       },
-      controller: textEditingController,
-      style: const TextStyle(fontSize: 19),
+      cursorColor: Colors.black,
+      controller: searchTextEditingController,
+      style: const TextStyle(fontSize: 18),
       decoration: InputDecoration(
-        border: OutlineInputBorder(
-          borderSide: const BorderSide(
-            width: 1,
+        enabledBorder: OutlineInputBorder(
+          borderSide: BorderSide(
+            color: searchTextEditingController.text.isEmpty
+                ? Colors.grey
+                : Colors.black,
+            width: searchTextEditingController.text.isEmpty ? 1 : 2,
           ),
-          borderRadius: BorderRadius.circular(8),
+          borderRadius: BorderRadius.circular(15),
         ),
-        hintText: 'ค้นหาวัตถุดิบ',
-        hintStyle:
-            const TextStyle(fontSize: 18, height: 1.9, color: Colors.grey),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(15),
+          borderSide: const BorderSide(
+            color: Colors.black,
+            width: 2,
+          ),
+        ),
+        labelText: labelText,
+        floatingLabelStyle: const TextStyle(
+          color: Colors.black,
+          fontSize: 26,
+          fontWeight: FontWeight.bold,
+        ),
         isDense: true,
         fillColor: Colors.white,
         filled: true,
         contentPadding: const EdgeInsets.only(
-          left: 20,
-          top: 10,
-          bottom: 10,
+          left: 15,
+          top: 12,
+          bottom: 12,
         ),
-        suffixIcon: textEditingController.text.isNotEmpty
+        suffixIcon: searchTextEditingController.text.isNotEmpty
             ? IconButton(
                 hoverColor: Colors.transparent,
                 onPressed: () {
-                  textEditingController.clear();
+                  searchTextEditingController.clear();
                   onSearch(searchText: '');
                 },
-                icon: const Icon(
-                  Icons.close,
-                  // color: kGreyColor,
-                  size: 18,
+                icon: Container(
+                  margin: const EdgeInsets.only(right: 5),
+                  child: const Icon(
+                    Icons.close,
+                    color: Colors.red,
+                    size: 18,
+                  ),
                 ),
               )
-            : Transform.scale(
-                scale: 2.8,
-                child: const Icon(
-                  Icons.search,
-                  // color: kGreyColor,
-                  size: 10,
+            : Container(
+                margin: const EdgeInsets.only(right: 10),
+                child: Transform.scale(
+                  scale: 2.8,
+                  child: const Icon(
+                    Icons.search,
+                    color: Colors.black,
+                    size: 10,
+                  ),
                 ),
               ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(8),
-          borderSide: const BorderSide(
-            // color: kLightBlueColor,
-            width: 1,
-          ),
-        ),
       ),
     );
   }

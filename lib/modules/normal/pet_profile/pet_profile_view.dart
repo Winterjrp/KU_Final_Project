@@ -6,27 +6,22 @@ import 'package:untitled1/constants/enum/pet_factor_type_enum.dart';
 import 'package:untitled1/constants/enum/pet_neuture_status_enum.dart';
 import 'package:untitled1/constants/pet_physiology_status_list.dart';
 import 'package:untitled1/hive_models/pet_profile_model.dart';
-import 'package:untitled1/manager/navigation_with_animation_manager.dart';
-import 'package:untitled1/models/user_info_model.dart';
-import 'package:untitled1/modules/normal/home/home_view.dart';
+import 'package:untitled1/modules/normal/widgets/popup/delete_confirm_popup.dart';
+import 'package:untitled1/modules/normal/widgets/popup/success_popup.dart';
+import 'package:untitled1/utility/navigation_with_animation.dart';
+import 'package:untitled1/modules/normal/my_pet/my_pet_view.dart';
 import 'package:untitled1/modules/normal/pet_profile/pet_profile_view_model.dart';
 import 'package:untitled1/modules/normal/select_ingredient/select_ingredient_view.dart';
 import 'package:untitled1/modules/normal/update_pet_profile/update_pet_profile_view.dart';
-import 'package:untitled1/widgets/background.dart';
+import 'package:untitled1/modules/normal/widgets/background.dart';
 import 'package:http/http.dart' as http;
-import 'package:untitled1/widgets/popup/delete_confirm_popup.dart';
-import 'package:untitled1/widgets/popup/success_popup.dart';
 
 class PetProfileView extends StatefulWidget {
   final PetProfileModel petProfileInfo;
-  final UserInfoModel userInfo;
   final bool isJustUpdate;
 
   const PetProfileView(
-      {required this.petProfileInfo,
-      required this.userInfo,
-      required this.isJustUpdate,
-      Key? key})
+      {required this.petProfileInfo, required this.isJustUpdate, Key? key})
       : super(key: key);
 
   @override
@@ -76,8 +71,7 @@ class _PetProfileViewState extends State<PetProfileView> {
             widget.isJustUpdate
                 ? Navigator.pushReplacement(
                     context,
-                    NavigationBackward(
-                        targetPage: HomeView(userInfo: widget.userInfo)),
+                    NavigationBackward(targetPage: const MyPetView()),
                   )
                 : Navigator.of(context).pop();
           },
@@ -189,9 +183,7 @@ class _PetProfileViewState extends State<PetProfileView> {
       Future.delayed(const Duration(milliseconds: 1800), () {
         Navigator.of(context).popUntil((route) => route.isFirst);
         Navigator.pushReplacement(
-            context,
-            NavigationBackward(
-                targetPage: HomeView(userInfo: widget.userInfo)));
+            context, NavigationBackward(targetPage: const MyPetView()));
       });
       SuccessPopup(context: context, successText: 'ลบข้อมูลสัตว์เลี้ยงสำเร็จ!!')
           .show();
@@ -207,7 +199,7 @@ class _PetProfileViewState extends State<PetProfileView> {
         onPressed: () async {
           DeleteConfirmPopup(
               context: context,
-              cancelText: "ยืนยันการลบข้อมูลสัตว์เลี้ยง",
+              cancelText: "ยืนยันการลบข้อมูลสัตว์เลี้ยง?",
               callback: () {
                 _handleDeletePetProfile();
               }).show();
@@ -240,7 +232,6 @@ class _PetProfileViewState extends State<PetProfileView> {
               context,
               NavigationForward(
                   targetPage: UpdatePetProfileView(
-                userInfo: widget.userInfo,
                 isCreate: false,
                 petProfileInfo: widget.petProfileInfo,
               )));

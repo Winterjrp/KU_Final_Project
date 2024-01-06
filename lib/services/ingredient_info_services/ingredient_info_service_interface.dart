@@ -1,3 +1,3 @@
 abstract class IngredientInfoServiceInterface {
-  Future<void> deleteIngredientInfo({required String ingredientID});
+  Future<void> deleteIngredientInfo({required String ingredientId});
 }

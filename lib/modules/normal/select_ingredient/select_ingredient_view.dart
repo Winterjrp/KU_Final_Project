@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/constants/enum/select_ingredient_type_enum.dart';
 import 'package:untitled1/modules/normal/select_ingredient/select_ingredient_view_model.dart';
-import 'package:untitled1/widgets/background.dart';
+import 'package:untitled1/modules/normal/widgets/background.dart';
 import 'package:untitled1/widgets/dropdown/multiple_dropdown_search.dart';
 
 class SelectIngredientView extends StatefulWidget {
