@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:untitled1/constants/color.dart';
 
 class AdminAppBar extends StatelessWidget implements PreferredSizeWidget {
   const AdminAppBar({Key? key}) : super(key: key);
@@ -23,7 +24,7 @@ class AdminAppBar extends StatelessWidget implements PreferredSizeWidget {
       ),
       // title: const Center(child: Text("ฟังก์ชันสำหรับผู้ดูแลระบบ")),
       iconTheme: const IconThemeData(color: Colors.black),
-      backgroundColor: Colors.white,
+      backgroundColor: backgroundColor,
     );
   }
 

@@ -6,37 +6,38 @@ part of 'recipes_model.dart';
 // TypeAdapterGenerator
 // **************************************************************************
 
-class RecipesModelAdapter extends TypeAdapter<RecipesModel> {
+class RecipeModelAdapter extends TypeAdapter<RecipeModel> {
   @override
   final int typeId = 7;
 
   @override
-  RecipesModel read(BinaryReader reader) {
+  RecipeModel read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return RecipesModel(
-      recipesID: fields[0] as String,
+    return RecipeModel(
+      recipeId: fields[0] as String,
       recipesName: fields[1] as String,
       petTypeName: fields[2] as String,
-      ingredientInRecipes: (fields[3] as List).cast<IngredientInRecipesModel>(),
+      ingredientInRecipeList:
+          (fields[3] as List).cast<IngredientInRecipeModel>(),
       nutrient: (fields[4] as List).cast<NutrientModel>(),
     );
   }
 
   @override
-  void write(BinaryWriter writer, RecipesModel obj) {
+  void write(BinaryWriter writer, RecipeModel obj) {
     writer
       ..writeByte(5)
       ..writeByte(0)
-      ..write(obj.recipesID)
+      ..write(obj.recipeId)
       ..writeByte(1)
       ..write(obj.recipesName)
       ..writeByte(2)
       ..write(obj.petTypeName)
       ..writeByte(3)
-      ..write(obj.ingredientInRecipes)
+      ..write(obj.ingredientInRecipeList)
       ..writeByte(4)
       ..write(obj.nutrient);
   }
@@ -47,7 +48,7 @@ class RecipesModelAdapter extends TypeAdapter<RecipesModel> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is RecipesModelAdapter &&
+      other is RecipeModelAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

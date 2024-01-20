@@ -40,8 +40,8 @@ class _UpdateIngredientTableCellState extends State<UpdateIngredientTableCell> {
   void initState() {
     super.initState();
     _nutrientAmountController = TextEditingController();
-    _nutrientAmountController.text = widget.nutrientInfo.amount.toString();
     _amountFocusNode = FocusNode();
+    _nutrientAmountController.text = widget.nutrientInfo.amount.toString();
   }
 
   @override
@@ -61,11 +61,11 @@ class _UpdateIngredientTableCellState extends State<UpdateIngredientTableCell> {
         TableRow(
           decoration: BoxDecoration(
             color: _amountFocusNode.hasFocus
-                ? flesh.withOpacity(0.2)
+                ? hoverColor
                 : widget.index % 2 == 1
                     ? Colors.white
                     : Colors.grey.shade100,
-            border: Border(
+            border: const Border(
               bottom: BorderSide(
                 width: 1,
                 color: lightGrey,
@@ -76,9 +76,24 @@ class _UpdateIngredientTableCellState extends State<UpdateIngredientTableCell> {
             _number(),
             _nutrient(),
             _amount(),
+            _unit(),
           ],
         ),
       ],
+    );
+  }
+
+  TableCell _unit() {
+    return TableCell(
+      child: Padding(
+        padding: _tableCellPaddingInset,
+        child: Center(
+          child: Text(
+            widget.nutrientInfo.unit,
+            style: const TextStyle(fontSize: 16),
+          ),
+        ),
+      ),
     );
   }
 
@@ -113,13 +128,17 @@ class _UpdateIngredientTableCellState extends State<UpdateIngredientTableCell> {
 
   void _onAmountChanged(String value) {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
-    _debounce = Timer(const Duration(milliseconds: 500), () {
+    _debounce = Timer(const Duration(milliseconds: 100), () {
       if (value == "") {
         _nutrientAmountController.text = "0";
-        value = "0";
+      } else {
+        if (double.parse(value) > 100) {
+          _nutrientAmountController.text = "100";
+        }
       }
       widget.ingredientAmountChangeCallback(
-          index: widget.index, amount: double.parse(value));
+          index: widget.index,
+          amount: double.parse(_nutrientAmountController.text));
     });
   }
 
@@ -128,7 +147,7 @@ class _UpdateIngredientTableCellState extends State<UpdateIngredientTableCell> {
       child: Padding(
         padding: _tableCellPaddingInset,
         child: Container(
-          margin: EdgeInsets.symmetric(horizontal: _width * 0.035),
+          margin: EdgeInsets.symmetric(horizontal: _width * 0.08),
           height: 30,
           child: TextField(
             focusNode: _amountFocusNode,
@@ -152,11 +171,11 @@ class _UpdateIngredientTableCellState extends State<UpdateIngredientTableCell> {
               contentPadding: const EdgeInsets.only(left: 0),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10.0),
-                borderSide: BorderSide(color: tGrey),
+                borderSide: const BorderSide(color: tGrey),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10.0),
-                borderSide: BorderSide(color: tGrey),
+                borderSide: const BorderSide(color: tGrey),
               ),
             ),
             onChanged: (value) {
@@ -165,6 +184,10 @@ class _UpdateIngredientTableCellState extends State<UpdateIngredientTableCell> {
             onEditingComplete: () {
               _moveToNextField();
             },
+            onTapOutside: (event) {
+              _amountFocusNode.unfocus();
+              setState(() {});
+            },
           ),
         ),
       ),
@@ -172,7 +195,8 @@ class _UpdateIngredientTableCellState extends State<UpdateIngredientTableCell> {
   }
 
   void _moveToNextField() {
-    Future.delayed(const Duration(milliseconds: 100), () {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 100), () {
       FocusScope.of(context).nextFocus();
     });
   }

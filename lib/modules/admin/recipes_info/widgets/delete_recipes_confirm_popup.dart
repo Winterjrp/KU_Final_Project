@@ -62,7 +62,7 @@ class DeleteRecipesConfirmPopup extends StatelessWidget {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => const RecipesManagementView()),
+                    builder: (context) => const RecipeManagementView()),
               );
             },
             style: ElevatedButton.styleFrom(

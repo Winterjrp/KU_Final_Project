@@ -19,7 +19,7 @@ class MyPetViewModel {
     try {
       retrievedUserInfoData = SharedPreferencesService.getUserInfo();
       retrievedUserInfo = await retrievedUserInfoData;
-      // print(retrievedUserInfo!.userID);
+
       homeDataFetch = services.getPetListData(userID: "1234");
       homeData = await homeDataFetch;
     } catch (e) {

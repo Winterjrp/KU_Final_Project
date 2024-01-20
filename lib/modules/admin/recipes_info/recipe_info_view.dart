@@ -1,32 +1,58 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
+import 'package:untitled1/constants/size.dart';
 import 'package:untitled1/hive_models/recipes_model.dart';
-import 'package:untitled1/modules/admin/edit_recipes/edit_recipe_view.dart';
-import 'package:untitled1/modules/admin/recipes_info/widgets/delete_recipes_confirm_popup.dart';
+import 'package:untitled1/modules/admin/add_recipes/add_recipe_view.dart';
 import 'package:untitled1/modules/admin/recipes_info/widgets/nutrient_info_table_cell.dart';
 import 'package:untitled1/modules/admin/recipes_info/widgets/recipes_info_table_cell.dart';
+import 'package:untitled1/modules/admin/recipes_management/recipes_management_view.dart';
+import 'package:untitled1/modules/admin/widgets/button/admin_delete_object_button.dart';
+import 'package:untitled1/modules/admin/widgets/button/admin_edit_object_button.dart';
+import 'package:untitled1/modules/admin/widgets/loading_screen/admin_loading_screen.dart';
+import 'package:untitled1/modules/admin/widgets/popup/admin_delete_confirm_popup.dart';
+import 'package:untitled1/modules/admin/widgets/popup/admin_success_popup.dart';
+import 'package:untitled1/utility/navigation_with_animation.dart';
 
-typedef DeleteRecipesCallBack = void Function({required String recipeID});
+typedef OnUserDeleteRecipesCallbackFunction = Future<void> Function(
+    {required String recipeId});
 
-class RecipesInfoView extends StatelessWidget {
-  final RecipesModel recipesData;
-  final DeleteRecipesCallBack deleteRecipesCallBack;
+typedef OnUserEditRecipeCallbackFunction = Future<void> Function(
+    {required RecipeModel recipeData});
 
-  RecipesInfoView(
+class RecipeInfoView extends StatelessWidget {
+  final bool isJustUpdate;
+  final RecipeModel recipesData;
+  final OnUserDeleteRecipesCallbackFunction onUserDeleteRecipesCallback;
+  final OnUserEditRecipeCallbackFunction onUserEditRecipeCallback;
+
+  RecipeInfoView(
       {required this.recipesData,
-      required this.deleteRecipesCallBack,
-      Key? key})
+      required this.onUserDeleteRecipesCallback,
+      Key? key,
+      required this.onUserEditRecipeCallback,
+      required this.isJustUpdate})
       : super(key: key);
 
   late String _recipesName;
   late String _petTypeName;
-  final Map<int, TableColumnWidth> _tableColumnWidth =
-      const <int, TableColumnWidth>{
+  static const Map<int, TableColumnWidth> _nutrientTableColumnWidth =
+      <int, TableColumnWidth>{
     0: FlexColumnWidth(0.2),
-    1: FlexColumnWidth(0.8),
-    2: FlexColumnWidth(0.3),
+    1: FlexColumnWidth(0.6),
+    2: FlexColumnWidth(0.4),
+    3: FlexColumnWidth(0.3),
   };
-  final double _tableHeaderPadding = 20;
+
+  static const _ingredientTableColumnWidth = <int, TableColumnWidth>{
+    0: FlexColumnWidth(0.2),
+    1: FlexColumnWidth(0.4),
+    2: FlexColumnWidth(0.35),
+  };
+  static const double _tableHeaderPadding = 12;
+
+  static const TextStyle _headerTextStyle =
+      TextStyle(fontSize: 17, color: Colors.white);
 
   @override
   Widget build(BuildContext context) {
@@ -34,22 +60,36 @@ class RecipesInfoView extends StatelessWidget {
     double width = size.width;
     _recipesName = recipesData.recipesName;
     _petTypeName = recipesData.petTypeName;
-    return Scaffold(
-      backgroundColor: backgroundColor,
-      body: Padding(
+    return WillPopScope(
+      onWillPop: () async {
+        Completer<bool> completer = Completer<bool>();
+        isJustUpdate
+            ? Navigator.pushReplacement(
+                context,
+                NavigationDownward(targetPage: const RecipeManagementView()),
+              )
+            : Navigator.pop(context);
+        return completer.future;
+      },
+      child: Scaffold(
+        backgroundColor: backgroundColor,
+        body: _body(context, width),
+      ),
+    );
+  }
+
+  Center _body(BuildContext context, double width) {
+    return Center(
+      child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+        constraints: const BoxConstraints(maxWidth: adminScreenMaxWidth),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            _routingGuide(),
+            const SizedBox(height: 5),
             _header(),
-            Row(
-              children: [
-                const Spacer(),
-                _editRecipeInfoButton(context: context),
-                const SizedBox(width: 15),
-                _deleteRecipeInfoButton(context: context),
-              ],
-            ),
+            _operationButton(context),
             Expanded(
               child: Row(
                 children: [
@@ -65,67 +105,84 @@ class RecipesInfoView extends StatelessWidget {
     );
   }
 
-  Widget _deleteRecipeInfoButton({required BuildContext context}) {
-    // IngredientInfoViewModel viewModel = IngredientInfoViewModel();
-    return SizedBox(
-      height: 40,
-      child: ElevatedButton(
-        onPressed: () async {
-          showDialog(
-            context: context,
-            builder: (context) {
-              return DeleteRecipesConfirmPopup(
-                recipeID: recipesData.recipesID,
-                deleteRecipesCallBack: deleteRecipesCallBack,
-              );
-            },
-          );
-        },
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          backgroundColor: Colors.red,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+  Row _operationButton(BuildContext context) {
+    return Row(
+      children: [
+        const Spacer(),
+        _editRecipeInfoButton(context: context),
+        const SizedBox(width: 15),
+        _deleteRecipeInfoButton(context: context),
+      ],
+    );
+  }
+
+  Text _routingGuide() {
+    return const Text(
+      "จัดการข้อมูลสูตรอาหาร / ข้อมูลสูตรอาหาร",
+      style: TextStyle(color: Colors.grey, fontSize: 20),
+    );
+  }
+
+  BuildContext? storedContext;
+
+  Future<void> _handleDeleteRecipe() async {
+    Navigator.pop(storedContext!);
+    showDialog(
+        barrierDismissible: false,
+        context: storedContext!,
+        builder: (context) {
+          return const Center(child: AdminLoadingScreen());
+        });
+    try {
+      await onUserDeleteRecipesCallback(recipeId: recipesData.recipeId);
+      if (!storedContext!.mounted) return;
+      Navigator.pop(storedContext!);
+      Future.delayed(const Duration(milliseconds: 1600), () {
+        Navigator.of(storedContext!).popUntil((route) => route.isFirst);
+        Navigator.pushReplacement(
+          storedContext!,
+          NavigationDownward(
+            targetPage: const RecipeManagementView(),
           ),
-        ),
-        child: const Row(
-          children: [
-            Icon(Icons.delete_rounded, color: Colors.white),
-            SizedBox(width: 5),
-            Text('ลบข้อมูล',
-                style: TextStyle(fontSize: 17, color: Colors.white)),
-          ],
-        ),
-      ),
+        );
+      });
+      AdminSuccessPopup(
+              context: storedContext!, successText: 'ลบข้อมูลสูตรอาหารสำเร็จ!!')
+          .show();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Widget _deleteRecipeInfoButton({required BuildContext context}) {
+    storedContext = context;
+    return AdminDeleteObjectButton(
+      deleteObjectCallback: () {
+        AdminDeleteConfirmPopup(
+          context: context,
+          deleteText: 'ยืนยันการลบข้อมูลสูตรอาหาร?',
+          callback: _handleDeleteRecipe,
+        ).show();
+      },
     );
   }
 
   Widget _editRecipeInfoButton({required BuildContext context}) {
-    return SizedBox(
-      height: 40,
-      child: ElevatedButton(
-        onPressed: () async {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => EditRecipesView(recipeData: recipesData)),
-          );
-        },
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          backgroundColor: Colors.blueAccent,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+    return AdminEditObjectButton(
+      editObjectCallback: () {
+        Navigator.push(
+          context,
+          NavigationUpward(
+            targetPage: AddRecipesView(
+              isCreate: false,
+              recipeInfo: recipesData,
+              onUserEditRecipeCallback: onUserEditRecipeCallback,
+              onUserDeleteRecipesCallback: onUserDeleteRecipesCallback,
+            ),
+            durationInMilliSec: 450,
           ),
-        ),
-        child: const Row(
-          children: [
-            Icon(Icons.edit, color: Colors.white),
-            SizedBox(width: 10),
-            Text('แก้ไข', style: TextStyle(fontSize: 17, color: Colors.white)),
-          ],
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -136,7 +193,7 @@ class RecipesInfoView extends StatelessWidget {
         children: [
           const Text(
             "สารอาหาร",
-            style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 10),
           _nutrientTable(),
@@ -158,35 +215,29 @@ class RecipesInfoView extends StatelessWidget {
 
   Widget _nutrientTableHeader() {
     return Table(
-      columnWidths: _tableColumnWidth,
+      columnWidths: _nutrientTableColumnWidth,
       border: TableBorder.symmetric(
         inside: const BorderSide(
           width: 1,
-          // color: primary,
         ),
       ),
-      children: [
+      children: const [
         TableRow(
           decoration: BoxDecoration(
-            color: primary,
-            border: Border.all(
-              width: 1,
-              // color: primary,
-            ),
-            // color: kColorLightBlueBTN,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(10),
-              topRight: Radius.circular(10),
+            color: specialBlack,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(15),
+              topRight: Radius.circular(15),
             ),
           ),
           children: [
             TableCell(
               child: Padding(
                 padding: EdgeInsets.all(_tableHeaderPadding),
-                child: const Center(
+                child: Center(
                   child: Text(
                     'ลำดับที่',
-                    style: TextStyle(fontSize: 17),
+                    style: _headerTextStyle,
                   ),
                 ),
               ),
@@ -194,10 +245,10 @@ class RecipesInfoView extends StatelessWidget {
             TableCell(
               child: Padding(
                 padding: EdgeInsets.all(_tableHeaderPadding),
-                child: const Center(
+                child: Center(
                   child: Text(
                     'สารอาหาร',
-                    style: TextStyle(fontSize: 17),
+                    style: _headerTextStyle,
                   ),
                 ),
               ),
@@ -205,10 +256,21 @@ class RecipesInfoView extends StatelessWidget {
             TableCell(
               child: Padding(
                 padding: EdgeInsets.all(_tableHeaderPadding),
-                child: const Center(
+                child: Center(
                   child: Text(
-                    'ปริมาณสารอาหาร',
-                    style: TextStyle(fontSize: 17),
+                    'ปริมาณสารอาหาร (%FM)',
+                    style: _headerTextStyle,
+                  ),
+                ),
+              ),
+            ),
+            TableCell(
+              child: Padding(
+                padding: EdgeInsets.all(_tableHeaderPadding),
+                child: Center(
+                  child: Text(
+                    'หน่วย',
+                    style: _headerTextStyle,
                   ),
                 ),
               ),
@@ -222,7 +284,7 @@ class RecipesInfoView extends StatelessWidget {
   Widget _nutrientTableBody() {
     return Expanded(
       child: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           border: Border(
             bottom: BorderSide(
               width: 0.9,
@@ -243,7 +305,7 @@ class RecipesInfoView extends StatelessWidget {
           itemBuilder: (context, index) {
             return NutrientInfoTableCell(
               index: index,
-              tableColumnWidth: _tableColumnWidth,
+              tableColumnWidth: _nutrientTableColumnWidth,
               nutrientInfo: recipesData.nutrient[index],
             );
           },
@@ -252,15 +314,16 @@ class RecipesInfoView extends StatelessWidget {
     );
   }
 
-  SizedBox _ingredient(double width) {
-    return SizedBox(
-      width: 0.43 * width,
+  Widget _ingredient(double width) {
+    return Container(
+      width: 0.3 * width,
+      constraints: const BoxConstraints(minWidth: 650),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
             "วัตถุดิบ",
-            style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 10),
           _ingredientTable(),
@@ -276,8 +339,7 @@ class RecipesInfoView extends StatelessWidget {
           "ข้อมูลสูตรอาหาร:",
           style: TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 45,
-            // color: kPrimaryDarkColor,
+            fontSize: headerTextFontSize,
           ),
         ),
         const SizedBox(width: 10),
@@ -285,17 +347,14 @@ class RecipesInfoView extends StatelessWidget {
           _recipesName,
           style: const TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 45,
-            // color: kPrimaryDarkColor,
+            fontSize: headerTextFontSize,
           ),
         ),
         const SizedBox(width: 10),
         const Text(
           "ของ",
           style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 45,
-            // color: kPrimaryDarkColor,
+            fontSize: headerTextFontSize,
           ),
         ),
         const SizedBox(width: 10),
@@ -303,8 +362,7 @@ class RecipesInfoView extends StatelessWidget {
           _petTypeName,
           style: const TextStyle(
             fontWeight: FontWeight.bold,
-            fontSize: 45,
-            // color: kPrimaryDarkColor,
+            fontSize: headerTextFontSize,
           ),
         ),
       ],
@@ -324,35 +382,24 @@ class RecipesInfoView extends StatelessWidget {
 
   Widget _ingredientTableHeader() {
     return Table(
-      columnWidths: _tableColumnWidth,
-      border: TableBorder.symmetric(
-        inside: const BorderSide(
-          width: 1,
-          // color: primary,
-        ),
-      ),
-      children: [
+      columnWidths: _ingredientTableColumnWidth,
+      children: const [
         TableRow(
           decoration: BoxDecoration(
-            color: primary,
-            border: Border.all(
-              width: 1,
-              // color: primary,
-            ),
-            // color: kColorLightBlueBTN,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(10),
-              topRight: Radius.circular(10),
+            color: specialBlack,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(15),
+              topRight: Radius.circular(15),
             ),
           ),
           children: [
             TableCell(
               child: Padding(
                 padding: EdgeInsets.all(_tableHeaderPadding),
-                child: const Center(
+                child: Center(
                   child: Text(
                     'ลำดับที่',
-                    style: TextStyle(fontSize: 17),
+                    style: _headerTextStyle,
                   ),
                 ),
               ),
@@ -360,10 +407,10 @@ class RecipesInfoView extends StatelessWidget {
             TableCell(
               child: Padding(
                 padding: EdgeInsets.all(_tableHeaderPadding),
-                child: const Center(
+                child: Center(
                   child: Text(
                     'วัตถุดิบ',
-                    style: TextStyle(fontSize: 17),
+                    style: _headerTextStyle,
                   ),
                 ),
               ),
@@ -371,10 +418,10 @@ class RecipesInfoView extends StatelessWidget {
             TableCell(
               child: Padding(
                 padding: EdgeInsets.all(_tableHeaderPadding),
-                child: const Center(
+                child: Center(
                   child: Text(
-                    'ปริมาณวัตถุดิบ',
-                    style: TextStyle(fontSize: 17),
+                    'ปริมาณวัตถุดิบ (%)',
+                    style: _headerTextStyle,
                   ),
                 ),
               ),
@@ -388,30 +435,14 @@ class RecipesInfoView extends StatelessWidget {
   Widget _ingredientTableBody() {
     return Expanded(
       child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(
-            bottom: BorderSide(
-              width: 0.9,
-              color: lightGrey,
-            ),
-            left: BorderSide(
-              width: 0.9,
-              color: lightGrey,
-            ),
-            right: BorderSide(
-              width: 0.9,
-              color: lightGrey,
-            ),
-          ),
-        ),
+        decoration: BoxDecoration(gradient: tableBackGroundGradient),
         child: ListView.builder(
-          itemCount: recipesData.ingredientInRecipes.length,
+          itemCount: recipesData.ingredientInRecipeList.length,
           itemBuilder: (context, index) {
             return RecipesInfoTableCell(
               index: index,
-              tableColumnWidth: _tableColumnWidth,
-              ingredientInRecipesList: recipesData.ingredientInRecipes,
+              tableColumnWidth: _ingredientTableColumnWidth,
+              ingredientInRecipesList: recipesData.ingredientInRecipeList,
             );
           },
         ),

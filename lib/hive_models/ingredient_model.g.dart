@@ -17,7 +17,7 @@ class IngredientModelAdapter extends TypeAdapter<IngredientModel> {
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
     return IngredientModel(
-      ingredientID: fields[0] as String,
+      ingredientId: fields[0] as String,
       ingredientName: fields[1] as String,
       nutrient: (fields[2] as List).cast<NutrientModel>(),
     );
@@ -28,7 +28,7 @@ class IngredientModelAdapter extends TypeAdapter<IngredientModel> {
     writer
       ..writeByte(3)
       ..writeByte(0)
-      ..write(obj.ingredientID)
+      ..write(obj.ingredientId)
       ..writeByte(1)
       ..write(obj.ingredientName)
       ..writeByte(2)
@@ -59,17 +59,20 @@ class NutrientModelAdapter extends TypeAdapter<NutrientModel> {
     return NutrientModel(
       nutrientName: fields[0] as String,
       amount: fields[1] as double,
+      unit: fields[3] as String,
     );
   }
 
   @override
   void write(BinaryWriter writer, NutrientModel obj) {
     writer
-      ..writeByte(2)
+      ..writeByte(3)
       ..writeByte(0)
       ..write(obj.nutrientName)
       ..writeByte(1)
-      ..write(obj.amount);
+      ..write(obj.amount)
+      ..writeByte(3)
+      ..write(obj.unit);
   }
 
   @override

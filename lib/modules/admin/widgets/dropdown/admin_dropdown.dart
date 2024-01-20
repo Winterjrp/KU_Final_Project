@@ -1,21 +1,21 @@
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
+import 'package:untitled1/constants/color.dart';
+import 'package:untitled1/constants/size.dart';
 
 typedef UpdateValueCallbackFunction = void Function({required String value});
 
-class CustomDropdownSearch extends StatelessWidget {
+class AdminCustomDropdown extends StatelessWidget {
   final Color primaryColor;
   final bool isCreate;
   final String value;
-  final double inputTextSize;
   final double labelTextSize;
   final List<String> choiceItemList;
   final UpdateValueCallbackFunction updateValueCallback;
-  const CustomDropdownSearch({
+  const AdminCustomDropdown({
     required this.primaryColor,
     required this.isCreate,
     required this.value,
-    required this.inputTextSize,
     required this.labelTextSize,
     required this.choiceItemList,
     required this.updateValueCallback,
@@ -33,62 +33,72 @@ class CustomDropdownSearch extends StatelessWidget {
           return _itemForm(item);
         },
         menuProps: MenuProps(
-            backgroundColor: const Color.fromRGBO(254, 245, 245, 1),
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(15))),
-        showSearchBox: true,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
+        ),
         showSelectedItems: true,
-        searchFieldProps: TextFieldProps(
-            decoration: InputDecoration(
+      ),
+      dropdownDecoratorProps: DropDownDecoratorProps(
+        baseStyle: const TextStyle(fontSize: headerInputTextFontSize),
+        dropdownSearchDecoration: InputDecoration(
+          prefixIconConstraints: const BoxConstraints(
+            minWidth: 15,
+          ),
+          prefixIcon: _searchTextPrefixWord(),
+          fillColor: Colors.white,
+          filled: true,
+          labelText: "ชนิดสัตว์เลี้ยง",
+          labelStyle: TextStyle(
+              fontSize: labelTextSize,
+              color: Colors.grey,
+              fontWeight: FontWeight.bold),
           floatingLabelStyle: const TextStyle(
             color: Colors.black,
-            fontSize: 20,
-            height: 0.9,
+            fontSize: 26,
+            fontWeight: FontWeight.bold,
           ),
-          filled: true,
-          fillColor: Colors.white,
-          suffixIcon: Icon(Icons.search, color: primaryColor),
-          labelText: "ค้นหาชนิดสัตว์เลี้ยง",
-          labelStyle: const TextStyle(fontSize: 16),
           contentPadding:
               const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15.0),
-            borderSide: const BorderSide(color: Colors.black, width: 1.8),
+            borderSide: BorderSide(
+                color: value == "" ? Colors.red : Colors.black,
+                width: value == "" ? 1.2 : 2),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15.0),
-            borderSide: const BorderSide(color: Colors.black, width: 1.8),
+            borderSide: const BorderSide(color: Colors.black, width: 2),
           ),
-        )),
+        ),
       ),
-      dropdownDecoratorProps: DropDownDecoratorProps(
-          baseStyle: TextStyle(fontSize: inputTextSize),
-          dropdownSearchDecoration: InputDecoration(
-            floatingLabelStyle: const TextStyle(
-              color: Colors.black,
-              fontSize: 22,
-              height: 0.9,
-            ),
-            fillColor: Colors.white,
-            filled: true,
-            hintText: "ชนิดสัตว์เลี้ยง",
-            hintStyle: TextStyle(fontSize: labelTextSize),
-            contentPadding:
-                const EdgeInsets.symmetric(horizontal: 15, vertical: 20),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15.0),
-              borderSide: const BorderSide(color: Colors.black, width: 2),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(15.0),
-              borderSide: const BorderSide(color: Colors.black, width: 2),
-            ),
-          )),
       items: choiceItemList,
       onChanged: (val) {
         updateValueCallback(value: val!);
       },
+    );
+  }
+
+  Container _searchTextPrefixWord() {
+    return Container(
+      margin: const EdgeInsets.only(left: 5),
+      child: value != ""
+          ? const SizedBox()
+          : const MouseRegion(
+              cursor: SystemMouseCursors.click,
+              child: Row(
+                children: [
+                  Text(
+                    " ชนิดสัตว์เลี้ยง",
+                    style: TextStyle(color: Colors.grey, fontSize: 19),
+                  ),
+                  Text(
+                    "*",
+                    style: TextStyle(color: Colors.red, fontSize: 19),
+                  ),
+                ],
+              ),
+            ),
     );
   }
 
@@ -114,14 +124,13 @@ class CustomDropdownSearch extends StatelessWidget {
                         item,
                         style: const TextStyle(
                           fontSize: 16,
-                          color: Color.fromRGBO(202, 102, 108, 1),
+                          color: darkFlesh,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                     const Spacer(),
-                    const Icon(Icons.pets,
-                        color: Color.fromRGBO(202, 102, 108, 1))
+                    Icon(Icons.pets, color: darkFlesh, size: 18)
                   ],
                 ),
         ],

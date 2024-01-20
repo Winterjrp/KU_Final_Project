@@ -89,11 +89,7 @@ class CustomDropdown extends StatelessWidget {
                   margin: const EdgeInsets.symmetric(vertical: 10),
                   child: Text(
                     item,
-                    style: TextStyle(
-                        fontSize: 16,
-                        color: item == value
-                            ? const Color.fromRGBO(202, 102, 108, 1)
-                            : Colors.black),
+                    style: const TextStyle(fontSize: 16, color: Colors.black),
                   ),
                 )
               : Row(
@@ -102,11 +98,11 @@ class CustomDropdown extends StatelessWidget {
                       margin: const EdgeInsets.symmetric(vertical: 10),
                       child: Text(
                         item,
-                        style: TextStyle(
-                            fontSize: 16,
-                            color: item == value
-                                ? const Color.fromRGBO(202, 102, 108, 1)
-                                : Colors.black),
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Color.fromRGBO(202, 102, 108, 1),
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     const Spacer(),

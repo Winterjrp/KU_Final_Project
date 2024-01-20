@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:untitled1/constants/color.dart';
-import 'package:untitled1/modules/admin/update_ingredient/update_ingredient_view_model.dart';
 
 typedef MinAmountChangeCallback = void Function(
     {required int index, required double amount});
@@ -32,7 +31,7 @@ class _AddPetChronicDiseaseTableCellState
     extends State<AddPetChronicDiseaseTableCell> {
   late TextEditingController _maxAmountController;
   late TextEditingController _minAmountController;
-  late UpdateIngredientViewModel _viewModel;
+  // late UpdateIngredientViewModel _viewModel;
 
   @override
   void initState() {

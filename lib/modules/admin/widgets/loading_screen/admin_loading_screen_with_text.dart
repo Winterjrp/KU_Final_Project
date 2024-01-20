@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:untitled1/modules/admin/widgets/loading_screen/admin_loading_screen.dart';
 
 class AdminLoadingScreenWithText extends StatelessWidget {
   const AdminLoadingScreenWithText({Key? key}) : super(key: key);
@@ -9,14 +10,7 @@ class AdminLoadingScreenWithText extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          SizedBox(
-            height: 40,
-            width: 40,
-            child: CircularProgressIndicator(
-              strokeWidth: 3,
-              color: Colors.black,
-            ),
-          ),
+          AdminLoadingScreen(),
           SizedBox(
             height: 30,
           ),

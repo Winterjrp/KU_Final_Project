@@ -1,22 +1,41 @@
 import 'dart:async';
-import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
+import 'package:untitled1/constants/size.dart';
 import 'package:untitled1/hive_models/ingredient_model.dart';
-import 'package:untitled1/modules/admin/update_ingredient/update_ingredient_view_model.dart';
+import 'package:untitled1/modules/admin/ingredient_info/ingredient_info_view.dart';
 import 'package:untitled1/modules/admin/update_ingredient/widgets/update_ingredient_table_cell.dart';
-import 'package:untitled1/modules/admin/widgets/admin_loading_screen.dart';
+import 'package:untitled1/modules/admin/widgets/loading_screen/admin_loading_screen.dart';
 import 'package:untitled1/modules/admin/widgets/popup/admin_confirm_popup.dart';
 import 'package:untitled1/modules/admin/widgets/popup/admin_cancel_popup.dart';
 import 'package:untitled1/modules/admin/ingredient_management/ingredient_management_view.dart';
 import 'package:untitled1/modules/admin/widgets/popup/admin_success_popup.dart';
+import 'package:untitled1/modules/admin/widgets/popup/admin_warning_popup.dart';
 import 'package:untitled1/utility/navigation_with_animation.dart';
+
+typedef AddIngredientCallback = Future<void> Function(
+    {required IngredientModel ingredientData});
+
+typedef EditIngredientCallback = Future<void> Function(
+    {required IngredientModel ingredientData});
+
+typedef OnUserDeleteIngredientCallBackFunction = Future<void> Function(
+    {required String ingredientId});
 
 class UpdateIngredientView extends StatefulWidget {
   final bool isCreate;
   final IngredientModel ingredientInfo;
+  final AddIngredientCallback onUserAddIngredientCallbackFunction;
+  final EditIngredientCallback onUserEditIngredientCallbackFunction;
+  final OnUserDeleteIngredientCallBackFunction
+      onUserDeleteIngredientCallBackFunction;
   const UpdateIngredientView(
-      {required this.isCreate, required this.ingredientInfo, Key? key})
+      {required this.isCreate,
+      required this.ingredientInfo,
+      required this.onUserEditIngredientCallbackFunction,
+      required this.onUserAddIngredientCallbackFunction,
+      Key? key,
+      required this.onUserDeleteIngredientCallBackFunction})
       : super(key: key);
 
   @override
@@ -24,17 +43,16 @@ class UpdateIngredientView extends StatefulWidget {
 }
 
 class _UpdateIngredientViewState extends State<UpdateIngredientView> {
-  late UpdateIngredientViewModel _viewModel;
   late TextEditingController _ingredientNameController;
   late FocusNode _ingredientNameFocusNode;
   late FocusNode _updateIngredientButtonFocusNode;
-  late bool _isHovered;
 
   final Map<int, TableColumnWidth> _tableColumnWidth =
       const <int, TableColumnWidth>{
-    0: FlexColumnWidth(0.08),
-    1: FlexColumnWidth(0.7),
-    2: FlexColumnWidth(0.16),
+    0: FlexColumnWidth(0.1),
+    1: FlexColumnWidth(0.3),
+    2: FlexColumnWidth(0.25),
+    3: FlexColumnWidth(0.12),
   };
 
   final TextStyle _headerTextStyle =
@@ -44,13 +62,10 @@ class _UpdateIngredientViewState extends State<UpdateIngredientView> {
   @override
   void initState() {
     super.initState();
-    _viewModel = UpdateIngredientViewModel();
-    _viewModel.copyIngredientInfo(ingredientInfo: widget.ingredientInfo);
     _ingredientNameController = TextEditingController();
     _ingredientNameFocusNode = FocusNode();
     _updateIngredientButtonFocusNode = FocusNode();
     _ingredientNameFocusNode.addListener(_onFocusChange);
-    _isHovered = false;
     if (!widget.isCreate) {
       _ingredientNameController.text = widget.ingredientInfo.ingredientName;
     }
@@ -83,22 +98,31 @@ class _UpdateIngredientViewState extends State<UpdateIngredientView> {
         return completer.future;
       },
       child: Scaffold(
-        body: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 13),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _routingGuide(),
-              const SizedBox(height: 5),
-              _header(),
-              const SizedBox(height: 5),
-              _ingredientName(),
-              const SizedBox(height: 10),
-              _table(),
-              const SizedBox(height: 10),
-              _addIngredientButton(context),
-            ],
-          ),
+        backgroundColor: backgroundColor,
+        body: _body(context),
+      ),
+    );
+  }
+
+  Widget _body(BuildContext context) {
+    return Center(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: adminScreenMaxWidth),
+        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 13),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _routingGuide(),
+            const SizedBox(height: 5),
+            _header(),
+            const SizedBox(height: 5),
+            _ingredientName(),
+            const SizedBox(height: 10),
+            _table(),
+            const SizedBox(height: 10),
+            _updateIngredientButton(context),
+            const SizedBox(height: 20),
+          ],
         ),
       ),
     );
@@ -119,8 +143,7 @@ class _UpdateIngredientViewState extends State<UpdateIngredientView> {
       const Duration(milliseconds: 500),
       () {
         if (_ingredientNameController.text.isNotEmpty) {
-          _viewModel.ingredientInfoTemp.ingredientName =
-              _ingredientNameController.text;
+          widget.ingredientInfo.ingredientName = _ingredientNameController.text;
           widget.isCreate
               ? AdminConfirmPopup(
                       context: context,
@@ -133,25 +156,9 @@ class _UpdateIngredientViewState extends State<UpdateIngredientView> {
                       callback: _handleEditIngredient)
                   .show();
         } else {
-          AwesomeDialog(
+          AdminWarningPopup(
             context: context,
-            width: 500,
-            dismissOnTouchOutside: false,
-            dialogType: DialogType.warning,
-            headerAnimationLoop: false,
-            autoHide: const Duration(milliseconds: 1400),
-            animType: AnimType.scale,
-            dialogBorderRadius: const BorderRadius.all(Radius.circular(20)),
-            body: Container(
-              margin: const EdgeInsets.only(bottom: 40),
-              height: 120,
-              child: const Center(
-                child: Text(
-                  "กรุณากรอกชื่อวัตถุดิบ!",
-                  style: TextStyle(fontSize: 22),
-                ),
-              ),
-            ),
+            warningText: 'กรุณากรอกชื่อวัตถุดิบ!',
           ).show();
         }
       },
@@ -174,10 +181,11 @@ class _UpdateIngredientViewState extends State<UpdateIngredientView> {
           return const Center(child: AdminLoadingScreen());
         });
     try {
-      await _viewModel.onUserAddIngredient();
+      await widget.onUserAddIngredientCallbackFunction(
+          ingredientData: widget.ingredientInfo);
       if (!context.mounted) return;
       Navigator.pop(context);
-      Future.delayed(const Duration(milliseconds: 1800), () {
+      Future.delayed(const Duration(milliseconds: 1600), () {
         Navigator.of(context).popUntil((route) => route.isFirst);
         Navigator.pushReplacement(context,
             NavigationDownward(targetPage: const IngredientManagementView()));
@@ -199,13 +207,27 @@ class _UpdateIngredientViewState extends State<UpdateIngredientView> {
           return const Center(child: AdminLoadingScreen());
         });
     try {
-      await _viewModel.onUserEditIngredient();
+      await widget.onUserEditIngredientCallbackFunction(
+          ingredientData: widget.ingredientInfo);
       if (!context.mounted) return;
       Navigator.pop(context);
       Future.delayed(const Duration(milliseconds: 1800), () {
         Navigator.of(context).popUntil((route) => route.isFirst);
-        Navigator.pushReplacement(context,
-            NavigationDownward(targetPage: const IngredientManagementView()));
+        Navigator.pushReplacement(
+          context,
+          NavigationDownward(
+            targetPage: IngredientInfoView(
+              ingredientInfo: widget.ingredientInfo,
+              onUserDeleteIngredientCallBack:
+                  widget.onUserDeleteIngredientCallBackFunction,
+              onUserEditIngredientCallback:
+                  widget.onUserEditIngredientCallbackFunction,
+              onUserAddIngredientCallback:
+                  widget.onUserAddIngredientCallbackFunction,
+              isJustUpdate: true,
+            ),
+          ),
+        );
       });
       AdminSuccessPopup(
               context: context, successText: 'แก้ไขข้อมูลวัตถุดิบสำเร็จ!!')
@@ -215,7 +237,7 @@ class _UpdateIngredientViewState extends State<UpdateIngredientView> {
     }
   }
 
-  Row _addIngredientButton(BuildContext context) {
+  Row _updateIngredientButton(BuildContext context) {
     return Row(
       children: [
         const Spacer(),
@@ -263,7 +285,7 @@ class _UpdateIngredientViewState extends State<UpdateIngredientView> {
     setState(() {});
   }
 
-  void _onTextChanged(String word) {
+  void _onIngredientNameChanged(String word) {
     if (_debounce?.isActive ?? false) _debounce?.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
       setState(() {});
@@ -283,10 +305,10 @@ class _UpdateIngredientViewState extends State<UpdateIngredientView> {
             extentOffset: _ingredientNameController.text.length,
           );
         },
-        onChanged: _onTextChanged,
+        onChanged: _onIngredientNameChanged,
         focusNode: _ingredientNameFocusNode,
         controller: _ingredientNameController,
-        style: const TextStyle(fontSize: 17),
+        style: const TextStyle(fontSize: headerInputTextFontSize),
         cursorColor: Colors.black,
         decoration: InputDecoration(
           prefixIconConstraints: const BoxConstraints(
@@ -306,9 +328,9 @@ class _UpdateIngredientViewState extends State<UpdateIngredientView> {
             borderRadius: BorderRadius.circular(15.0),
             borderSide: BorderSide(
                 color: _ingredientNameController.text.isEmpty
-                    ? Colors.grey
+                    ? Colors.red
                     : Colors.black,
-                width: _ingredientNameController.text.isEmpty ? 1 : 2),
+                width: _ingredientNameController.text.isEmpty ? 1.2 : 2),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(15.0),
@@ -325,13 +347,9 @@ class _UpdateIngredientViewState extends State<UpdateIngredientView> {
       child: _ingredientNameFocusNode.hasFocus ||
               _ingredientNameController.text.isNotEmpty
           ? const SizedBox()
-          : MouseRegion(
-              onEnter: (_) => setState(() => _isHovered = true),
-              onExit: (_) => setState(() => _isHovered = false),
-              cursor: _isHovered
-                  ? SystemMouseCursors.text
-                  : SystemMouseCursors.basic,
-              child: const Row(
+          : const MouseRegion(
+              cursor: SystemMouseCursors.text,
+              child: Row(
                 children: [
                   Text(
                     " ชื่อวัตถุดิบ",
@@ -361,18 +379,13 @@ class _UpdateIngredientViewState extends State<UpdateIngredientView> {
   Widget _tableHeader() {
     return Table(
       columnWidths: _tableColumnWidth,
-      border: TableBorder.symmetric(
-        inside: const BorderSide(
-          width: 1,
-        ),
-      ),
       children: [
         TableRow(
           decoration: const BoxDecoration(
             color: Color.fromRGBO(16, 16, 29, 1),
             borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(10),
-              topRight: Radius.circular(10),
+              topLeft: Radius.circular(15),
+              topRight: Radius.circular(15),
             ),
           ),
           children: [
@@ -409,6 +422,17 @@ class _UpdateIngredientViewState extends State<UpdateIngredientView> {
                 ),
               ),
             ),
+            TableCell(
+              child: Padding(
+                padding: EdgeInsets.all(_tableHeaderPadding),
+                child: Center(
+                  child: Text(
+                    'หน่วย',
+                    style: _headerTextStyle,
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ],
@@ -418,13 +442,13 @@ class _UpdateIngredientViewState extends State<UpdateIngredientView> {
   Widget _tableBody() {
     void ingredientAmountChange({required int index, required double amount}) {
       setState(() {
-        _viewModel.ingredientInfoTemp.nutrient[index].amount = amount;
+        widget.ingredientInfo.nutrient[index].amount = amount;
       });
     }
 
     return Expanded(
       child: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           border: Border(
             bottom: BorderSide(
               width: 0.9,
@@ -441,13 +465,13 @@ class _UpdateIngredientViewState extends State<UpdateIngredientView> {
           ),
         ),
         child: ListView.builder(
-          itemCount: _viewModel.ingredientInfoTemp.nutrient.length,
+          itemCount: widget.ingredientInfo.nutrient.length,
           itemBuilder: (context, index) {
             return UpdateIngredientTableCell(
               index: index,
               tableColumnWidth: _tableColumnWidth,
               ingredientAmountChangeCallback: ingredientAmountChange,
-              nutrientInfo: _viewModel.ingredientInfoTemp.nutrient[index],
+              nutrientInfo: widget.ingredientInfo.nutrient[index],
             );
           },
         ),

@@ -9,6 +9,7 @@ import 'package:untitled1/hive_models/pet_type_info_model.dart';
 import 'package:untitled1/hive_models/nutrient_limit_info_model.dart';
 import 'package:untitled1/hive_models/recipes_model.dart';
 import 'package:untitled1/modules/normal/login/responsive_login_view.dart';
+import 'package:untitled1/modules/normal/my_pet_with_no_authen/my_pet_with_no_authen_view.dart';
 import 'package:untitled1/provider/authentication_provider.dart';
 
 void main() async {
@@ -19,8 +20,8 @@ void main() async {
   Hive.registerAdapter(PetTypeInfoModelAdapter());
   Hive.registerAdapter(PetChronicDiseaseModelAdapter());
   Hive.registerAdapter(NutrientLimitInfoModelAdapter());
-  Hive.registerAdapter(IngredientInRecipesModelAdapter());
-  Hive.registerAdapter(RecipesModelAdapter());
+  Hive.registerAdapter(IngredientInRecipeModelAdapter());
+  Hive.registerAdapter(RecipeModelAdapter());
   runApp(const MyApp());
 }
 
@@ -28,6 +29,7 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
   @override
   Widget build(BuildContext context) {
+    bool isAuthen = true;
     return MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
@@ -36,8 +38,9 @@ class MyApp extends StatelessWidget {
         home: ChangeNotifierProvider(
           create: (_) => AuthenticationProvider(),
           child: LayoutBuilder(builder: (context, constraints) {
-            // return const UserManagementView();
-            return const LoginView();
+            return isAuthen
+                ? const LoginView()
+                : const MyPetWithNoAuthenticationView();
           }),
         ));
   }

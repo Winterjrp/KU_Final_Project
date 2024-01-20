@@ -26,10 +26,11 @@ class AdminConfirmPopup {
       body: SizedBox(
         height: 120,
         child: Center(
-            child: Text(
-          confirmText,
-          style: const TextStyle(fontSize: 20),
-        )),
+          child: Text(
+            confirmText,
+            style: const TextStyle(fontSize: 20),
+          ),
+        ),
       ),
       btnCancel: Container(
         margin: const EdgeInsets.only(left: 60, right: 15, top: 12, bottom: 12),
@@ -49,22 +50,22 @@ class AdminConfirmPopup {
         ),
       ),
       btnOk: Container(
-          margin:
-              const EdgeInsets.only(left: 15, right: 60, top: 12, bottom: 12),
-          height: 40,
-          child: ElevatedButton(
-            onPressed: () async {
-              callback();
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: acceptButtonBackground,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
+        margin: const EdgeInsets.only(left: 15, right: 60, top: 12, bottom: 12),
+        height: 40,
+        child: ElevatedButton(
+          onPressed: () async {
+            callback();
+          },
+          style: ElevatedButton.styleFrom(
+            backgroundColor: acceptButtonBackground,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(10),
             ),
-            child: const Text('ตกลง',
-                style: TextStyle(fontSize: 17, color: Colors.white)),
-          )),
+          ),
+          child: const Text('ตกลง',
+              style: TextStyle(fontSize: 17, color: Colors.white)),
+        ),
+      ),
     ).show();
   }
 }

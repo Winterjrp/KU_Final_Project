@@ -1,28 +1,29 @@
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 
-class AdminSuccessPopup {
+class AdminWarningPopup {
   final BuildContext context;
-  final String successText;
+  final String warningText;
 
-  AdminSuccessPopup({required this.context, required this.successText});
+  AdminWarningPopup({required this.context, required this.warningText});
 
   void show() {
     AwesomeDialog(
+      context: context,
       width: 500,
       dismissOnTouchOutside: false,
-      context: context,
-      dialogType: DialogType.success,
+      dialogType: DialogType.warning,
       headerAnimationLoop: false,
+      autoHide: const Duration(milliseconds: 1450),
       animType: AnimType.scale,
-      dialogBorderRadius: const BorderRadius.all(Radius.circular(20)),
+      dialogBorderRadius: const BorderRadius.all(Radius.circular(25)),
       body: Container(
         margin: const EdgeInsets.only(bottom: 40),
         height: 120,
         child: Center(
           child: Text(
-            successText,
-            style: const TextStyle(fontSize: 24),
+            warningText,
+            style: const TextStyle(fontSize: 22),
           ),
         ),
       ),

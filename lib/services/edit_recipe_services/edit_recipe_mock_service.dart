@@ -26,8 +26,8 @@ class EditRecipesMockService implements EditRecipesServiceInterface {
   }
 
   @override
-  Future<void> updateRecipesData({required RecipesModel recipesData}) async {
-    Box recipesListBox = Hive.box<RecipesModel>('recipesListBox');
-    await recipesListBox.put(recipesData.recipesID, recipesData);
+  Future<void> updateRecipesData({required RecipeModel recipesData}) async {
+    Box recipesListBox = Hive.box<RecipeModel>('recipesListBox');
+    await recipesListBox.put(recipesData.recipeId, recipesData);
   }
 }

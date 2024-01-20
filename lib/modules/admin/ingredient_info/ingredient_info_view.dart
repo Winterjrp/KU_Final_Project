@@ -1,36 +1,76 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
-import 'package:untitled1/modules/admin/ingredient_info/ingredient_info_view_model.dart';
+import 'package:untitled1/constants/size.dart';
 import 'package:untitled1/modules/admin/ingredient_info/widgets/ingredient_info_table_cell.dart';
 import 'package:untitled1/hive_models/ingredient_model.dart';
 import 'package:untitled1/modules/admin/ingredient_management/ingredient_management_view.dart';
 import 'package:untitled1/modules/admin/update_ingredient/update_ingredient_view.dart';
-import 'package:untitled1/modules/admin/widgets/admin_loading_screen.dart';
+import 'package:untitled1/modules/admin/widgets/button/admin_delete_object_button.dart';
+import 'package:untitled1/modules/admin/widgets/button/admin_edit_object_button.dart';
+import 'package:untitled1/modules/admin/widgets/loading_screen/admin_loading_screen.dart';
 import 'package:untitled1/modules/admin/widgets/popup/admin_delete_confirm_popup.dart';
 import 'package:untitled1/modules/admin/widgets/popup/admin_success_popup.dart';
 import 'package:untitled1/utility/navigation_with_animation.dart';
 
+typedef OnUserDeleteIngredientCallBackFunction = Future<void> Function(
+    {required String ingredientId});
+
+typedef OnUserAddIngredientCallbackFunction = Future<void> Function(
+    {required IngredientModel ingredientData});
+
+typedef OnUserEditIngredientCallbackFunction = Future<void> Function(
+    {required IngredientModel ingredientData});
+
 class IngredientInfoView extends StatelessWidget {
+  final IngredientModel ingredientInfo;
+  final OnUserDeleteIngredientCallBackFunction onUserDeleteIngredientCallBack;
+  final OnUserAddIngredientCallbackFunction onUserAddIngredientCallback;
+  final OnUserEditIngredientCallbackFunction onUserEditIngredientCallback;
+  final bool isJustUpdate;
   IngredientInfoView({
     required this.ingredientInfo,
+    required this.onUserDeleteIngredientCallBack,
+    required this.onUserEditIngredientCallback,
+    required this.onUserAddIngredientCallback,
     Key? key,
+    required this.isJustUpdate,
   }) : super(key: key);
 
-  final double _tableHeaderPadding = 12;
-  final IngredientModel ingredientInfo;
-  final Map<int, TableColumnWidth> _tableColumnWidth =
-      const <int, TableColumnWidth>{
-    0: FlexColumnWidth(0.1),
+  static const double _tableHeaderPadding = 12;
+  static const Map<int, TableColumnWidth> _tableColumnWidth =
+      <int, TableColumnWidth>{
+    0: FlexColumnWidth(0.15),
     1: FlexColumnWidth(0.5),
-    2: FlexColumnWidth(0.2),
+    2: FlexColumnWidth(0.3),
   };
-  final TextStyle _headerTextStyle =
-      const TextStyle(fontSize: 17, color: Colors.white);
+  static const TextStyle _headerTextStyle =
+      TextStyle(fontSize: 17, color: Colors.white);
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Padding(
+    return WillPopScope(
+      onWillPop: () async {
+        Completer<bool> completer = Completer<bool>();
+        isJustUpdate
+            ? Navigator.pushReplacement(
+                context,
+                NavigationDownward(
+                    targetPage: const IngredientManagementView()),
+              )
+            : Navigator.pop(context);
+        return completer.future;
+      },
+      child: Scaffold(
+        body: _body(context),
+      ),
+    );
+  }
+
+  Center _body(BuildContext context) {
+    return Center(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: adminScreenMaxWidth),
         padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -80,12 +120,11 @@ class IngredientInfoView extends StatelessWidget {
           return const Center(child: AdminLoadingScreen());
         });
     try {
-      IngredientInfoViewModel viewModel = IngredientInfoViewModel();
-      await viewModel.onUserDeleteIngredientInfo(
-          ingredientID: ingredientInfo.ingredientID);
+      await onUserDeleteIngredientCallBack(
+          ingredientId: ingredientInfo.ingredientId);
       if (!storedContext!.mounted) return;
       Navigator.pop(storedContext!);
-      Future.delayed(const Duration(milliseconds: 1800), () {
+      Future.delayed(const Duration(milliseconds: 1600), () {
         Navigator.of(storedContext!).popUntil((route) => route.isFirst);
         Navigator.pushReplacement(
           storedContext!,
@@ -104,67 +143,36 @@ class IngredientInfoView extends StatelessWidget {
 
   Widget _deleteIngredientInfoButton({required BuildContext context}) {
     storedContext = context;
-    return SizedBox(
-      height: 40,
-      child: ElevatedButton(
-        onPressed: () async {
-          AdminDeleteConfirmPopup(
-            context: context,
-            deleteText: 'ยืนยันการลบข้อมูลวัตถุดิบ?',
-            callback: _handleDeleteIngredient,
-          ).show();
-        },
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          backgroundColor: red,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-        child: const Row(
-          children: [
-            Icon(Icons.delete_forever_outlined, color: Colors.white),
-            SizedBox(width: 5),
-            Text('ลบข้อมูล',
-                style: TextStyle(fontSize: 17, color: Colors.white)),
-          ],
-        ),
-      ),
+    return AdminDeleteObjectButton(
+      deleteObjectCallback: () {
+        AdminDeleteConfirmPopup(
+          context: context,
+          deleteText: 'ยืนยันการลบข้อมูลวัตถุดิบ?',
+          callback: _handleDeleteIngredient,
+        ).show();
+      },
     );
   }
 
   Widget _editIngredientInfoButton({required BuildContext context}) {
-    return SizedBox(
-      height: 40,
-      child: ElevatedButton(
-        onPressed: () async {
-          Navigator.push(
-            context,
-            NavigationUpward(
-              targetPage: UpdateIngredientView(
-                ingredientInfo: ingredientInfo,
-                isCreate: false,
-              ),
-              durationInMilliSec: 450,
+    return AdminEditObjectButton(
+      editObjectCallback: () {
+        Navigator.push(
+          context,
+          NavigationUpward(
+            targetPage: UpdateIngredientView(
+              ingredientInfo: ingredientInfo,
+              isCreate: false,
+              onUserEditIngredientCallbackFunction:
+                  onUserEditIngredientCallback,
+              onUserAddIngredientCallbackFunction: onUserAddIngredientCallback,
+              onUserDeleteIngredientCallBackFunction:
+                  onUserDeleteIngredientCallBack,
             ),
-          );
-        },
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 10),
-          backgroundColor: const Color.fromRGBO(252, 135, 119, 1),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
+            durationInMilliSec: 450,
           ),
-        ),
-        child: const Row(
-          children: [
-            Icon(Icons.edit, color: Colors.white),
-            SizedBox(width: 10),
-            Text('แก้ไขข้อมูล',
-                style: TextStyle(fontSize: 17, color: Colors.white)),
-          ],
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -210,7 +218,7 @@ class IngredientInfoView extends StatelessWidget {
               topRight: Radius.circular(10),
             ),
           ),
-          children: [
+          children: const [
             TableCell(
               child: Padding(
                 padding: EdgeInsets.all(_tableHeaderPadding),
@@ -238,7 +246,7 @@ class IngredientInfoView extends StatelessWidget {
                 padding: EdgeInsets.all(_tableHeaderPadding),
                 child: Center(
                   child: Text(
-                    'ปริมาณสารอาหาร',
+                    'ปริมาณสารอาหาร (%FM)',
                     style: _headerTextStyle,
                   ),
                 ),
@@ -251,15 +259,9 @@ class IngredientInfoView extends StatelessWidget {
   }
 
   Widget _tableBody() {
-    // void onShopGroupRemove(String shopGroupID) {
-    //   setState(() {
-    //     onUserDeleteShopGroup(shopGroupID);
-    //   });
-    // }
-
     return Expanded(
       child: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           border: Border(
             bottom: BorderSide(
               width: 0.9,

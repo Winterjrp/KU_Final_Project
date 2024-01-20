@@ -5,15 +5,15 @@ import 'package:untitled1/hive_models/ingredient_model.dart';
 
 part 'recipes_model.g.dart';
 
-RecipesModel recipesModelFromJson(String str) =>
-    RecipesModel.fromJson(json.decode(str));
+RecipeModel recipesModelFromJson(String str) =>
+    RecipeModel.fromJson(json.decode(str));
 
-String recipesModelToJson(RecipesModel data) => json.encode(data.toJson());
+String recipesModelToJson(RecipeModel data) => json.encode(data.toJson());
 
 @HiveType(typeId: 7)
-class RecipesModel {
+class RecipeModel {
   @HiveField(0)
-  String recipesID;
+  String recipeId;
 
   @HiveField(1)
   String recipesName;
@@ -22,35 +22,35 @@ class RecipesModel {
   String petTypeName;
 
   @HiveField(3)
-  List<IngredientInRecipesModel> ingredientInRecipes;
+  List<IngredientInRecipeModel> ingredientInRecipeList;
 
   @HiveField(4)
   List<NutrientModel> nutrient;
 
-  RecipesModel(
-      {required this.recipesID,
+  RecipeModel(
+      {required this.recipeId,
       required this.recipesName,
       required this.petTypeName,
-      required this.ingredientInRecipes,
+      required this.ingredientInRecipeList,
       required this.nutrient});
 
-  factory RecipesModel.fromJson(Map<String, dynamic> json) => RecipesModel(
-        recipesID: json["recipesID"],
+  factory RecipeModel.fromJson(Map<String, dynamic> json) => RecipeModel(
+        recipeId: json["recipesID"],
         recipesName: json["recipesName"],
         petTypeName: json["petTypeName"],
-        ingredientInRecipes: List<IngredientInRecipesModel>.from(
+        ingredientInRecipeList: List<IngredientInRecipeModel>.from(
             json["ingredientInRecipes"]
-                .map((x) => IngredientInRecipesModel.fromJson(x))),
+                .map((x) => IngredientInRecipeModel.fromJson(x))),
         nutrient: List<NutrientModel>.from(
             json["nutrient"].map((x) => NutrientModel.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
-        "recipesID": recipesID,
+        "recipesID": recipeId,
         "recipesName": recipesName,
         "petTypeName": petTypeName,
         "ingredientInRecipes":
-            List<dynamic>.from(ingredientInRecipes.map((x) => x.toJson())),
+            List<dynamic>.from(ingredientInRecipeList.map((x) => x.toJson())),
         "nutrient": List<dynamic>.from(nutrient.map((x) => x.toJson())),
       };
 }

@@ -7,15 +7,30 @@ import 'package:untitled1/utility/navigation_with_animation.dart';
 typedef IngredientAmountChangeCallback = void Function(
     {required int index, required double amount});
 
+typedef DeleteIngredientCallBack = Future<void> Function(
+    {required String ingredientId});
+
+typedef AddIngredientCallback = Future<void> Function(
+    {required IngredientModel ingredientData});
+
+typedef EditIngredientCallback = Future<void> Function(
+    {required IngredientModel ingredientData});
+
 class IngredientTableCell extends StatefulWidget {
   final int index;
   final Map<int, TableColumnWidth> tableColumnWidth;
   final IngredientModel ingredientInfo;
+  final DeleteIngredientCallBack onUserDeleteIngredientCallBack;
+  final AddIngredientCallback onUserAddIngredientCallback;
+  final EditIngredientCallback onUserEditIngredientCallback;
   const IngredientTableCell({
     Key? key,
     required this.index,
     required this.tableColumnWidth,
     required this.ingredientInfo,
+    required this.onUserDeleteIngredientCallBack,
+    required this.onUserEditIngredientCallback,
+    required this.onUserAddIngredientCallback,
   }) : super(key: key);
 
   @override
@@ -38,16 +53,34 @@ class _IngredientTableCellState extends State<IngredientTableCell> {
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
-      cursor: _isHovered ? SystemMouseCursors.click : SystemMouseCursors.basic,
+      cursor: SystemMouseCursors.click,
       child: GestureDetector(
         onTap: () {
           Navigator.push(
             context,
             NavigationUpward(
                 targetPage: IngredientInfoView(
-                  ingredientInfo: widget.ingredientInfo,
+                  ingredientInfo: IngredientModel(
+                    ingredientId: widget.ingredientInfo.ingredientId,
+                    ingredientName: widget.ingredientInfo.ingredientName,
+                    nutrient: List.from(
+                      widget.ingredientInfo.nutrient.map(
+                        (nutrient) => NutrientModel(
+                            nutrientName: nutrient.nutrientName,
+                            amount: nutrient.amount,
+                            unit: nutrient.unit),
+                      ),
+                    ),
+                  ),
+                  onUserDeleteIngredientCallBack:
+                      widget.onUserDeleteIngredientCallBack,
+                  onUserEditIngredientCallback:
+                      widget.onUserEditIngredientCallback,
+                  onUserAddIngredientCallback:
+                      widget.onUserEditIngredientCallback,
+                  isJustUpdate: false,
                 ),
-                durationInMilliSec: 300),
+                durationInMilliSec: 250),
           );
         },
         child: Container(
@@ -58,24 +91,10 @@ class _IngredientTableCellState extends State<IngredientTableCell> {
               TableRow(
                 decoration: BoxDecoration(
                   color: _isHovered
-                      ? flesh.withOpacity(0.2)
+                      ? hoverColor
                       : widget.index % 2 == 1
                           ? Colors.white
                           : Colors.grey.shade100,
-                  border: Border(
-                    bottom: BorderSide(
-                      width: 1,
-                      color: lightGrey,
-                    ),
-                    left: BorderSide(
-                      width: 1,
-                      color: lightGrey,
-                    ),
-                    right: BorderSide(
-                      width: 1,
-                      color: lightGrey,
-                    ),
-                  ),
                 ),
                 children: [
                   _number(),
@@ -110,7 +129,7 @@ class _IngredientTableCellState extends State<IngredientTableCell> {
         padding: _tableCellPaddingInset,
         child: Center(
           child: Text(
-            widget.ingredientInfo.ingredientID,
+            widget.ingredientInfo.ingredientId,
             style: const TextStyle(fontSize: 16),
           ),
         ),

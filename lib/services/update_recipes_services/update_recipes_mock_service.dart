@@ -2,9 +2,9 @@ import 'package:hive/hive.dart';
 import 'package:untitled1/hive_models/ingredient_model.dart';
 import 'package:untitled1/hive_models/pet_type_info_model.dart';
 import 'package:untitled1/hive_models/recipes_model.dart';
-import 'package:untitled1/services/add_recipes_services/add_recipes_service_interface.dart';
+import 'package:untitled1/services/update_recipes_services/update_recipes_service_interface.dart';
 
-class AddRecipesMockService implements AddRecipesServiceInterface {
+class AddRecipesMockService implements UpdateRecipesServiceInterface {
   @override
   Future<List<IngredientModel>> getIngredientListData() async {
     await Future.delayed(const Duration(milliseconds: 1200), () {});
@@ -26,8 +26,9 @@ class AddRecipesMockService implements AddRecipesServiceInterface {
   }
 
   @override
-  Future<void> postRecipesData({required RecipesModel recipesData}) async {
-    Box recipesListBox = Hive.box<RecipesModel>('recipesListBox');
-    await recipesListBox.put(recipesData.recipesID, recipesData);
+  Future<void> addRecipeData({required RecipeModel recipesData}) async {
+    await Future.delayed(const Duration(milliseconds: 1000), () {});
+    Box recipesListBox = Hive.box<RecipeModel>('recipesListBox');
+    await recipesListBox.put(recipesData.recipeId, recipesData);
   }
 }

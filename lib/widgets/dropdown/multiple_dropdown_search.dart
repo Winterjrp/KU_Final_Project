@@ -75,28 +75,29 @@ class CustomMultipleDropdownSearch extends StatelessWidget {
         showSearchBox: true,
         showSelectedItems: true,
         searchFieldProps: TextFieldProps(
-            decoration: InputDecoration(
-          floatingLabelStyle: const TextStyle(
-            color: Colors.black,
-            fontSize: 22,
-            height: 0.9,
+          decoration: InputDecoration(
+            floatingLabelStyle: const TextStyle(
+              color: Colors.black,
+              fontSize: 22,
+              height: 0.9,
+            ),
+            filled: true,
+            fillColor: Colors.white,
+            suffixIcon: Icon(Icons.search, color: primaryColor),
+            labelText: searchText,
+            labelStyle: const TextStyle(fontSize: 16, height: 1),
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: const BorderSide(color: Colors.black, width: 2),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15),
+              borderSide: const BorderSide(color: Colors.black, width: 2),
+            ),
           ),
-          filled: true,
-          fillColor: Colors.white,
-          suffixIcon: Icon(Icons.search, color: primaryColor),
-          labelText: searchText,
-          labelStyle: const TextStyle(fontSize: 16, height: 1),
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-            borderSide: const BorderSide(color: Colors.black, width: 2),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15),
-            borderSide: const BorderSide(color: Colors.black, width: 2),
-          ),
-        )),
+        ),
       ),
       dropdownBuilder: (BuildContext context, List<String> selectedItems) {
         if (selectedItems.isEmpty) {
@@ -176,7 +177,7 @@ class CustomMultipleDropdownSearch extends StatelessWidget {
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
                         iconSize: 10,
-                        color: Colors.black,
+                        color: Colors.white,
                       ),
                     ),
                   )

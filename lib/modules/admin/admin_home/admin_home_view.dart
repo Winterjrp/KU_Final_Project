@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/constants/main_page_index_constants.dart';
 import 'package:untitled1/modules/admin/widgets/admin_appbar.dart';
 import 'package:untitled1/modules/admin/widgets/admin_drawer.dart';
@@ -44,21 +45,63 @@ class _AdminHomeViewState extends State<AdminHomeView> {
         ).show();
         return completer.future;
       },
-      child: const Scaffold(
-        drawer: AdminDrawer(
+      child: Scaffold(
+        backgroundColor: backgroundColor,
+        drawer: const AdminDrawer(
             currentIndex: MainPageIndexConstants.adminHomePageIndex),
-        appBar: AdminAppBar(),
-        body: Padding(
-          padding: EdgeInsets.only(left: 30, right: 30, top: 25, bottom: 30),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Column(
-                children: [],
-              )
-            ],
-          ),
-        ),
+        appBar: const AdminAppBar(),
+        body: _body(),
+      ),
+    );
+  }
+
+  Padding _body() {
+    return const Padding(
+      padding: EdgeInsets.only(left: 30, right: 30, top: 25, bottom: 30),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Center(
+            child: SizedBox(
+              width: 1300,
+              child: Row(
+                children: [
+                  SizedBox(width: 350),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    // mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        // mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(" สวัสดีคุณ",
+                              style: TextStyle(
+                                  fontSize: 40,
+                                  height: 1.5,
+                                  fontWeight: FontWeight.bold)),
+                          Text(" 'Temp'",
+                              style: TextStyle(
+                                  fontSize: 40,
+                                  height: 1.5,
+                                  fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                      Text(" ยินดีต้อนรับเข้าสู่หน้า..",
+                          style: TextStyle(fontSize: 40, height: 1.4)),
+                      Text(
+                        "HOME!",
+                        style: TextStyle(
+                            fontSize: 270,
+                            fontWeight: FontWeight.bold,
+                            height: 1.02),
+                      )
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          )
+        ],
       ),
     );
   }

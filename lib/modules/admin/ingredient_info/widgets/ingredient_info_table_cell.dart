@@ -26,7 +26,7 @@ class IngredientInfoTableCell extends StatelessWidget {
         TableRow(
           decoration: BoxDecoration(
             color: index % 2 == 1 ? Colors.white : Colors.grey.shade100,
-            border: Border(
+            border: const Border(
               bottom: BorderSide(
                 width: 1,
                 color: lightGrey,

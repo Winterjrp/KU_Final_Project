@@ -3,7 +3,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/constants/main_page_index_constants.dart';
-import 'package:untitled1/constants/nutrient_list.dart';
+import 'package:untitled1/constants/nutrient_list_template.dart';
+import 'package:untitled1/constants/size.dart';
 import 'package:untitled1/modules/admin/admin_home/admin_home_view.dart';
 import 'package:untitled1/modules/admin/update_ingredient/update_ingredient_view.dart';
 import 'package:untitled1/modules/admin/widgets/admin_appbar.dart';
@@ -11,8 +12,8 @@ import 'package:untitled1/modules/admin/widgets/admin_drawer.dart';
 import 'package:untitled1/modules/admin/ingredient_management/ingredient_management_view_model.dart';
 import 'package:untitled1/hive_models/ingredient_model.dart';
 import 'package:untitled1/modules/admin/ingredient_management/widgets/ingredient_management_table_cell.dart';
-import 'package:untitled1/modules/admin/user_management/widgets/filter_search_bar.dart';
-import 'package:untitled1/modules/admin/widgets/admin_loading_screen_with_text.dart';
+import 'package:untitled1/modules/admin/widgets/filter_search_bar.dart';
+import 'package:untitled1/modules/admin/widgets/loading_screen/admin_loading_screen_with_text.dart';
 import 'package:untitled1/utility/navigation_with_animation.dart';
 
 class IngredientManagementView extends StatefulWidget {
@@ -24,7 +25,6 @@ class IngredientManagementView extends StatefulWidget {
 }
 
 class _IngredientManagementViewState extends State<IngredientManagementView> {
-  late double height;
   late IngredientManagementViewModel _viewModel;
   late TextEditingController _searchTextEditingController;
 
@@ -32,9 +32,9 @@ class _IngredientManagementViewState extends State<IngredientManagementView> {
       const TextStyle(fontSize: 17, color: Colors.white);
   final Map<int, TableColumnWidth> _tableColumnWidth =
       const <int, TableColumnWidth>{
-    0: FlexColumnWidth(0.07),
-    1: FlexColumnWidth(0.2),
-    2: FlexColumnWidth(1),
+    0: FlexColumnWidth(0.05),
+    1: FlexColumnWidth(0.15),
+    2: FlexColumnWidth(0.1),
   };
   final double _tableHeaderPadding = 12;
   Timer? _debounce;
@@ -56,8 +56,6 @@ class _IngredientManagementViewState extends State<IngredientManagementView> {
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    double height = size.height;
     return WillPopScope(
       onWillPop: () async {
         Completer<bool> completer = Completer<bool>();
@@ -68,51 +66,58 @@ class _IngredientManagementViewState extends State<IngredientManagementView> {
         return completer.future;
       },
       child: Scaffold(
-        backgroundColor: Colors.white,
+        backgroundColor: backgroundColor,
         drawer: const AdminDrawer(
             currentIndex: MainPageIndexConstants.ingredientManagementIndex),
         appBar: const AdminAppBar(),
-        body: FutureBuilder<List<IngredientModel>>(
-          future: _viewModel.ingredientListData,
-          builder: (context, AsyncSnapshot<List<IngredientModel>> snapshot) {
-            if (snapshot.connectionState != ConnectionState.done) {
-              return const AdminLoadingScreenWithText();
-            } else if (snapshot.hasError) {
-              return Text('Error: ${snapshot.error}');
-            } else if (snapshot.hasData) {
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 30),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _header(),
-                          const SizedBox(height: 15),
-                          _ingredientListTable(height, context),
-                          const SizedBox(height: 20),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              );
-            }
-            return const Text('No data available');
-          },
-        ),
+        body: _body(),
       ),
     );
   }
 
-  Widget _ingredientListTable(double height, BuildContext context) {
+  FutureBuilder<List<IngredientModel>> _body() {
+    return FutureBuilder<List<IngredientModel>>(
+      future: _viewModel.ingredientListData,
+      builder: (context, AsyncSnapshot<List<IngredientModel>> snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const AdminLoadingScreenWithText();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else if (snapshot.hasData) {
+          return Center(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 30),
+              constraints: const BoxConstraints(maxWidth: adminScreenMaxWidth),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _header(),
+                        const SizedBox(height: 15),
+                        _ingredientListTable(context),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        }
+        return const Text('No data available');
+      },
+    );
+  }
+
+  Widget _ingredientListTable(BuildContext context) {
     return Expanded(
       child: Column(
         children: [
           _tableHeader(),
-          _tableBody(height: height, context: context),
+          _tableBody(context: context),
         ],
       ),
     );
@@ -121,19 +126,13 @@ class _IngredientManagementViewState extends State<IngredientManagementView> {
   Table _tableHeader() {
     return Table(
       columnWidths: _tableColumnWidth,
-      border: TableBorder.symmetric(
-        inside: const BorderSide(
-          width: 1,
-          // color: primary,
-        ),
-      ),
       children: [
         TableRow(
           decoration: const BoxDecoration(
-            color: Color.fromRGBO(16, 16, 29, 1),
+            color: specialBlack,
             borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(10),
-              topRight: Radius.circular(10),
+              topLeft: Radius.circular(15),
+              topRight: Radius.circular(15),
             ),
           ),
           children: [
@@ -194,7 +193,7 @@ class _IngredientManagementViewState extends State<IngredientManagementView> {
         Row(
           children: [
             SizedBox(
-              width: 600,
+              width: 400,
               child: _searchBar(),
             ),
             const Spacer(),
@@ -221,33 +220,53 @@ class _IngredientManagementViewState extends State<IngredientManagementView> {
     );
   }
 
-  Widget _tableBody({required double height, required BuildContext context}) {
+  Future<void> _onUserDeleteIngredient({required String ingredientId}) async {
+    await _viewModel.onUserDeleteIngredientInfo(ingredientId: ingredientId);
+  }
+
+  Widget _tableBody({required BuildContext context}) {
     return Expanded(
       child: _viewModel.filterIngredientList.isEmpty
           ? Container(
               width: double.infinity,
-              color: Colors.grey.shade200,
+              decoration: BoxDecoration(gradient: tableBackGroundGradient),
               child: const Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
                     "ไม่มีข้อมูลวัตถุดิบ",
-                    style: TextStyle(fontSize: 18),
+                    style: TextStyle(fontSize: 20),
                   ),
                   SizedBox(height: 50)
                 ],
               ),
             )
-          : ListView.builder(
-              itemCount: _viewModel.filterIngredientList.length,
-              itemBuilder: (context, index) {
-                return IngredientTableCell(
-                    index: index,
-                    tableColumnWidth: _tableColumnWidth,
-                    ingredientInfo: _viewModel.filterIngredientList[index]);
-              },
+          : Container(
+              decoration: BoxDecoration(gradient: tableBackGroundGradient),
+              child: ListView.builder(
+                itemCount: _viewModel.filterIngredientList.length,
+                itemBuilder: (context, index) {
+                  return IngredientTableCell(
+                      index: index,
+                      tableColumnWidth: _tableColumnWidth,
+                      ingredientInfo: _viewModel.filterIngredientList[index],
+                      onUserDeleteIngredientCallBack: _onUserDeleteIngredient,
+                      onUserEditIngredientCallback: _onUserEditIngredient,
+                      onUserAddIngredientCallback: _onUserAddIngredient);
+                },
+              ),
             ),
     );
+  }
+
+  Future<void> _onUserAddIngredient(
+      {required IngredientModel ingredientData}) async {
+    await _viewModel.onUserAddIngredient(ingredientInfo: ingredientData);
+  }
+
+  Future<void> _onUserEditIngredient(
+      {required IngredientModel ingredientData}) async {
+    await _viewModel.onUserEditIngredient(ingredientInfo: ingredientData);
   }
 
   Widget _addIngredientButton() {
@@ -261,9 +280,20 @@ class _IngredientManagementViewState extends State<IngredientManagementView> {
               targetPage: UpdateIngredientView(
                 isCreate: true,
                 ingredientInfo: IngredientModel(
-                    ingredientID: Random().nextInt(999).toString(),
-                    ingredientName: "",
-                    nutrient: nutrientList),
+                  ingredientId: Random().nextInt(999).toString(),
+                  ingredientName: "",
+                  nutrient: List.from(
+                    freshNutrientListTemplate.map(
+                      (nutrient) => NutrientModel(
+                          nutrientName: nutrient.nutrientName,
+                          amount: nutrient.amount,
+                          unit: nutrient.unit),
+                    ),
+                  ),
+                ),
+                onUserEditIngredientCallbackFunction: _onUserEditIngredient,
+                onUserAddIngredientCallbackFunction: _onUserAddIngredient,
+                onUserDeleteIngredientCallBackFunction: _onUserDeleteIngredient,
               ),
               durationInMilliSec: 500,
             ),

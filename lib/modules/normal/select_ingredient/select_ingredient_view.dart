@@ -21,7 +21,7 @@ class _SelectIngredientViewState extends State<SelectIngredientView> {
   // late List<String> _nonSelectedIngredientList;
   // late Set<String> _selectedIngredientSet;
   // late Set<String> _nonSelectedIngredientListSet;
-  final double _labelTextSize = 18;
+  final double _labelTextSize = 21;
   final double _headerTextSize = 20;
   final double _choiceTextSize = 17.5;
   final Color _primaryColor = primary;
@@ -54,7 +54,7 @@ class _SelectIngredientViewState extends State<SelectIngredientView> {
       appBar: AppBar(
           elevation: 0,
           leading: IconButton(
-            icon: Icon(Icons.keyboard_backspace_rounded, color: primary),
+            icon: const Icon(Icons.keyboard_backspace_rounded, color: primary),
             onPressed: () {
               // widget.isJustUpdate
               //     ? Navigator.pushReplacement(
@@ -67,8 +67,8 @@ class _SelectIngredientViewState extends State<SelectIngredientView> {
               Navigator.of(context).pop();
             },
           ),
-          title: Center(
-              child: Text("เลือกวัตถุดิบ       ",
+          title: const Center(
+              child: Text("เลือกวัตถุดิบ      ",
                   style:
                       TextStyle(color: primary, fontWeight: FontWeight.bold))),
           backgroundColor: const Color.fromRGBO(194, 190, 241, 0.4)),
@@ -87,8 +87,8 @@ class _SelectIngredientViewState extends State<SelectIngredientView> {
                   const SizedBox(height: 10),
                   _selectedIngredientPart(),
                   const SizedBox(height: 30),
-                  _selectIngredientTypePart(),
-                  const SizedBox(height: 290),
+                  // _selectIngredientTypePart(),
+                  const SizedBox(height: 480),
                   _searchFoodRecipesButton(),
                   const SizedBox(height: 30),
                 ],
@@ -160,8 +160,10 @@ class _SelectIngredientViewState extends State<SelectIngredientView> {
 
   Text _headerText({required String text}) {
     return Text(text,
-        style:
-            TextStyle(fontSize: _labelTextSize, fontWeight: FontWeight.bold));
+        style: TextStyle(
+          fontSize: _labelTextSize,
+          fontWeight: FontWeight.bold,
+        ));
   }
 
   Column _selectedIngredientPart() {
@@ -169,7 +171,7 @@ class _SelectIngredientViewState extends State<SelectIngredientView> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _headerText(text: "เลือกวัตถุดิบที่ต้องการในสูตรอาหาร"),
-        const SizedBox(height: 10),
+        const SizedBox(height: 15),
         CustomMultipleDropdownSearch(
           primaryColor: _primaryColor,
           isCreate: true,
@@ -183,6 +185,17 @@ class _SelectIngredientViewState extends State<SelectIngredientView> {
           labelTextSize: _labelTextSize,
           searchText: 'ค้นหาวัตถุดิบ',
           hintText: 'เลือกวัตถุดิบ',
+        ),
+        const SizedBox(height: 10),
+        const Row(
+          children: [
+            Text("ในสูตรอาหารจะมีแค่วัตถุดิบที่ท่านเลือกเท่านั้น",
+                style: TextStyle(fontSize: 17)),
+            Text(
+              "*",
+              style: TextStyle(color: Colors.red),
+            )
+          ],
         ),
       ],
     );

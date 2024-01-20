@@ -1,17 +1,42 @@
+import 'dart:async';
 import 'dart:math';
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
-import 'package:untitled1/hive_models/pet_type_info_model.dart';
+import 'package:untitled1/constants/size.dart';
+import 'package:untitled1/hive_models/recipes_model.dart';
 import 'package:untitled1/modules/admin/add_recipes/add_recipes_view_model.dart';
-import 'package:untitled1/modules/admin/add_recipes/widgets/add_recipes_cancel_popup.dart';
-import 'package:untitled1/modules/admin/add_recipes/widgets/add_recipes_confirm_popup.dart';
 import 'package:untitled1/modules/admin/add_recipes/widgets/add_recipes_table_cell.dart';
 import 'package:untitled1/modules/admin/add_recipes/widgets/nutrient_table_cell.dart';
 import 'package:untitled1/hive_models/ingredient_model.dart';
+import 'package:untitled1/modules/admin/recipes_info/recipe_info_view.dart';
+import 'package:untitled1/modules/admin/recipes_management/recipes_management_view.dart';
+import 'package:untitled1/modules/admin/widgets/dropdown/admin_dropdown_search.dart';
+import 'package:untitled1/modules/admin/widgets/loading_screen/admin_loading_screen.dart';
+import 'package:untitled1/modules/admin/widgets/loading_screen/admin_loading_screen_with_text.dart';
+import 'package:untitled1/modules/admin/widgets/popup/admin_cancel_popup.dart';
+import 'package:untitled1/modules/admin/widgets/popup/admin_confirm_popup.dart';
+import 'package:untitled1/modules/admin/widgets/popup/admin_success_popup.dart';
+import 'package:untitled1/modules/admin/widgets/popup/admin_warning_popup.dart';
+import 'package:untitled1/utility/navigation_with_animation.dart';
+
+typedef OnUserEditRecipeCallbackFunction = Future<void> Function(
+    {required RecipeModel recipeData});
+
+typedef OnUserDeleteRecipesCallbackFunction = Future<void> Function(
+    {required String recipeId});
 
 class AddRecipesView extends StatefulWidget {
-  const AddRecipesView({Key? key}) : super(key: key);
+  final bool isCreate;
+  final RecipeModel recipeInfo;
+  final OnUserEditRecipeCallbackFunction onUserEditRecipeCallback;
+  final OnUserDeleteRecipesCallbackFunction onUserDeleteRecipesCallback;
+  const AddRecipesView(
+      {required this.isCreate,
+      required this.recipeInfo,
+      Key? key,
+      required this.onUserEditRecipeCallback,
+      required this.onUserDeleteRecipesCallback})
+      : super(key: key);
 
   @override
   State<AddRecipesView> createState() => _AddRecipesViewState();
@@ -19,76 +44,157 @@ class AddRecipesView extends StatefulWidget {
 
 class _AddRecipesViewState extends State<AddRecipesView> {
   late AddRecipesViewModel _viewModel;
-  late TextEditingController _recipesNameController;
+  late TextEditingController _recipeNameController;
+  late ScrollController _scrollController;
+  late FocusNode _recipeNameFocusNode;
   late String _petTypeName;
-  final Map<int, TableColumnWidth> _tableColumnWidth =
+  late bool _isZeroAmount;
+  late bool _isIngredientTextFieldBlank;
+  late double _width;
+
+  final Map<int, TableColumnWidth> _ingredientTableColumnWidth =
       const <int, TableColumnWidth>{
     0: FlexColumnWidth(0.2),
-    1: FlexColumnWidth(0.9),
+    1: FlexColumnWidth(0.4),
     2: FlexColumnWidth(0.35),
     3: FlexColumnWidth(0.15),
   };
-  final double _tableHeaderPadding = 20;
+
+  final Map<int, TableColumnWidth> _nutrientTableColumnWidth =
+      const <int, TableColumnWidth>{
+    0: FlexColumnWidth(0.1),
+    1: FlexColumnWidth(0.25),
+    2: FlexColumnWidth(0.19),
+    3: FlexColumnWidth(0.12),
+  };
+
+  static const double _tableHeaderPadding = 12;
+  static const TextStyle _headerTextStyle =
+      TextStyle(fontSize: 17, color: Colors.white);
+  Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
     _viewModel = AddRecipesViewModel();
-    _recipesNameController = TextEditingController();
+    _recipeNameController = TextEditingController();
+    _scrollController = ScrollController();
+    _recipeNameFocusNode = FocusNode();
+    _recipeNameFocusNode.addListener(_onRecipeFocusChange);
     _viewModel.getIngredientData();
     _viewModel.getPetTypeListData();
-    _petTypeName = "";
+    _viewModel.getRecipeInfo(recipeInfo: widget.recipeInfo);
+    _isIngredientTextFieldBlank = false;
+    _isZeroAmount = false;
+    _recipeNameController.text = widget.recipeInfo.recipesName;
+    _petTypeName = widget.recipeInfo.petTypeName;
+  }
+
+  @override
+  void dispose() {
+    _recipeNameController.dispose();
+    _scrollController.dispose();
+    _recipeNameFocusNode.removeListener(_onRecipeFocusChange);
+    _recipeNameFocusNode.dispose();
+    _debounce?.cancel();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    double width = size.width;
+    _width = size.width;
     return WillPopScope(
       onWillPop: () async {
-        bool confirm = await showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return const AddRecipesCancelPopup();
-            });
-        return confirm;
+        Completer<bool> completer = Completer<bool>();
+        widget.isCreate
+            ? AdminCancelPopup(
+                    cancelText: 'ยกเลิกการเพิ่มข้อมูลสูตรอาหาร?',
+                    context: context)
+                .show()
+            : AdminCancelPopup(
+                    cancelText: 'ยกเลิกการเเก้ไขข้อมูลสูตรอาหาร?',
+                    context: context)
+                .show();
+        return completer.future;
       },
       child: Scaffold(
         backgroundColor: backgroundColor,
-        body: FutureBuilder<List<IngredientModel>>(
-            future: _viewModel.ingredientListData,
-            builder: (context, AsyncSnapshot<List<IngredientModel>> snapshot) {
-              if (snapshot.connectionState != ConnectionState.done) {
-                return _loadingScreen();
-              } else if (snapshot.hasError) {
-                return Text('Error: ${snapshot.error}');
-              } else if (snapshot.hasData) {
-                return Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _header(),
-                      const SizedBox(height: 5),
-                      _recipesName(),
-                      const SizedBox(height: 5),
-                      Expanded(
-                        child: Row(
-                          children: [
-                            _ingredient(width),
-                            const SizedBox(width: 30),
-                            _nutrient(context),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              }
-              return const Text('No data available');
-            }),
+        body: _body(_width),
       ),
+    );
+  }
+
+  FutureBuilder<List<IngredientModel>> _body(double width) {
+    return FutureBuilder<List<IngredientModel>>(
+      future: _viewModel.ingredientListData,
+      builder: (context, AsyncSnapshot<List<IngredientModel>> snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const AdminLoadingScreenWithText();
+        } else if (snapshot.hasError) {
+          return Text('Error: ${snapshot.error}');
+        } else if (snapshot.hasData) {
+          return _content(width, context);
+        }
+        return const Text('No data available');
+      },
+    );
+  }
+
+  Center _content(double width, BuildContext context) {
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 13),
+        constraints: const BoxConstraints(maxWidth: adminScreenMaxWidth),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _routingGuide(),
+            const SizedBox(height: 5),
+            _header(),
+            const SizedBox(height: 5),
+            Row(
+              children: [
+                _recipeName(),
+                const SizedBox(width: 15),
+                Container(
+                  margin: const EdgeInsets.only(top: 10),
+                  child: const Text(
+                    "สำหรับ",
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 19,
+                      // color: kPrimaryDarkColor,
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 15),
+                _petType()
+              ],
+            ),
+            const SizedBox(height: 5),
+            Expanded(
+              child: Row(
+                children: [
+                  _ingredient(width),
+                  const SizedBox(width: 30),
+                  _nutrient(context),
+                ],
+              ),
+            ),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Text _routingGuide() {
+    return Text(
+      widget.isCreate
+          ? "จัดการข้อมูลสูตรอาหาร / เพิ่มข้อมูลสูตรอาหาร"
+          : "จัดการข้อมูลสูตรอาหาร / ข้อมูลสูตรอาหาร / แก้ไขข้อมูลสูตรอาหาร",
+      style: const TextStyle(color: Colors.grey, fontSize: 20),
     );
   }
 
@@ -99,11 +205,11 @@ class _AddRecipesViewState extends State<AddRecipesView> {
         children: [
           const Text(
             "สารอาหาร",
-            style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 10),
           _nutrientTable(),
-          const SizedBox(height: 20),
+          const SizedBox(height: 9),
           _acceptButton(context),
         ],
       ),
@@ -123,35 +229,24 @@ class _AddRecipesViewState extends State<AddRecipesView> {
 
   Widget _nutrientTableHeader() {
     return Table(
-      columnWidths: _tableColumnWidth,
-      border: TableBorder.symmetric(
-        inside: const BorderSide(
-          width: 1,
-          // color: primary,
-        ),
-      ),
-      children: [
+      columnWidths: _nutrientTableColumnWidth,
+      children: const [
         TableRow(
           decoration: BoxDecoration(
-            color: primary,
-            border: Border.all(
-              width: 1,
-              // color: primary,
-            ),
-            // color: kColorLightBlueBTN,
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(10),
-              topRight: Radius.circular(10),
+            color: specialBlack,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(15),
+              topRight: Radius.circular(15),
             ),
           ),
           children: [
             TableCell(
               child: Padding(
                 padding: EdgeInsets.all(_tableHeaderPadding),
-                child: const Center(
+                child: Center(
                   child: Text(
                     'ลำดับที่',
-                    style: TextStyle(fontSize: 17),
+                    style: _headerTextStyle,
                   ),
                 ),
               ),
@@ -159,10 +254,10 @@ class _AddRecipesViewState extends State<AddRecipesView> {
             TableCell(
               child: Padding(
                 padding: EdgeInsets.all(_tableHeaderPadding),
-                child: const Center(
+                child: Center(
                   child: Text(
                     'สารอาหาร',
-                    style: TextStyle(fontSize: 17),
+                    style: _headerTextStyle,
                   ),
                 ),
               ),
@@ -170,10 +265,21 @@ class _AddRecipesViewState extends State<AddRecipesView> {
             TableCell(
               child: Padding(
                 padding: EdgeInsets.all(_tableHeaderPadding),
-                child: const Center(
+                child: Center(
                   child: Text(
-                    'ปริมาณสารอาหาร',
-                    style: TextStyle(fontSize: 17),
+                    'ปริมาณสารอาหาร (FM%)',
+                    style: _headerTextStyle,
+                  ),
+                ),
+              ),
+            ),
+            TableCell(
+              child: Padding(
+                padding: EdgeInsets.all(_tableHeaderPadding),
+                child: Center(
+                  child: Text(
+                    'หน่วย',
+                    style: _headerTextStyle,
                   ),
                 ),
               ),
@@ -187,7 +293,7 @@ class _AddRecipesViewState extends State<AddRecipesView> {
   Widget _nutrientTableBody() {
     return Expanded(
       child: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           border: Border(
             bottom: BorderSide(
               width: 0.9,
@@ -204,12 +310,12 @@ class _AddRecipesViewState extends State<AddRecipesView> {
           ),
         ),
         child: ListView.builder(
-          itemCount: _viewModel.nutrientList.length,
+          itemCount: _viewModel.nutrientInRecipe.length,
           itemBuilder: (context, index) {
             return NutrientTableCell(
               index: index,
-              tableColumnWidth: _tableColumnWidth,
-              nutrientInfo: _viewModel.nutrientList[index],
+              tableColumnWidth: _nutrientTableColumnWidth,
+              nutrientInfo: _viewModel.nutrientInRecipe[index],
             );
           },
         ),
@@ -217,15 +323,16 @@ class _AddRecipesViewState extends State<AddRecipesView> {
     );
   }
 
-  SizedBox _ingredient(double width) {
-    return SizedBox(
-      width: 0.48 * width,
+  Widget _ingredient(double width) {
+    return Container(
+      width: 0.3 * width,
+      constraints: const BoxConstraints(minWidth: 700),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
             "วัตถุดิบ",
-            style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 10),
           _ingredientTable(),
@@ -236,58 +343,143 @@ class _AddRecipesViewState extends State<AddRecipesView> {
     );
   }
 
-  Widget _loadingScreen() {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          CircularProgressIndicator(
-            strokeWidth: 3.5,
-          ),
-          SizedBox(
-            height: 30,
-          ),
-          Text(
-            "กำลังโหลดข้อมูล กรุณารอสักครู่...",
-            style: TextStyle(fontSize: 20),
-          ),
-        ],
-      ),
-    );
+  Future<void> _handleAddRecipe() async {
+    Navigator.pop(context);
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return const Center(child: AdminLoadingScreen());
+        });
+    try {
+      await _viewModel.onUserAddRecipes(
+          recipesID: Random().nextInt(999).toString(),
+          recipesName: _recipeNameController.text,
+          petTypeName: _petTypeName);
+      if (!context.mounted) return;
+      Navigator.pop(context);
+      Future.delayed(const Duration(milliseconds: 1600), () {
+        Navigator.of(context).popUntil((route) => route.isFirst);
+        Navigator.pushReplacement(context,
+            NavigationDownward(targetPage: const RecipeManagementView()));
+      });
+      AdminSuccessPopup(
+              context: context, successText: 'เพิ่มข้อมูลสูตรอาหารสำเร็จ!!')
+          .show();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  Future<void> _handleEditRecipe() async {
+    Navigator.pop(context);
+    showDialog(
+        barrierDismissible: false,
+        context: context,
+        builder: (context) {
+          return const Center(child: AdminLoadingScreen());
+        });
+    try {
+      RecipeModel recipeData = RecipeModel(
+          recipeId: widget.recipeInfo.recipeId,
+          recipesName: _recipeNameController.text,
+          petTypeName: _petTypeName,
+          ingredientInRecipeList: _viewModel.ingredientInRecipeList,
+          nutrient: _viewModel.nutrientInRecipe);
+      await widget.onUserEditRecipeCallback(recipeData: recipeData);
+      if (!context.mounted) return;
+      Navigator.pop(context);
+      Future.delayed(
+        const Duration(milliseconds: 1600),
+        () {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+          Navigator.pushReplacement(
+            context,
+            NavigationDownward(
+              targetPage: RecipeInfoView(
+                  recipesData: recipeData,
+                  onUserDeleteRecipesCallback:
+                      widget.onUserDeleteRecipesCallback,
+                  onUserEditRecipeCallback: widget.onUserEditRecipeCallback,
+                  isJustUpdate: true),
+            ),
+          );
+        },
+      );
+      AdminSuccessPopup(
+              context: context, successText: 'เพิ่มข้อมูลสูตรอาหารสำเร็จ!!')
+          .show();
+    } catch (e) {
+      print(e);
+    }
+  }
+
+  void _updateRecipeFunction() {
+    if (_recipeNameController.text.isEmpty) {
+      AdminWarningPopup(
+              context: context, warningText: 'กรุณากรอกชื่อสูตรอาหาร!')
+          .show();
+    } else if (_isIngredientTextFieldBlank) {
+      AdminWarningPopup(
+              context: context, warningText: 'กรุณากรอกชื่อวัตถุดิบให้ครบ!')
+          .show();
+    } else if (_isZeroAmount) {
+      AdminWarningPopup(
+              context: context, warningText: 'กรุณากรอกปริมาณวัตถุดิบให้ครบ!')
+          .show();
+    } else if (_petTypeName == "") {
+      AdminWarningPopup(
+              context: context, warningText: 'กรุณาเลือกชนิดสัตว์เลี้ยง!')
+          .show();
+    } else if (_viewModel.totalAmount != 100) {
+      AdminWarningPopup(
+              context: context,
+              warningText: 'ปริมาณวัตถุดิบสุทธิไม่เท่ากับ 100%!')
+          .show();
+    } else {
+      widget.isCreate
+          ? AdminConfirmPopup(
+              context: context,
+              confirmText: 'ยืนยันการเพิ่มข้อมูลสูตรอาหาร?',
+              callback: _handleAddRecipe,
+            ).show()
+          : AdminConfirmPopup(
+              context: context,
+              confirmText: 'ยืนยันการเเก้ไขข้อมูลสูตรอาหาร?',
+              callback: _handleEditRecipe,
+            ).show();
+    }
   }
 
   Row _acceptButton(BuildContext context) {
-    void onUserAddRecipesCallBack() {
-      _viewModel.onUserAddRecipes(
-          recipesID: Random().nextInt(999).toString(),
-          recipesName: _recipesNameController.text,
-          petTypeName: _petTypeName);
-    }
+    bool isButtonDisable = _recipeNameController.text.isEmpty ||
+        _isIngredientTextFieldBlank ||
+        _isZeroAmount ||
+        _petTypeName == "" ||
+        _viewModel.totalAmount != 100;
 
     return Row(
       children: [
         const Spacer(),
         SizedBox(
-          height: 50,
-          width: 150,
+          height: 45,
+          width: 100,
           child: ElevatedButton(
             onPressed: () async {
-              showDialog(
-                context: context,
-                builder: (context) {
-                  return AddRecipesConfirmPopup(
-                    addRecipesCallBack: onUserAddRecipesCallBack,
-                  );
-                },
-              );
+              _updateRecipeFunction();
             },
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color.fromRGBO(58, 180, 106, 1),
+              backgroundColor: isButtonDisable
+                  ? disableButtonBackground
+                  : acceptButtonBackground,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            child: const Text('ตกลง', style: TextStyle(fontSize: 17)),
+            child: const Text(
+              'ตกลง',
+              style: TextStyle(fontSize: 17, color: Colors.white),
+            ),
           ),
         ),
       ],
@@ -300,94 +492,112 @@ class _AddRecipesViewState extends State<AddRecipesView> {
         "เพิ่มข้อมูลสูตรอาหาร",
         style: TextStyle(
           fontWeight: FontWeight.bold,
-          fontSize: 45,
+          fontSize: headerInputTextFontSize,
           // color: kPrimaryDarkColor,
         ),
       ),
     );
   }
 
-  Widget _recipesName() {
-    return Row(
-      children: [
-        Container(
-          margin: const EdgeInsets.only(top: 10),
-          height: 50,
-          width: 500,
-          child: TextField(
-            controller: _recipesNameController,
-            style: const TextStyle(fontSize: 17),
-            cursorColor: Colors.black,
-            decoration: InputDecoration(
-              fillColor: Colors.white,
-              filled: true,
-              labelText: "ชื่อสูตรอาหาร",
-              labelStyle: const TextStyle(fontSize: 19),
-              contentPadding: const EdgeInsets.only(left: 15),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide: BorderSide(color: tGrey),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10.0),
-                borderSide: BorderSide(color: tGrey),
-              ),
-            ),
-            onChanged: (value) {
-              setState(() {});
-            },
-          ),
-        ),
-        const SizedBox(width: 15),
-        Container(
-          margin: const EdgeInsets.only(top: 10),
-          child: const Text(
-            "ของ",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 19,
-              // color: kPrimaryDarkColor,
-            ),
-          ),
-        ),
-        const SizedBox(width: 15),
-        Container(
-          width: 350,
-          margin: const EdgeInsets.only(top: 10),
-          child: DropdownSearch<PetTypeInfoModel>(
-            dropdownDecoratorProps: DropDownDecoratorProps(
-                baseStyle: const TextStyle(fontSize: 19),
-                dropdownSearchDecoration: InputDecoration(
-                  fillColor: Colors.white,
-                  filled: true,
-                  labelText: "ชนิดสัตว์เลี้ยง",
-                  labelStyle: const TextStyle(fontSize: 19),
-                  contentPadding: const EdgeInsets.only(left: 15),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    borderSide: BorderSide(color: tGrey),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                    borderSide: BorderSide(color: tGrey),
-                  ),
-                )),
-            items: _viewModel.petTypeList,
-            onChanged: (value) {
-              if (value != null) {
-                _petTypeName = value.petTypeName;
-              }
+  void _onRecipeNameChanged(String word) {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      setState(() {});
+    });
+  }
 
-              // setState(() {
-              //   _petPhysiologyStatus = value!;
-              // });
-            },
-            itemAsString: (PetTypeInfoModel? item) {
-              return item?.petTypeName ?? "";
-            },
+  Widget _petType() {
+    return Container(
+      width: 350,
+      margin: const EdgeInsets.only(top: 6),
+      child: AdminCustomDropdownSearch(
+          primaryColor: Colors.black,
+          isCreate: widget.isCreate,
+          value: _petTypeName,
+          labelTextSize: 16,
+          choiceItemList: _viewModel.petTypeList
+              .map((petTypeModel) => petTypeModel.petTypeName)
+              .toList(),
+          updateValueCallback: ({required String value}) {
+            _petTypeName = value;
+            setState(() {});
+          }),
+    );
+  }
+
+  void _onRecipeFocusChange() {
+    setState(() {});
+  }
+
+  Container _recipeName() {
+    return Container(
+      margin: const EdgeInsets.only(top: 10),
+      height: 50,
+      width: 500,
+      child: TextField(
+        onTap: () {
+          _recipeNameController.selection = TextSelection(
+            baseOffset: 0,
+            extentOffset: _recipeNameController.text.length,
+          );
+        },
+        onChanged: _onRecipeNameChanged,
+        focusNode: _recipeNameFocusNode,
+        controller: _recipeNameController,
+        style: const TextStyle(fontSize: headerInputTextFontSize),
+        cursorColor: Colors.black,
+        decoration: InputDecoration(
+          prefixIconConstraints: const BoxConstraints(
+            minWidth: 15,
           ),
-        )
-      ],
+          prefixIcon: _recipeNamePrefixWord(),
+          fillColor: Colors.white,
+          filled: true,
+          labelText: "ชื่อสูตรอาหาร",
+          floatingLabelStyle: const TextStyle(
+            color: Colors.black,
+            fontSize: 26,
+            fontWeight: FontWeight.bold,
+          ),
+          contentPadding: const EdgeInsets.only(left: 15),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15.0),
+            borderSide: BorderSide(
+                color: _recipeNameController.text.isEmpty
+                    ? Colors.red
+                    : Colors.black,
+                width: _recipeNameController.text.isEmpty ? 1.2 : 2),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(15.0),
+            borderSide: const BorderSide(color: Colors.black, width: 2),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Container _recipeNamePrefixWord() {
+    return Container(
+      margin: const EdgeInsets.only(left: 5),
+      child:
+          _recipeNameFocusNode.hasFocus || _recipeNameController.text.isNotEmpty
+              ? const SizedBox()
+              : const MouseRegion(
+                  cursor: SystemMouseCursors.text,
+                  child: Row(
+                    children: [
+                      Text(
+                        " ชื่อสูตรอาหาร",
+                        style: TextStyle(color: Colors.grey, fontSize: 19),
+                      ),
+                      Text(
+                        "*",
+                        style: TextStyle(color: Colors.red, fontSize: 19),
+                      ),
+                    ],
+                  ),
+                ),
     );
   }
 
@@ -402,61 +612,92 @@ class _AddRecipesViewState extends State<AddRecipesView> {
     );
   }
 
-  Padding _addIngredientButton() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
-      child: MouseRegion(
-        cursor: SystemMouseCursors.click,
-        child: GestureDetector(
-            onTap: () async {
-              _viewModel.onUserAddIngredient();
-              setState(() {});
+  void _onUserAddIngredient({required bool isOutOfIngredientInChoice}) {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 300), () {
+      if (isOutOfIngredientInChoice) {
+        AdminWarningPopup(
+          context: context,
+          warningText: 'ไม่มีข้อมูลวัตถุดิบให้เพิ่มอีกแล้ว!',
+        ).show();
+      } else {
+        _viewModel.onUserAddIngredient();
+        _checkIfIsZeroAmount();
+        _checkIfIngredientTextFieldBlank();
+        setState(() {});
+      }
+    });
+  }
+
+  Widget _addIngredientButton() {
+    bool isOutOfIngredientInChoice = _viewModel.selectedIngredientList.length ==
+        _viewModel.ingredientList.length;
+    return Row(
+      children: [
+        const Spacer(),
+        SizedBox(
+          height: 43,
+          width: 180,
+          child: ElevatedButton(
+            onPressed: () async {
+              _onUserAddIngredient(
+                  isOutOfIngredientInChoice: isOutOfIngredientInChoice);
             },
-            child: const Row(
+            style: ElevatedButton.styleFrom(
+              backgroundColor:
+                  isOutOfIngredientInChoice ? disableButtonBackground : flesh,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+            ),
+            child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.add_circle_outline, size: 50),
+                Icon(Icons.add_rounded,
+                    size: 36,
+                    color: isOutOfIngredientInChoice
+                        ? Colors.white
+                        : Colors.black),
                 Text(
-                  " เพิ่มวัตถุดิบ",
-                  style: TextStyle(fontSize: 16),
+                  ' เพิ่มวัตถุดิบ',
+                  style: TextStyle(
+                      fontSize: 18,
+                      color: isOutOfIngredientInChoice
+                          ? Colors.white
+                          : Colors.black),
                 )
               ],
-            )),
-      ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
   Widget _ingredientTableHeader() {
     return Table(
-      columnWidths: _tableColumnWidth,
-      border: TableBorder.symmetric(
-        inside: const BorderSide(
-          width: 1,
-          // color: primary,
-        ),
-      ),
+      columnWidths: _ingredientTableColumnWidth,
       children: [
         TableRow(
           decoration: BoxDecoration(
-            color: primary,
+            color: specialBlack,
             border: Border.all(
               width: 1,
               // color: primary,
             ),
-            // color: kColorLightBlueBTN,
             borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(10),
-              topRight: Radius.circular(10),
+              topLeft: Radius.circular(15),
+              topRight: Radius.circular(15),
             ),
           ),
-          children: [
+          children: const [
             TableCell(
               child: Padding(
                 padding: EdgeInsets.all(_tableHeaderPadding),
-                child: const Center(
+                child: Center(
                   child: Text(
                     'ลำดับที่',
-                    style: TextStyle(fontSize: 17),
+                    style: _headerTextStyle,
                   ),
                 ),
               ),
@@ -464,10 +705,10 @@ class _AddRecipesViewState extends State<AddRecipesView> {
             TableCell(
               child: Padding(
                 padding: EdgeInsets.all(_tableHeaderPadding),
-                child: const Center(
+                child: Center(
                   child: Text(
                     'วัตถุดิบ',
-                    style: TextStyle(fontSize: 17),
+                    style: _headerTextStyle,
                   ),
                 ),
               ),
@@ -475,15 +716,15 @@ class _AddRecipesViewState extends State<AddRecipesView> {
             TableCell(
               child: Padding(
                 padding: EdgeInsets.all(_tableHeaderPadding),
-                child: const Center(
+                child: Center(
                   child: Text(
-                    'ปริมาณวัตถุดิบ',
-                    style: TextStyle(fontSize: 17),
+                    'ปริมาณวัตถุดิบ (%)',
+                    style: _headerTextStyle,
                   ),
                 ),
               ),
             ),
-            const TableCell(
+            TableCell(
               child: SizedBox(),
             ),
           ],
@@ -492,52 +733,152 @@ class _AddRecipesViewState extends State<AddRecipesView> {
     );
   }
 
+  void _checkIfIngredientTextFieldBlank() {
+    if (_viewModel.selectedIngredientList
+        .any((ingredient) => ingredient.ingredientName == "")) {
+      _isIngredientTextFieldBlank = true;
+    } else {
+      _isIngredientTextFieldBlank = false;
+    }
+  }
+
+  Future<void> _onUserDeleteIngredient({required int index}) async {
+    await _viewModel.onUserDeleteIngredient(index: index);
+    _checkIfIngredientTextFieldBlank();
+    setState(() {});
+  }
+
+  void _onUserSelectAmountCallback(
+      {required double amountData, required int index}) {
+    setState(() {
+      _viewModel.onUserSelectAmount(amountData: amountData, index: index);
+      _checkIfIsZeroAmount();
+    });
+  }
+
+  void _checkIfIsZeroAmount() {
+    if (_viewModel.ingredientInRecipeList
+        .any((ingredientInRecipe) => ingredientInRecipe.amount == 0)) {
+      _isZeroAmount = true;
+    } else {
+      _isZeroAmount = false;
+    }
+  }
+
+  void _onUserSelectIngredient(
+      {required int index, required IngredientModel ingredientData}) {
+    _viewModel.onUserSelectIngredient(
+        ingredientData: ingredientData, index: index);
+    if (_viewModel.selectedIngredientList
+        .any((ingredient) => ingredient.ingredientName == "")) {
+      _isIngredientTextFieldBlank = true;
+    } else {
+      _isIngredientTextFieldBlank = false;
+    }
+    setState(() {});
+  }
+
   Widget _ingredientTableBody() {
-    Future<void> ingredientDelete({required int index}) async {
-      await _viewModel.onUserDeleteIngredient(index: index);
-      setState(() {});
-    }
-
-    void onUserSelectAmountCallback(
-        {required double amountData, required int index}) {
-      setState(() {
-        _viewModel.onUserSelectAmount(amountData: amountData, index: index);
-      });
-    }
-
     return Expanded(
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border(
-            bottom: BorderSide(
-              width: 0.9,
-              color: lightGrey,
+      child: _viewModel.ingredientInRecipeList.isEmpty
+          ? Container(
+              width: double.infinity,
+              decoration: BoxDecoration(gradient: tableBackGroundGradient),
+              child: const Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "ยังไม่ได้เพิ่มวัตถุดิบในสูตรอาหาร",
+                    style: TextStyle(fontSize: 19),
+                  ),
+                  SizedBox(height: 50)
+                ],
+              ),
+            )
+          : Column(
+              children: [
+                Expanded(
+                  child: Container(
+                    decoration:
+                        BoxDecoration(gradient: tableBackGroundGradient),
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      itemCount: _viewModel.ingredientInRecipeList.length,
+                      itemBuilder: (context, index) {
+                        return AddRecipesTableCell(
+                          index: index,
+                          tableColumnWidth: _ingredientTableColumnWidth,
+                          onUserIngredientDeleteCallback:
+                              _onUserDeleteIngredient,
+                          onUserSelectAmountCallback:
+                              _onUserSelectAmountCallback,
+                          ingredientInRecipeInfo:
+                              _viewModel.ingredientInRecipeList[index],
+                          // onShowDropdownCallback: (
+                          //     {required bool showDropdown}) {
+                          //   _showDropdown = showDropdown;
+                          //   setState(() {});
+                          // },
+                          // onUpdateDropdownPosition: (
+                          //     {required Offset dropdownPosition}) {
+                          //   _dropdownPosition = dropdownPosition;
+                          //   setState(() {});
+                          // },
+                          ingredientList: _viewModel.ingredientList,
+                          onUserSelectIngredientCallback: (
+                              {required int index,
+                              required IngredientModel ingredientData}) {
+                            _onUserSelectIngredient(
+                                index: index, ingredientData: ingredientData);
+                          },
+                          selectedIngredientList:
+                              _viewModel.selectedIngredientList,
+                          onIngredientTextFieldBlankCallback: () {
+                            _isIngredientTextFieldBlank = true;
+                            _viewModel.calculateNutrient();
+                            setState(() {});
+                          },
+                          viewModel: _viewModel,
+                          scrollToTheBottomOfListViewCallback: () {
+                            if (_scrollController.hasClients) {
+                              _scrollController.jumpTo(
+                                  _scrollController.position.maxScrollExtent);
+                            }
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ),
+                _totalIngredientAmount(),
+              ],
             ),
-            left: BorderSide(
-              width: 0.9,
-              color: lightGrey,
-            ),
-            right: BorderSide(
-              width: 0.9,
-              color: lightGrey,
-            ),
+    );
+  }
+
+  Container _totalIngredientAmount() {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Color.fromRGBO(232, 232, 232, 1.0),
+        // border: Border.all(width: 0.9, color: Colors.grey.shade100),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+      child: Row(
+        children: [
+          const Text(
+            "ปริมาณวัตถุดิบรวมสุทธิ",
+            style: TextStyle(fontSize: 18),
           ),
-        ),
-        child: ListView.builder(
-          itemCount: _viewModel.ingredientInRecipes.length,
-          itemBuilder: (context, index) {
-            return AddRecipesTableCell(
-              index: index,
-              tableColumnWidth: _tableColumnWidth,
-              // ingredientAmountChangeCallback: ingredientAmountChange,
-              ingredientList: _viewModel.ingredientInChoice,
-              viewModel: _viewModel,
-              ingredientDeleteCallback: ingredientDelete,
-              onUserSelectAmount: onUserSelectAmountCallback,
-            );
-          },
-        ),
+          const Spacer(),
+          Text(
+            "${_viewModel.totalAmount.toString()} %",
+            style: TextStyle(
+                fontSize: 18,
+                color:
+                    _viewModel.totalAmount == 100 ? Colors.green : Colors.red),
+          ),
+          const SizedBox(width: 97)
+        ],
       ),
     );
   }

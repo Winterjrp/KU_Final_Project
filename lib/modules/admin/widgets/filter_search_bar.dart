@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:untitled1/constants/size.dart';
 
 typedef SearchCallback = void Function({required String searchText});
 
@@ -28,7 +29,9 @@ class FilterSearchBar extends StatelessWidget {
       },
       cursorColor: Colors.black,
       controller: searchTextEditingController,
-      style: const TextStyle(fontSize: 18),
+      style: TextStyle(
+        fontSize: headerInputTextFontSize,
+      ),
       decoration: InputDecoration(
         enabledBorder: OutlineInputBorder(
           borderSide: BorderSide(
@@ -47,6 +50,8 @@ class FilterSearchBar extends StatelessWidget {
           ),
         ),
         labelText: labelText,
+        labelStyle:
+            TextStyle(color: Colors.grey, fontSize: headerInputTextFontSize),
         floatingLabelStyle: const TextStyle(
           color: Colors.black,
           fontSize: 26,

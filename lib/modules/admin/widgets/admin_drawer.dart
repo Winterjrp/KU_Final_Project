@@ -103,7 +103,7 @@ class AdminDrawer extends StatelessWidget {
                             pageIndex:
                                 MainPageIndexConstants.recipeManagementIndex,
                             currentIndex: currentIndex,
-                            targetPage: const RecipesManagementView(),
+                            targetPage: const RecipeManagementView(),
                             context: context,
                           ),
                           buildDrawerItem(

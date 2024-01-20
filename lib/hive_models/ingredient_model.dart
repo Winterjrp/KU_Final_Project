@@ -12,7 +12,7 @@ String ingredientModelToJson(IngredientModel data) =>
 @HiveType(typeId: 1)
 class IngredientModel {
   @HiveField(0)
-  String ingredientID;
+  String ingredientId;
 
   @HiveField(1)
   String ingredientName;
@@ -21,21 +21,21 @@ class IngredientModel {
   List<NutrientModel> nutrient;
 
   IngredientModel({
-    required this.ingredientID,
+    required this.ingredientId,
     required this.ingredientName,
     required this.nutrient,
   });
 
   factory IngredientModel.fromJson(Map<String, dynamic> json) =>
       IngredientModel(
-        ingredientID: json["ingredientID"],
+        ingredientId: json["ingredientID"],
         ingredientName: json["ingredientName"],
         nutrient: List<NutrientModel>.from(
             json["nutrient"].map((x) => NutrientModel.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
-        "ingredientID": ingredientID,
+        "ingredientID": ingredientId,
         "ingredientName": ingredientName,
         "nutrient": List<dynamic>.from(nutrient.map((x) => x.toJson())),
       };
@@ -49,18 +49,24 @@ class NutrientModel {
   @HiveField(1)
   double amount;
 
+  @HiveField(3)
+  String unit;
+
   NutrientModel({
     required this.nutrientName,
     required this.amount,
+    required this.unit,
   });
 
   factory NutrientModel.fromJson(Map<String, dynamic> json) => NutrientModel(
         nutrientName: json["nutrientName"],
         amount: json["amount"],
+        unit: json["unit"],
       );
 
   Map<String, dynamic> toJson() => {
         "nutrientName": nutrientName,
         "amount": amount,
+        "unit": unit,
       };
 }

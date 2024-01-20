@@ -122,43 +122,44 @@ class _MyPetViewState extends State<MyPetView> {
       children: [
         const SizedBox(height: 10),
         Container(
-            decoration: const BoxDecoration(
-              color: Color.fromRGBO(228, 234, 240, 1),
-              borderRadius: BorderRadius.all(Radius.circular(30)),
-            ),
-            width: width * 0.8,
-            padding: const EdgeInsets.symmetric(vertical: 20),
-            child: Column(
-              children: [
-                const Text(
-                  "ยังไม่ได้เพิ่มข้อมูลสัตว์เลี้ยง?",
-                  style: TextStyle(
-                      fontSize: 17, color: Color.fromRGBO(28, 28, 44, 1)),
-                ),
-                const SizedBox(height: 20),
-                Transform.translate(
-                  offset: const Offset(100, 0),
-                  child: Transform.scale(
-                    scale: 1.7,
-                    child: SizedBox(
-                      height: 290,
-                      child: SvgPicture.asset(
-                        'assets/pet_owner.svg',
-                        // semanticsLabel:
-                        //     'My SVG Image',
-                        // width: 200,
-                      ),
+          decoration: const BoxDecoration(
+            color: Color.fromRGBO(228, 234, 240, 1),
+            borderRadius: BorderRadius.all(Radius.circular(30)),
+          ),
+          width: width * 0.8,
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Column(
+            children: [
+              const Text(
+                "ยังไม่ได้เพิ่มข้อมูลสัตว์เลี้ยง?",
+                style: TextStyle(
+                    fontSize: 17, color: Color.fromRGBO(28, 28, 44, 1)),
+              ),
+              const SizedBox(height: 20),
+              Transform.translate(
+                offset: const Offset(100, 0),
+                child: Transform.scale(
+                  scale: 1.7,
+                  child: SizedBox(
+                    height: 290,
+                    child: SvgPicture.asset(
+                      'assets/pet_owner.svg',
+                      // semanticsLabel:
+                      //     'My SVG Image',
+                      // width: 200,
                     ),
                   ),
                 ),
-                const SizedBox(height: 10),
-                const Text(
-                  "เพิ่มสัตว์เลี้ยงได้เลย!!",
-                  style: TextStyle(
-                      fontSize: 18, color: Color.fromRGBO(28, 28, 44, 1)),
-                ),
-              ],
-            )),
+              ),
+              const SizedBox(height: 10),
+              const Text(
+                "เพิ่มสัตว์เลี้ยงได้เลย!!",
+                style: TextStyle(
+                    fontSize: 18, color: Color.fromRGBO(28, 28, 44, 1)),
+              ),
+            ],
+          ),
+        ),
         const SizedBox(height: 15),
       ],
     );
@@ -167,7 +168,7 @@ class _MyPetViewState extends State<MyPetView> {
   Container _header() {
     return Container(
       alignment: Alignment.topLeft,
-      child: Text(
+      child: const Text(
         "สัตว์เลี้ยงของฉัน",
         style: TextStyle(
             fontSize: 25, color: primary, fontWeight: FontWeight.bold),
