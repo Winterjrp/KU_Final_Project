@@ -75,6 +75,7 @@ class CustomMultipleDropdownSearch extends StatelessWidget {
         showSearchBox: true,
         showSelectedItems: true,
         searchFieldProps: TextFieldProps(
+          cursorColor: Colors.black,
           decoration: InputDecoration(
             floatingLabelStyle: const TextStyle(
               color: Colors.black,

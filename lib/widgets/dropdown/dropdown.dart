@@ -7,6 +7,7 @@ class CustomDropdown extends StatelessWidget {
   final Color primaryColor;
   final bool isCreate;
   final String value;
+  final String searchText;
   final double inputTextSize;
   final double labelTextSize;
   final List<String> choiceItemList;
@@ -20,6 +21,7 @@ class CustomDropdown extends StatelessWidget {
     required this.choiceItemList,
     required this.updateValueCallback,
     Key? key,
+    required this.searchText,
   }) : super(key: key);
   @override
   Widget build(BuildContext context) {
@@ -58,7 +60,7 @@ class CustomDropdown extends StatelessWidget {
             ),
             fillColor: Colors.white,
             filled: true,
-            hintText: "ชนิดสัตว์เลี้ยง",
+            hintText: searchText,
             hintStyle: TextStyle(fontSize: labelTextSize),
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 15, vertical: 20),

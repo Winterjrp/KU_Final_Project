@@ -1,23 +1,26 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import 'package:untitled1/data/secure_stroage.dart';
 import 'package:untitled1/models/user_info_model.dart';
 import 'package:untitled1/services/login/login_service_interface.dart';
+import 'package:untitled1/services/shared_preferences_services/user_info.dart';
 
 class LoginMockService implements LoginServiceInterface {
   @override
-  Future<UserInfoModel> login(
+  Future<void> login(
       {required String username, required String password}) async {
     await Future.delayed(const Duration(milliseconds: 2000), () {});
     http.Response mockResponse = http.Response(
         '''
   {
-    "username": "คุณนีน่า",
-    "userID": "12345678",
+    "username": "นีน่า",
+    "userId": "12345678",
     "userRole": {
       "isUserManagementAdmin": true,
       "isPetFoodManagementAdmin": true
-    }
+    },
+    "accessToken" : "12345"
   }
   ''',
         200,
@@ -26,8 +29,12 @@ class LoginMockService implements LoginServiceInterface {
         });
     UserInfoModel userInfoData;
     if (mockResponse.statusCode == 200) {
-      // print(jsonDecode(mockResponse.body));
-      userInfoData = UserInfoModel.fromJson(json.decode(mockResponse.body));
+      Map<String, dynamic> jsonData = json.decode(mockResponse.body);
+
+      userInfoData = UserInfoModel.fromJson(jsonData);
+      await SecureStorage()
+          .writeSecureData(key: "token", value: jsonData['accessToken']);
+      SharedPreferencesService.saveUserInfo(userInfoData);
     } else if (mockResponse.statusCode == 400) {
       throw Exception(
           "Username and password cannot be empty. Please provide valid credentials.");
@@ -36,6 +43,5 @@ class LoginMockService implements LoginServiceInterface {
     } else {
       throw Exception('Failed to login.');
     }
-    return userInfoData;
   }
 }

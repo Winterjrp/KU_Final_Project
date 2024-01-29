@@ -1,13 +1,34 @@
+import 'dart:async';
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/constants/main_page_index_constants.dart';
+import 'package:untitled1/constants/nutrient_list_template.dart';
+import 'package:untitled1/constants/size.dart';
+import 'package:untitled1/hive_models/nutrient_limit_info_model.dart';
 import 'package:untitled1/hive_models/pet_type_info_model.dart';
+import 'package:untitled1/modules/admin/admin_home/admin_home_view.dart';
+import 'package:untitled1/modules/admin/pet_type_info_management/widgets/pet_type_info_management_table_cell.dart';
+import 'package:untitled1/modules/admin/widgets/admin_appbar.dart';
 import 'package:untitled1/modules/admin/widgets/admin_drawer.dart';
 import 'package:untitled1/modules/admin/pet_type_info_management/pet_type_info_management_view_model.dart';
-import 'package:untitled1/modules/admin/pet_type_info_management/widgets/pet_type_info_management_card.dart';
-import 'package:untitled1/modules/admin/update_pet_type_info/add_pet_type_info_view.dart';
+import 'package:untitled1/modules/admin/update_pet_type_info/update_pet_type_info_view.dart';
+import 'package:untitled1/modules/admin/widgets/button/admin_add_object_button.dart';
+import 'package:untitled1/modules/admin/widgets/filter_search_bar.dart';
+import 'package:untitled1/modules/admin/widgets/loading_screen/admin_loading_screen_with_text.dart';
+import 'package:untitled1/modules/admin/widgets/popup/admin_error_popup.dart';
+import 'package:untitled1/utility/navigation_with_animation.dart';
+
+// typedef OnUserDeletePetChronicDiseaseCallBackFunction = void Function(
+//     {required PetChronicDiseaseModel petChronicDiseaseData});
 
 class PetTypeInfoManagementView extends StatefulWidget {
-  const PetTypeInfoManagementView({Key? key}) : super(key: key);
+  // final OnUserDeletePetChronicDiseaseCallBackFunction
+  // onUserDeletePetChronicDiseaseCallBack;
+  const PetTypeInfoManagementView({
+    Key? key,
+    // required this.onUserDeletePetChronicDiseaseCallBack
+  }) : super(key: key);
 
   @override
   State<PetTypeInfoManagementView> createState() =>
@@ -15,160 +36,274 @@ class PetTypeInfoManagementView extends StatefulWidget {
 }
 
 class _PetTypeInfoManagementViewState extends State<PetTypeInfoManagementView> {
-  late double height;
   late PetTypeInfoManagementViewModel _viewModel;
+  late TextEditingController _searchTextEditingController;
+
+  static const Map<int, TableColumnWidth> _tableColumnWidth =
+      <int, TableColumnWidth>{
+    0: FlexColumnWidth(0.12),
+    1: FlexColumnWidth(0.4),
+    2: FlexColumnWidth(0.45),
+    3: FlexColumnWidth(0.22),
+  };
+  static const double _tableHeaderPadding = 12;
+  static const TextStyle _tableHeaderTextStyle =
+      TextStyle(fontSize: 17, color: Colors.white);
+
+  Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
     _viewModel = PetTypeInfoManagementViewModel();
     _viewModel.getPetTypeInfoData();
+    _searchTextEditingController = TextEditingController();
   }
 
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     double height = size.height;
-    return Scaffold(
-      drawer: const AdminDrawer(
-          currentIndex: MainPageIndexConstants.petTypeManagementIndex),
-      appBar: AppBar(
-        elevation: 0,
-        leading: Builder(
-          builder: (context) => // Ensure Scaffold is in context
-              IconButton(
-            icon: const Icon(
-              Icons.menu,
-            ),
-            onPressed: () {
-              Scaffold.of(context).openDrawer();
-            },
-          ),
-        ),
-
-        // title: const Center(child: Text("ฟังก์ชันสำหรับผู้ดูแลระบบ")),
-        iconTheme: const IconThemeData(color: Colors.black),
-        backgroundColor: Colors.white,
+    return WillPopScope(
+      onWillPop: () async {
+        Completer<bool> completer = Completer<bool>();
+        Navigator.pushReplacement(
+          context,
+          NavigationDownward(targetPage: const AdminHomeView()),
+        );
+        return completer.future;
+      },
+      child: Scaffold(
+        drawer: const AdminDrawer(
+            currentIndex: MainPageIndexConstants.petTypeManagementIndex),
+        appBar: const AdminAppBar(color: backgroundColor),
+        backgroundColor: backgroundColor,
+        body: _body(height),
       ),
-      body: SafeArea(
+    );
+  }
+
+  Widget _body(double height) {
+    return Center(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: adminScreenMaxWidth),
+        padding: const EdgeInsets.symmetric(horizontal: 30),
         child: FutureBuilder<List<PetTypeInfoModel>>(
             future: _viewModel.petTypeInfoData,
             builder: (context, AsyncSnapshot<List<PetTypeInfoModel>> snapshot) {
               if (snapshot.connectionState != ConnectionState.done) {
-                return _loadingScreen();
+                return const AdminLoadingScreenWithText();
               } else if (snapshot.hasError) {
                 return Text('Error: ${snapshot.error}');
               } else if (snapshot.hasData) {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 25),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const SizedBox(height: 15),
-                          _header(),
-                          const SizedBox(height: 15),
-                          _userPetInfo(height: height, context: context),
-                          const SizedBox(height: 15),
-                          _addPetTypeInfoButton()
-                        ],
-                      ),
-                    ),
+                    _header(),
+                    const SizedBox(height: 15),
+                    _userPetInfoTable(height: height, context: context),
+                    const SizedBox(height: 20),
                   ],
                 );
               }
-              return const Text('No data available');
+
+              return const SizedBox();
             }),
       ),
     );
   }
 
   Widget _header() {
-    return const SizedBox(
-      child: Text(
-        "จัดการข้อมูลชนิดสัตว์เลี้ยง",
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 42,
-          // color: kPrimaryDarkColor,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "จัดการข้อมูลชนิดสัตว์เลี้ยง",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: headerTextFontSize,
+          ),
         ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            _searchBar(),
+            const Spacer(),
+            _addPetTypeInfoButton(),
+          ],
+        ),
+      ],
+    );
+  }
+
+  void _onSearchTextChanged({required String searchText}) {
+    if (_debounce?.isActive ?? false) _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      _viewModel.onUserSearchPetType(searchText: searchText);
+      setState(() {});
+    });
+  }
+
+  Widget _searchBar() {
+    return SizedBox(
+      width: 600,
+      child: FilterSearchBar(
+        onSearch: _onSearchTextChanged,
+        searchTextEditingController: _searchTextEditingController,
+        labelText: "ค้นหาชนิดสัตว์เลี้ยง",
       ),
     );
   }
 
-  SingleChildScrollView _userPetInfo(
-      {required double height, required BuildContext context}) {
-    Future<void> deletePetTypeDataCallback(
-        {required String petTypeInfoID}) async {
-      _viewModel.deletePetTypeData(petTypeInfoID: petTypeInfoID);
-    }
-
-    return SingleChildScrollView(
-        child: Container(
-      constraints: BoxConstraints(maxHeight: height * 0.72),
-      height: 75.0 * _viewModel.petTypeInfo.length,
-      child: ListView.builder(
-        itemCount: _viewModel.petTypeInfo.length,
-        itemBuilder: (context, index) {
-          return PetTypeInfoManagementCard(
-            index: index,
-            context: context,
-            viewModel: _viewModel,
-            deletePetTypeInfoCallBack: deletePetTypeDataCallback,
-          );
-        },
-      ),
-    ));
+  Future<void> _onUserDeletePetTypeData({required String petTypeInfoId}) async {
+    await _viewModel.onUserDeletePetTypeData(petTypeInfoID: petTypeInfoId);
   }
 
-  Widget _loadingScreen() {
-    return const Center(
+  Widget _userPetInfoTable(
+      {required double height, required BuildContext context}) {
+    return Expanded(
       child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          CircularProgressIndicator(
-            strokeWidth: 3.5,
-          ),
-          SizedBox(
-            height: 30,
-          ),
-          Text(
-            "กำลังโหลดข้อมูล กรุณารอสักครู่...",
-            style: TextStyle(fontSize: 20),
-          ),
+          _tableHeader(),
+          _tableBody(),
         ],
       ),
     );
   }
 
-  Widget _addPetTypeInfoButton() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 5),
-        child: MouseRegion(
-          cursor: SystemMouseCursors.click,
-          child: GestureDetector(
-              onTap: () async {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => const AddPetTypeInfoView()),
-                );
-              },
-              child: const Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.add_circle_outline, size: 50),
-                  Text(
-                    " เพิ่มข้อมูลชนิดสัตว์เลี้ยง",
-                    style: TextStyle(fontSize: 16),
-                  )
-                ],
-              )),
+  Table _tableHeader() {
+    return Table(
+      columnWidths: _tableColumnWidth,
+      children: const [
+        TableRow(
+          decoration: BoxDecoration(
+            color: Color.fromRGBO(16, 16, 29, 1),
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(15),
+              topRight: Radius.circular(15),
+            ),
+          ),
+          children: [
+            TableCell(
+              child: Padding(
+                padding: EdgeInsets.all(_tableHeaderPadding),
+                child: Center(
+                  child: Text(
+                    'ลำดับที่',
+                    style: _tableHeaderTextStyle,
+                  ),
+                ),
+              ),
+            ),
+            TableCell(
+              child: Padding(
+                padding: EdgeInsets.all(_tableHeaderPadding),
+                child: Center(
+                  child: Text(
+                    'รหัสชนิดสัตว์เลี้ยง',
+                    style: _tableHeaderTextStyle,
+                  ),
+                ),
+              ),
+            ),
+            TableCell(
+              child: Padding(
+                padding: EdgeInsets.all(_tableHeaderPadding),
+                child: Center(
+                  child: Text(
+                    'ชื่อชนิดสัตว์เลี้ยง',
+                    style: _tableHeaderTextStyle,
+                  ),
+                ),
+              ),
+            ),
+            TableCell(
+              child: Padding(
+                padding: EdgeInsets.all(_tableHeaderPadding),
+                child: Center(
+                  child: Text(
+                    'จำนวนข้อมูลโรคประจำตัว',
+                    style: _tableHeaderTextStyle,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
-      ),
+      ],
+    );
+  }
+
+  Widget _tableBody() {
+    return Expanded(
+        child: _viewModel.filteredPetTypeInfoList.isEmpty
+            ? Container(
+                width: double.infinity,
+                decoration: BoxDecoration(gradient: tableBackGroundGradient),
+                child: const Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "ไม่มีข้อมูลชนิดสัตว์เลี้ยง",
+                      style: TextStyle(fontSize: 20),
+                    ),
+                    SizedBox(height: 50)
+                  ],
+                ),
+              )
+            : Container(
+                decoration: BoxDecoration(gradient: tableBackGroundGradient),
+                child: ListView.builder(
+                  itemCount: _viewModel.filteredPetTypeInfoList.length,
+                  itemBuilder: (context, index) {
+                    return PetTypeInfoTableCell(
+                      index: index, tableColumnWidth: _tableColumnWidth,
+                      petTypeInfo: _viewModel.filteredPetTypeInfoList[index],
+                      onUserDeletePetTypeCallback: (
+                          {required String petTypeInfoId}) async {
+                        await _onUserDeletePetTypeData(
+                            petTypeInfoId: petTypeInfoId);
+                      },
+                      // onUserEditRecipeCallback: onUserEditRecipeCallback,
+                    );
+                  },
+                ),
+              ));
+  }
+
+  Widget _addPetTypeInfoButton() {
+    return SizedBox(
+      height: 43,
+      child: AdminAddObjectButton(
+          addObjectCallback: () {
+            Navigator.push(
+              context,
+              NavigationUpward(
+                  targetPage: UpdatePetTypeInfoView(
+                    isCreate: true,
+                    petTypeInfo: PetTypeInfoModel(
+                      petTypeId: Random().nextInt(999).toString(),
+                      petTypeName: "",
+                      petChronicDisease: [],
+                      defaultNutrientLimitList: List.from(
+                        secondaryFreshNutrientListTemplate.map(
+                          (e) => NutrientLimitInfoModel(
+                              nutrientName: e.nutrientName,
+                              min: 0,
+                              max: 100,
+                              unit: e.unit),
+                        ),
+                      ),
+                    ),
+                    onUserDeletePetTypeInfoCallBack: (
+                        {required String petTypeId}) async {
+                      await _onUserDeletePetTypeData(petTypeInfoId: petTypeId);
+                    },
+                  ),
+                  durationInMilliSec: 600),
+            );
+          },
+          addObjectText: " เพิ่มข้อมูลชนิดสัตว์เลี้ยง"),
     );
   }
 }

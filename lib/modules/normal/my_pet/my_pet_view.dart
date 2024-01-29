@@ -46,6 +46,7 @@ class _MyPetViewState extends State<MyPetView> {
               child: Stack(
                 children: [
                   Container(
+                    margin: const EdgeInsets.only(top: 70),
                     decoration: const BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topCenter,
@@ -80,8 +81,6 @@ class _MyPetViewState extends State<MyPetView> {
   FutureBuilder<dynamic> _content(double height, double width) {
     return FutureBuilder<dynamic>(
         future: _viewModel.getHomeData(),
-        // Future.wait(
-        //     [_viewModel.homeDataFetch, _viewModel.retrievedUserInfoData]),
         builder: (context, AsyncSnapshot<dynamic> snapshot) {
           if (snapshot.connectionState != ConnectionState.done) {
             return _loadingScreen();
@@ -144,9 +143,6 @@ class _MyPetViewState extends State<MyPetView> {
                     height: 290,
                     child: SvgPicture.asset(
                       'assets/pet_owner.svg',
-                      // semanticsLabel:
-                      //     'My SVG Image',
-                      // width: 200,
                     ),
                   ),
                 ),

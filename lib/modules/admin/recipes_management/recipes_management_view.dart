@@ -7,9 +7,10 @@ import 'package:untitled1/constants/nutrient_list_template.dart';
 import 'package:untitled1/constants/size.dart';
 import 'package:untitled1/hive_models/ingredient_model.dart';
 import 'package:untitled1/hive_models/recipes_model.dart';
-import 'package:untitled1/modules/admin/add_recipes/add_recipe_view.dart';
+import 'package:untitled1/modules/admin/update_recipe/update_recipe_view.dart';
 import 'package:untitled1/modules/admin/admin_home/admin_home_view.dart';
 import 'package:untitled1/modules/admin/recipes_management/widgets/recipe_management_table_cell.dart';
+import 'package:untitled1/modules/admin/widgets/button/admin_add_object_button.dart';
 import 'package:untitled1/modules/admin/widgets/filter_search_bar.dart';
 import 'package:untitled1/modules/admin/widgets/admin_appbar.dart';
 import 'package:untitled1/modules/admin/widgets/admin_drawer.dart';
@@ -28,16 +29,17 @@ class _RecipeManagementViewState extends State<RecipeManagementView> {
   late RecipesManagementViewModel _viewModel;
   late TextEditingController _searchTextEditingController;
 
-  final Map<int, TableColumnWidth> _tableColumnWidth =
-      const <int, TableColumnWidth>{
-    0: FlexColumnWidth(0.1),
-    1: FlexColumnWidth(0.2),
-    2: FlexColumnWidth(0.5),
-    3: FlexColumnWidth(0.2),
+  static const Map<int, TableColumnWidth> _tableColumnWidth =
+      <int, TableColumnWidth>{
+    0: FlexColumnWidth(0.08),
+    1: FlexColumnWidth(0.25),
+    2: FlexColumnWidth(0.3),
+    3: FlexColumnWidth(0.22),
   };
-  final double _tableHeaderPadding = 12;
-  final TextStyle _tableHeaderTextStyle =
-      const TextStyle(fontSize: 17, color: Colors.white);
+  static const double _tableHeaderPadding = 12;
+  static const TextStyle _tableHeaderTextStyle =
+      TextStyle(fontSize: 17, color: Colors.white);
+
   Timer? _debounce;
 
   @override
@@ -51,6 +53,7 @@ class _RecipeManagementViewState extends State<RecipeManagementView> {
   @override
   void dispose() {
     _debounce?.cancel();
+    _searchTextEditingController.dispose();
     super.dispose();
   }
 
@@ -69,19 +72,19 @@ class _RecipeManagementViewState extends State<RecipeManagementView> {
         backgroundColor: backgroundColor,
         drawer: const AdminDrawer(
             currentIndex: MainPageIndexConstants.recipeManagementIndex),
-        appBar: const AdminAppBar(),
+        appBar: const AdminAppBar(color: backgroundColor),
         body: _body(),
       ),
     );
   }
 
-  Center _body() {
+  Widget _body() {
     return Center(
       child: Container(
         constraints: const BoxConstraints(maxWidth: adminScreenMaxWidth),
         padding: const EdgeInsets.symmetric(horizontal: 30),
         child: FutureBuilder<List<RecipeModel>>(
-            future: _viewModel.recipesListData,
+            future: _viewModel.recipeListData,
             builder: (context, AsyncSnapshot<List<RecipeModel>> snapshot) {
               if (snapshot.connectionState != ConnectionState.done) {
                 return const AdminLoadingScreenWithText();
@@ -118,9 +121,9 @@ class _RecipeManagementViewState extends State<RecipeManagementView> {
   Table _tableHeader() {
     return Table(
       columnWidths: _tableColumnWidth,
-      children: [
+      children: const [
         TableRow(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: Color.fromRGBO(16, 16, 29, 1),
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(15),
@@ -184,7 +187,7 @@ class _RecipeManagementViewState extends State<RecipeManagementView> {
 
   Widget _tableBody({required BuildContext context}) {
     return Expanded(
-      child: _viewModel.filterRecipesList.isEmpty
+      child: _viewModel.filteredRecipeList.isEmpty
           ? Container(
               width: double.infinity,
               decoration: BoxDecoration(gradient: tableBackGroundGradient),
@@ -202,12 +205,12 @@ class _RecipeManagementViewState extends State<RecipeManagementView> {
           : Container(
               decoration: BoxDecoration(gradient: tableBackGroundGradient),
               child: ListView.builder(
-                itemCount: _viewModel.filterRecipesList.length,
+                itemCount: _viewModel.filteredRecipeList.length,
                 itemBuilder: (context, index) {
                   return RecipeTableCell(
                     index: index,
                     tableColumnWidth: _tableColumnWidth,
-                    recipeInfo: _viewModel.filterRecipesList[index],
+                    recipeInfo: _viewModel.filteredRecipeList[index],
                     onUserDeleteRecipeCallback: _onUserDeleteRecipe,
                     onUserEditRecipeCallback: _onUserEditRecipe,
                   );
@@ -221,23 +224,18 @@ class _RecipeManagementViewState extends State<RecipeManagementView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const SizedBox(
-          child: Text(
-            "จัดการข้อมูลสูตรอาหารสัตว์เลี้ยง",
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: headerTextFontSize,
-              // color: kPrimaryDarkColor,
-            ),
+        const Text(
+          "จัดการข้อมูลสูตรอาหารสัตว์เลี้ยง",
+          style: TextStyle(
+            fontWeight: FontWeight.bold,
+            fontSize: headerTextFontSize,
+            // color: kPrimaryDarkColor,
           ),
         ),
         const SizedBox(height: 12),
         Row(
           children: [
-            SizedBox(
-              width: 600,
-              child: _searchBar(),
-            ),
+            _searchBar(),
             const Spacer(),
             _addRecipesButton(),
           ],
@@ -255,10 +253,13 @@ class _RecipeManagementViewState extends State<RecipeManagementView> {
   }
 
   Widget _searchBar() {
-    return FilterSearchBar(
-      onSearch: _onSearchTextChanged,
-      searchTextEditingController: _searchTextEditingController,
-      labelText: "ค้นหาสูตรอาหาร",
+    return SizedBox(
+      width: 600,
+      child: FilterSearchBar(
+        onSearch: _onSearchTextChanged,
+        searchTextEditingController: _searchTextEditingController,
+        labelText: "ค้นหาสูตรอาหาร",
+      ),
     );
   }
 
@@ -268,52 +269,35 @@ class _RecipeManagementViewState extends State<RecipeManagementView> {
 
   Widget _addRecipesButton() {
     return SizedBox(
-      height: 43,
-      child: ElevatedButton(
-        onPressed: () async {
-          Navigator.push(
-            context,
-            NavigationUpward(
-              targetPage: AddRecipesView(
-                isCreate: true,
-                recipeInfo: RecipeModel(
-                  recipeId: Random().nextInt(999).toString(),
-                  recipesName: '',
-                  petTypeName: '',
-                  ingredientInRecipeList: [],
-                  nutrient: List.from(
-                    freshNutrientListTemplate.map(
-                      (nutrient) => NutrientModel(
-                          nutrientName: nutrient.nutrientName,
-                          amount: nutrient.amount,
-                          unit: nutrient.unit),
+        height: 43,
+        child: AdminAddObjectButton(
+            addObjectCallback: () {
+              Navigator.push(
+                context,
+                NavigationUpward(
+                  targetPage: UpdateRecipesView(
+                    isCreate: true,
+                    recipeInfo: RecipeModel(
+                      recipeId: Random().nextInt(999).toString(),
+                      recipeName: '',
+                      petTypeName: '',
+                      ingredientInRecipeList: [],
+                      freshNutrientList: List.from(
+                        primaryFreshNutrientListTemplate.map(
+                          (nutrient) => NutrientModel(
+                              nutrientName: nutrient.nutrientName,
+                              amount: nutrient.amount,
+                              unit: nutrient.unit),
+                        ),
+                      ),
                     ),
+                    onUserEditRecipeCallback: _onUserEditRecipe,
+                    onUserDeleteRecipesCallback: _onUserDeleteRecipe,
                   ),
+                  durationInMilliSec: 400,
                 ),
-                onUserEditRecipeCallback: _onUserEditRecipe,
-                onUserDeleteRecipesCallback: _onUserDeleteRecipe,
-              ),
-              durationInMilliSec: 400,
-            ),
-          );
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: flesh,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-        child: const Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(Icons.add_rounded, size: 36, color: Colors.black),
-            Text(
-              " เพิ่มข้อมูลสูตรอาหาร",
-              style: TextStyle(fontSize: 18, color: Colors.black),
-            )
-          ],
-        ),
-      ),
-    );
+              );
+            },
+            addObjectText: " เพิ่มข้อมูลสูตรอาหาร"));
   }
 }

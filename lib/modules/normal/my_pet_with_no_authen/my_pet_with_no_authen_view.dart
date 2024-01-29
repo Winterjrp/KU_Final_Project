@@ -13,12 +13,10 @@ class MyPetWithNoAuthenticationView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    double height = size.height;
+    // double height = size.height;
     double width = size.width;
     return Scaffold(
       backgroundColor: Colors.white,
-      // bottomNavigationBar: const ProjectNavigationBar(
-      //     index: MainPageIndexConstants.myPetPageIndex),
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -63,7 +61,7 @@ class MyPetWithNoAuthenticationView extends StatelessWidget {
                         topColor: Color.fromRGBO(222, 150, 154, 0),
                         bottomColor: Color.fromRGBO(241, 165, 165, 0.3)),
                   ),
-                  _content(height: height, width: width, context: context),
+                  _content(width: width, context: context),
                 ],
               ),
             ),
@@ -73,10 +71,7 @@ class MyPetWithNoAuthenticationView extends StatelessWidget {
     );
   }
 
-  Widget _content(
-      {required double height,
-      required double width,
-      required BuildContext context}) {
+  Widget _content({required double width, required BuildContext context}) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

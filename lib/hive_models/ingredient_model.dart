@@ -28,14 +28,14 @@ class IngredientModel {
 
   factory IngredientModel.fromJson(Map<String, dynamic> json) =>
       IngredientModel(
-        ingredientId: json["ingredientID"],
+        ingredientId: json["ingredientId"],
         ingredientName: json["ingredientName"],
         nutrient: List<NutrientModel>.from(
             json["nutrient"].map((x) => NutrientModel.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
-        "ingredientID": ingredientId,
+        "ingredientId": ingredientId,
         "ingredientName": ingredientName,
         "nutrient": List<dynamic>.from(nutrient.map((x) => x.toJson())),
       };

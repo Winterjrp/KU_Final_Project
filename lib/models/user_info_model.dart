@@ -1,23 +1,23 @@
 class UserInfoModel {
   String username;
-  String userID;
+  String userId;
   UserRoleModel userRole;
 
   UserInfoModel({
     required this.username,
-    required this.userID,
+    required this.userId,
     required this.userRole,
   });
 
   factory UserInfoModel.fromJson(Map<String, dynamic> json) => UserInfoModel(
         username: json["username"],
-        userID: json["userID"],
+        userId: json["userId"],
         userRole: UserRoleModel.fromJson(json["userRole"]),
       );
 
   Map<String, dynamic> toJson() => {
         "username": username,
-        "userID": userID,
+        "userId": userId,
         "userRole": userRole.toJson(),
       };
 }

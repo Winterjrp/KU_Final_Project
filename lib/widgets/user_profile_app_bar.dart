@@ -41,7 +41,7 @@ class UserProfileAppBar extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(userInfo!.username, style: const TextStyle(fontSize: 18)),
-        Text(userInfo!.userID),
+        Text(userInfo!.userId),
       ],
     );
   }

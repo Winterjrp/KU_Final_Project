@@ -70,7 +70,7 @@ class UserManagementTableCell extends StatelessWidget {
         padding: const EdgeInsets.all(15),
         child: Center(
           child: Text(
-            viewModel.filterUserInfoList[index].userID,
+            viewModel.filterUserInfoList[index].userId,
             style: const TextStyle(fontSize: 17),
           ),
         ),

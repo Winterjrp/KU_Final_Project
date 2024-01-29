@@ -5,7 +5,7 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:untitled1/constants/enum/pet_activity_enum.dart';
 import 'package:untitled1/constants/enum/pet_age_type_enum.dart';
 import 'package:untitled1/constants/enum/pet_factor_type_enum.dart';
-import 'package:untitled1/constants/enum/pet_neuture_status_enum.dart';
+import 'package:untitled1/constants/enum/pet_neutering_status_enum.dart';
 import 'package:untitled1/constants/pet_physiology_status_list.dart';
 import 'package:untitled1/hive_models/pet_profile_model.dart';
 import 'package:untitled1/modules/normal/widgets/popup/add_confirm_popup.dart';
@@ -47,7 +47,7 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
   late String _petAgeType;
   late String _petID;
   late bool _isEnable;
-  late AddPetProfileViewModel _viewModel;
+  late UpdatePetProfileViewModel _viewModel;
   late TextEditingController _petNameController;
   late TextEditingController _petFactorNumberController;
   late TextEditingController _petWeightController;
@@ -66,7 +66,7 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
     _petNameController = TextEditingController();
     _petFactorNumberController = TextEditingController();
     _petWeightController = TextEditingController();
-    _viewModel = AddPetProfileViewModel();
+    _viewModel = UpdatePetProfileViewModel();
     _petTypeList = [
       "สุนัข",
       "แมว",
@@ -142,7 +142,7 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
       child: Scaffold(
         appBar: AppBar(
           leading: IconButton(
-            icon: Icon(Icons.keyboard_backspace_rounded, color: red),
+            icon: const Icon(Icons.keyboard_backspace_rounded, color: red),
             onPressed: () {
               widget.isCreate
                   ? CancelPopup(
@@ -160,7 +160,7 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
             widget.isCreate
                 ? "เพิ่มข้อมูลสัตว์เลี้ยง    "
                 : "แก้ไขข้อมูลสัตว์เลี้ยง    ",
-            style: TextStyle(color: red, fontWeight: FontWeight.bold),
+            style: const TextStyle(color: red, fontWeight: FontWeight.bold),
           )),
           backgroundColor: const Color.fromRGBO(222, 150, 154, 0.6),
           elevation: 0,
@@ -263,7 +263,7 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
         petActivityType: _petActivityType);
   }
 
-  Future<http.Response> onUserEditPetProfile() async {
+  Future<http.Response> _onUserEditPetProfile() async {
     _petFactorNumber =
         _factorType == PetFactorType.customize.toString().split('.').last
             ? _petFactorNumber
@@ -325,7 +325,7 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
           return const Center(child: CircularProgressIndicator());
         });
     try {
-      await onUserEditPetProfile();
+      await _onUserEditPetProfile();
       if (!context.mounted) return;
       Navigator.pop(context);
       Future.delayed(const Duration(milliseconds: 1800), () {
@@ -458,6 +458,7 @@ class _UpdatePetProfileViewState extends State<UpdatePetProfileView> {
               _petPhysiologyStatus = value;
               setState(() {});
             },
+            searchText: 'สถานะทางสรีระ',
           ),
         ),
       ],

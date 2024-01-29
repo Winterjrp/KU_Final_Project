@@ -1,22 +1,26 @@
 import 'package:untitled1/hive_models/recipes_model.dart';
+import 'package:untitled1/manager/service_manager.dart';
+import 'package:untitled1/services/recipes_management/recipe_management_service.dart';
 import 'package:untitled1/services/recipes_management/recipes_management_mock_service.dart';
 import 'package:untitled1/services/recipes_management/recipes_management _service_interface.dart';
 
 class RecipesManagementViewModel {
-  late List<RecipeModel> recipesList;
-  late List<RecipeModel> filterRecipesList;
-  late Future<List<RecipeModel>> recipesListData;
-  late RecipesManagementServiceInterface service;
+  late List<RecipeModel> recipeList;
+  late List<RecipeModel> filteredRecipeList;
+  late Future<List<RecipeModel>> recipeListData;
+  late RecipeManagementServiceInterface service;
 
   RecipesManagementViewModel() {
-    service = RecipesManagementMockService();
+    service = ServiceManager.isRealService
+        ? RecipeManagementService()
+        : RecipesManagementMockService();
     fetchRecipesListData();
   }
 
   Future<void> fetchRecipesListData() async {
-    recipesListData = service.getRecipeListData();
-    recipesList = await recipesListData;
-    filterRecipesList = recipesList;
+    recipeListData = service.getRecipeListData();
+    recipeList = await recipeListData;
+    filteredRecipeList = recipeList;
   }
 
   Future<void> onUserDeleteRecipe({required String recipeId}) async {
@@ -38,13 +42,13 @@ class RecipesManagementViewModel {
   void onUserSearchIngredient({required String searchText}) async {
     searchText = searchText.toLowerCase();
     if (searchText == '') {
-      filterRecipesList = recipesList;
+      filteredRecipeList = recipeList;
     } else {
-      filterRecipesList = recipesList
-          .where((recipesData) =>
-              recipesData.recipeId.toLowerCase().contains(searchText) ||
-              recipesData.recipesName.toLowerCase().contains(searchText) ||
-              recipesData.petTypeName.toLowerCase().contains(searchText))
+      filteredRecipeList = recipeList
+          .where((recipeData) =>
+              recipeData.recipeId.toLowerCase().contains(searchText) ||
+              recipeData.recipeName.toLowerCase().contains(searchText) ||
+              recipeData.petTypeName.toLowerCase().contains(searchText))
           .toList();
     }
   }

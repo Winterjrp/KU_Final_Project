@@ -1,5 +1,8 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/main_page_index_constants.dart';
+import 'package:untitled1/hive_models/pet_profile_model.dart';
+import 'package:untitled1/modules/admin/admin_add_pet_info/admin_add_pet_profile_view.dart';
 import 'package:untitled1/utility/navigation_with_animation.dart';
 import 'package:untitled1/models/user_info_model.dart';
 import 'package:untitled1/modules/admin/admin_home/admin_home_view.dart';
@@ -73,21 +76,35 @@ class AdminDrawer extends StatelessWidget {
                           ),
                           buildDrawerItem(
                             icon: Icons.pets_rounded,
-                            text: 'สัตว์เลี้ยงของฉัน',
+                            text: 'ค้นหาสูตรอาหารสัตว์เลี้ยง',
                             pageIndex: MainPageIndexConstants.myPetPageIndex,
                             currentIndex: currentIndex,
-                            targetPage: const UserManagementView(),
+                            targetPage: AdminAddPetProfileView(
+                              petProfileInfo: PetProfileModel(
+                                  petId: Random().nextInt(999).toString(),
+                                  petName: "-1",
+                                  petType: "-1",
+                                  factorType: "factorType",
+                                  petFactorNumber: -1,
+                                  petWeight: -1,
+                                  petNeuteringStatus: "-1",
+                                  petAgeType: "-1",
+                                  petPhysiologyStatus: "-1",
+                                  petChronicDisease: [],
+                                  petActivityType: "-1",
+                                  updateRecent: ""),
+                            ),
                             context: context,
                           ),
-                          buildDrawerItem(
-                            icon: Icons.face_retouching_natural_rounded,
-                            text: 'จัดการผู้ใช้งาน',
-                            pageIndex:
-                                MainPageIndexConstants.userManagementIndex,
-                            currentIndex: currentIndex,
-                            targetPage: const UserManagementView(),
-                            context: context,
-                          ),
+                          // buildDrawerItem(
+                          //   icon: Icons.face_retouching_natural_rounded,
+                          //   text: 'จัดการผู้ใช้งาน',
+                          //   pageIndex:
+                          //       MainPageIndexConstants.userManagementIndex,
+                          //   currentIndex: currentIndex,
+                          //   targetPage: const UserManagementView(),
+                          //   context: context,
+                          // ),
                           buildDrawerItem(
                             icon: Icons.egg_alt_outlined,
                             text: 'จัดการวัตุดิบ',
@@ -116,14 +133,14 @@ class AdminDrawer extends StatelessWidget {
                             targetPage: const PetTypeInfoManagementView(),
                             context: context,
                           ),
-                          buildDrawerItem(
-                            icon: Icons.settings,
-                            text: 'จัดการบัญชี',
-                            pageIndex: 6,
-                            currentIndex: currentIndex,
-                            targetPage: const UserManagementView(),
-                            context: context,
-                          ),
+                          // buildDrawerItem(
+                          //   icon: Icons.settings,
+                          //   text: 'จัดการบัญชี',
+                          //   pageIndex: 6,
+                          //   currentIndex: currentIndex,
+                          //   targetPage: const UserManagementView(),
+                          //   context: context,
+                          // ),
                         ],
                       ),
                     ),

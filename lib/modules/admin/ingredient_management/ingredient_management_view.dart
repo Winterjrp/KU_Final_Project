@@ -33,7 +33,7 @@ class _IngredientManagementViewState extends State<IngredientManagementView> {
   final Map<int, TableColumnWidth> _tableColumnWidth =
       const <int, TableColumnWidth>{
     0: FlexColumnWidth(0.05),
-    1: FlexColumnWidth(0.15),
+    1: FlexColumnWidth(0.08),
     2: FlexColumnWidth(0.1),
   };
   final double _tableHeaderPadding = 12;
@@ -69,26 +69,26 @@ class _IngredientManagementViewState extends State<IngredientManagementView> {
         backgroundColor: backgroundColor,
         drawer: const AdminDrawer(
             currentIndex: MainPageIndexConstants.ingredientManagementIndex),
-        appBar: const AdminAppBar(),
+        appBar: const AdminAppBar(color: backgroundColor),
         body: _body(),
       ),
     );
   }
 
-  FutureBuilder<List<IngredientModel>> _body() {
-    return FutureBuilder<List<IngredientModel>>(
-      future: _viewModel.ingredientListData,
-      builder: (context, AsyncSnapshot<List<IngredientModel>> snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
-          return const AdminLoadingScreenWithText();
-        } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        } else if (snapshot.hasData) {
-          return Center(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 30),
-              constraints: const BoxConstraints(maxWidth: adminScreenMaxWidth),
-              child: Column(
+  Widget _body() {
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 30),
+        constraints: const BoxConstraints(maxWidth: adminScreenMaxWidth),
+        child: FutureBuilder<List<IngredientModel>>(
+          future: _viewModel.ingredientListData,
+          builder: (context, AsyncSnapshot<List<IngredientModel>> snapshot) {
+            if (snapshot.connectionState != ConnectionState.done) {
+              return const AdminLoadingScreenWithText();
+            } else if (snapshot.hasError) {
+              return Text('Error: ${snapshot.error}');
+            } else if (snapshot.hasData) {
+              return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Expanded(
@@ -103,12 +103,12 @@ class _IngredientManagementViewState extends State<IngredientManagementView> {
                     ),
                   ),
                 ],
-              ),
-            ),
-          );
-        }
-        return const Text('No data available');
-      },
+              );
+            }
+            return const Text('No data available');
+          },
+        ),
+      ),
     );
   }
 
@@ -283,7 +283,7 @@ class _IngredientManagementViewState extends State<IngredientManagementView> {
                   ingredientId: Random().nextInt(999).toString(),
                   ingredientName: "",
                   nutrient: List.from(
-                    freshNutrientListTemplate.map(
+                    primaryFreshNutrientListTemplate.map(
                       (nutrient) => NutrientModel(
                           nutrientName: nutrient.nutrientName,
                           amount: nutrient.amount,

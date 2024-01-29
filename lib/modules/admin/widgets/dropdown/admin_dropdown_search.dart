@@ -142,7 +142,11 @@ class AdminCustomDropdownSearch extends StatelessWidget {
                   margin: const EdgeInsets.symmetric(vertical: 10),
                   child: Text(
                     item,
-                    style: const TextStyle(fontSize: 16, color: Colors.black),
+                    style: const TextStyle(
+                      fontSize: 16,
+                      color: Colors.black,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
                 )
               : Row(
@@ -155,6 +159,7 @@ class AdminCustomDropdownSearch extends StatelessWidget {
                           fontSize: 16,
                           color: darkFlesh,
                           fontWeight: FontWeight.bold,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ),

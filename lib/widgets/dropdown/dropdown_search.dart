@@ -39,28 +39,29 @@ class CustomDropdownSearch extends StatelessWidget {
         showSearchBox: true,
         showSelectedItems: true,
         searchFieldProps: TextFieldProps(
+            cursorColor: Colors.black,
             decoration: InputDecoration(
-          floatingLabelStyle: const TextStyle(
-            color: Colors.black,
-            fontSize: 20,
-            height: 0.9,
-          ),
-          filled: true,
-          fillColor: Colors.white,
-          suffixIcon: Icon(Icons.search, color: primaryColor),
-          labelText: "ค้นหาชนิดสัตว์เลี้ยง",
-          labelStyle: const TextStyle(fontSize: 16),
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15.0),
-            borderSide: const BorderSide(color: Colors.black, width: 1.8),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(15.0),
-            borderSide: const BorderSide(color: Colors.black, width: 1.8),
-          ),
-        )),
+              floatingLabelStyle: const TextStyle(
+                color: Colors.black,
+                fontSize: 20,
+                height: 0.9,
+              ),
+              filled: true,
+              fillColor: Colors.white,
+              suffixIcon: Icon(Icons.search, color: primaryColor),
+              labelText: "ค้นหาชนิดสัตว์เลี้ยง",
+              labelStyle: const TextStyle(fontSize: 16),
+              contentPadding:
+                  const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+              enabledBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15.0),
+                borderSide: const BorderSide(color: Colors.black, width: 1.8),
+              ),
+              focusedBorder: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(15.0),
+                borderSide: const BorderSide(color: Colors.black, width: 1.8),
+              ),
+            )),
       ),
       dropdownDecoratorProps: DropDownDecoratorProps(
           baseStyle: TextStyle(fontSize: inputTextSize),

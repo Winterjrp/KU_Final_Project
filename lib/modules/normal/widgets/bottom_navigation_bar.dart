@@ -22,9 +22,9 @@ class ProjectNavigationBar extends StatelessWidget {
             color: const Color.fromRGBO(199, 232, 229, 0.65),
           ),
           Container(
-            decoration: BoxDecoration(
+            decoration: const BoxDecoration(
               color: primary,
-              borderRadius: const BorderRadius.only(
+              borderRadius: BorderRadius.only(
                 topLeft: Radius.circular(30), // Adjust the radius as needed
                 topRight: Radius.circular(30), // Adjust the radius as needed
               ),
@@ -64,7 +64,7 @@ class ProjectNavigationBar extends StatelessWidget {
                 _buildNavItem(
                     icon: Icons.person,
                     // label: 'Settings',
-                    navigationIndex: 1,
+                    navigationIndex: MainPageIndexConstants.userManagementIndex,
                     context: context),
               ],
             ),

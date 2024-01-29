@@ -1,14 +1,14 @@
 import 'package:untitled1/constants/enum/pet_activity_enum.dart';
 import 'package:untitled1/constants/enum/pet_age_type_enum.dart';
-import 'package:untitled1/constants/enum/pet_neuture_status_enum.dart';
+import 'package:untitled1/constants/enum/pet_neutering_status_enum.dart';
 import 'package:untitled1/hive_models/pet_profile_model.dart';
 import 'package:untitled1/services/add_pet_profile_services/add_pet_profile_mock_service.dart';
 import 'package:untitled1/services/add_pet_profile_services/add_pet_info_service_interface.dart';
 import 'package:http/http.dart' as http;
 
-class AddPetProfileViewModel {
+class UpdatePetProfileViewModel {
   late AddPetProfileServiceInterface services;
-  AddPetProfileViewModel() {
+  UpdatePetProfileViewModel() {
     services = AddPetProfileMockService();
   }
 

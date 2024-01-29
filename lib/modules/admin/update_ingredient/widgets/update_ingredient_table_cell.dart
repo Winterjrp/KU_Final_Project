@@ -31,8 +31,8 @@ class _UpdateIngredientTableCellState extends State<UpdateIngredientTableCell> {
   late FocusNode _amountFocusNode;
   late double _width;
 
-  final EdgeInsets _tableCellPaddingInset =
-      const EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10);
+  static const EdgeInsets _tableCellPaddingInset =
+      EdgeInsets.only(left: 20, right: 20, top: 10, bottom: 10);
 
   Timer? _debounce;
 
@@ -41,6 +41,9 @@ class _UpdateIngredientTableCellState extends State<UpdateIngredientTableCell> {
     super.initState();
     _nutrientAmountController = TextEditingController();
     _amountFocusNode = FocusNode();
+    _amountFocusNode.addListener(() {
+      setState(() {});
+    });
     _nutrientAmountController.text = widget.nutrientInfo.amount.toString();
   }
 
@@ -48,6 +51,7 @@ class _UpdateIngredientTableCellState extends State<UpdateIngredientTableCell> {
   void dispose() {
     _nutrientAmountController.dispose();
     _debounce?.cancel();
+    _amountFocusNode.removeListener;
     _amountFocusNode.dispose();
     super.dispose();
   }
@@ -65,12 +69,6 @@ class _UpdateIngredientTableCellState extends State<UpdateIngredientTableCell> {
                 : widget.index % 2 == 1
                     ? Colors.white
                     : Colors.grey.shade100,
-            border: const Border(
-              bottom: BorderSide(
-                width: 1,
-                color: lightGrey,
-              ),
-            ),
           ),
           children: [
             _number(),

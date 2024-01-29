@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/constants/size.dart';
 import 'package:untitled1/hive_models/recipes_model.dart';
-import 'package:untitled1/modules/admin/add_recipes/add_recipe_view.dart';
+import 'package:untitled1/modules/admin/update_recipe/update_recipe_view.dart';
 import 'package:untitled1/modules/admin/recipes_info/widgets/nutrient_info_table_cell.dart';
 import 'package:untitled1/modules/admin/recipes_info/widgets/recipes_info_table_cell.dart';
 import 'package:untitled1/modules/admin/recipes_management/recipes_management_view.dart';
@@ -16,7 +16,6 @@ import 'package:untitled1/utility/navigation_with_animation.dart';
 
 typedef OnUserDeleteRecipesCallbackFunction = Future<void> Function(
     {required String recipeId});
-
 typedef OnUserEditRecipeCallbackFunction = Future<void> Function(
     {required RecipeModel recipeData});
 
@@ -36,6 +35,7 @@ class RecipeInfoView extends StatelessWidget {
 
   late String _recipesName;
   late String _petTypeName;
+
   static const Map<int, TableColumnWidth> _nutrientTableColumnWidth =
       <int, TableColumnWidth>{
     0: FlexColumnWidth(0.2),
@@ -43,14 +43,12 @@ class RecipeInfoView extends StatelessWidget {
     2: FlexColumnWidth(0.4),
     3: FlexColumnWidth(0.3),
   };
-
   static const _ingredientTableColumnWidth = <int, TableColumnWidth>{
     0: FlexColumnWidth(0.2),
     1: FlexColumnWidth(0.4),
     2: FlexColumnWidth(0.35),
   };
   static const double _tableHeaderPadding = 12;
-
   static const TextStyle _headerTextStyle =
       TextStyle(fontSize: 17, color: Colors.white);
 
@@ -58,7 +56,7 @@ class RecipeInfoView extends StatelessWidget {
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
     double width = size.width;
-    _recipesName = recipesData.recipesName;
+    _recipesName = recipesData.recipeName;
     _petTypeName = recipesData.petTypeName;
     return WillPopScope(
       onWillPop: () async {
@@ -173,7 +171,7 @@ class RecipeInfoView extends StatelessWidget {
         Navigator.push(
           context,
           NavigationUpward(
-            targetPage: AddRecipesView(
+            targetPage: UpdateRecipesView(
               isCreate: false,
               recipeInfo: recipesData,
               onUserEditRecipeCallback: onUserEditRecipeCallback,
@@ -301,12 +299,12 @@ class RecipeInfoView extends StatelessWidget {
           ),
         ),
         child: ListView.builder(
-          itemCount: recipesData.nutrient.length,
+          itemCount: recipesData.freshNutrientList.length,
           itemBuilder: (context, index) {
             return NutrientInfoTableCell(
               index: index,
               tableColumnWidth: _nutrientTableColumnWidth,
-              nutrientInfo: recipesData.nutrient[index],
+              nutrientInfo: recipesData.freshNutrientList[index],
             );
           },
         ),
@@ -351,10 +349,13 @@ class RecipeInfoView extends StatelessWidget {
           ),
         ),
         const SizedBox(width: 10),
-        const Text(
-          "ของ",
-          style: TextStyle(
-            fontSize: headerTextFontSize,
+        Container(
+          margin: const EdgeInsets.only(top: 4),
+          child: const Text(
+            "ของ",
+            style: TextStyle(
+              fontSize: 30,
+            ),
           ),
         ),
         const SizedBox(width: 10),

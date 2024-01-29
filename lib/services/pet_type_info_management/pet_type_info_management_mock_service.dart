@@ -16,6 +16,7 @@ class PetTypeInfoManagementMockService
 
   @override
   Future<void> deletePetTypeInfo({required String petTypeInfoID}) async {
+    await Future.delayed(const Duration(milliseconds: 1000), () {});
     Box petTypeInfoListBox = Hive.box<PetTypeInfoModel>('petTypeInfoListBox');
     await petTypeInfoListBox.delete(petTypeInfoID);
   }

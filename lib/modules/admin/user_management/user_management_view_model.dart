@@ -12,35 +12,35 @@ class UserManagementViewModel {
     userInfoListData = Future.value([
       UserInfoModel(
           username: "username",
-          userID: "userID",
+          userId: "userID",
           userRole: UserRoleModel(
             isUserManagementAdmin: true,
             isPetFoodManagementAdmin: true,
           )),
       UserInfoModel(
           username: "username",
-          userID: "userID",
+          userId: "userID",
           userRole: UserRoleModel(
             isUserManagementAdmin: true,
             isPetFoodManagementAdmin: true,
           )),
       UserInfoModel(
           username: "username",
-          userID: "userID",
+          userId: "userID",
           userRole: UserRoleModel(
             isUserManagementAdmin: true,
             isPetFoodManagementAdmin: true,
           )),
       UserInfoModel(
           username: "username",
-          userID: "userID",
+          userId: "userID",
           userRole: UserRoleModel(
             isUserManagementAdmin: true,
             isPetFoodManagementAdmin: true,
           )),
       UserInfoModel(
           username: "username",
-          userID: "userID",
+          userId: "userID",
           userRole: UserRoleModel(
             isUserManagementAdmin: true,
             isPetFoodManagementAdmin: true,

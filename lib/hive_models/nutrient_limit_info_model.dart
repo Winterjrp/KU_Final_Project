@@ -8,13 +8,17 @@ class NutrientLimitInfoModel {
   String nutrientName;
 
   @HiveField(1)
-  double min;
+  String unit;
 
   @HiveField(2)
+  double min;
+
+  @HiveField(3)
   double max;
 
   NutrientLimitInfoModel({
     required this.nutrientName,
+    required this.unit,
     required this.min,
     required this.max,
   });
@@ -22,12 +26,14 @@ class NutrientLimitInfoModel {
   factory NutrientLimitInfoModel.fromJson(Map<String, dynamic> json) =>
       NutrientLimitInfoModel(
         nutrientName: json["nutrientName"],
+        unit: json["unit"],
         min: json["min"],
         max: json["max"],
       );
 
   Map<String, dynamic> toJson() => {
         "nutrientName": nutrientName,
+        "unit": unit,
         "min": min,
         "max": max,
       };

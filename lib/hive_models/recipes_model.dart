@@ -16,7 +16,7 @@ class RecipeModel {
   String recipeId;
 
   @HiveField(1)
-  String recipesName;
+  String recipeName;
 
   @HiveField(2)
   String petTypeName;
@@ -25,32 +25,33 @@ class RecipeModel {
   List<IngredientInRecipeModel> ingredientInRecipeList;
 
   @HiveField(4)
-  List<NutrientModel> nutrient;
+  List<NutrientModel> freshNutrientList;
 
   RecipeModel(
       {required this.recipeId,
-      required this.recipesName,
+      required this.recipeName,
       required this.petTypeName,
       required this.ingredientInRecipeList,
-      required this.nutrient});
+      required this.freshNutrientList});
 
   factory RecipeModel.fromJson(Map<String, dynamic> json) => RecipeModel(
-        recipeId: json["recipesID"],
-        recipesName: json["recipesName"],
+        recipeId: json["recipeId"],
+        recipeName: json["recipeName"],
         petTypeName: json["petTypeName"],
         ingredientInRecipeList: List<IngredientInRecipeModel>.from(
-            json["ingredientInRecipes"]
+            json["ingredientInRecipeList"]
                 .map((x) => IngredientInRecipeModel.fromJson(x))),
-        nutrient: List<NutrientModel>.from(
-            json["nutrient"].map((x) => NutrientModel.fromJson(x))),
+        freshNutrientList: List<NutrientModel>.from(
+            json["freshNutrientList"].map((x) => NutrientModel.fromJson(x))),
       );
 
   Map<String, dynamic> toJson() => {
-        "recipesID": recipeId,
-        "recipesName": recipesName,
+        "recipeId": recipeId,
+        "recipeName": recipeName,
         "petTypeName": petTypeName,
-        "ingredientInRecipes":
+        "ingredientInRecipeList":
             List<dynamic>.from(ingredientInRecipeList.map((x) => x.toJson())),
-        "nutrient": List<dynamic>.from(nutrient.map((x) => x.toJson())),
+        "freshNutrientList":
+            List<dynamic>.from(freshNutrientList.map((x) => x.toJson())),
       };
 }

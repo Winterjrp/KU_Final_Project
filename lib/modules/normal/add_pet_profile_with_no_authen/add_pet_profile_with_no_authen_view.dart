@@ -5,7 +5,7 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:untitled1/constants/enum/pet_activity_enum.dart';
 import 'package:untitled1/constants/enum/pet_age_type_enum.dart';
 import 'package:untitled1/constants/enum/pet_factor_type_enum.dart';
-import 'package:untitled1/constants/enum/pet_neuture_status_enum.dart';
+import 'package:untitled1/constants/enum/pet_neutering_status_enum.dart';
 import 'package:untitled1/constants/pet_physiology_status_list.dart';
 import 'package:untitled1/hive_models/pet_profile_model.dart';
 import 'package:untitled1/modules/normal/select_ingredient/select_ingredient_view.dart';
@@ -38,14 +38,13 @@ class _AddPetProfileWithNoAuthenticationViewState
   late List<String> _petChronicDisease;
   late String _petType;
   late String _petActivityType;
-  late String _petName;
   late String _factorType;
   late String _petPhysiologyStatus;
   late String _petNeuteringStatus;
   late String _petAgeType;
   late String _petID;
   late bool _isEnable;
-  late AddPetProfileViewModel _viewModel;
+  late UpdatePetProfileViewModel _viewModel;
   late TextEditingController _petNameController;
   late TextEditingController _petFactorNumberController;
   late TextEditingController _petWeightController;
@@ -64,7 +63,7 @@ class _AddPetProfileWithNoAuthenticationViewState
     _petNameController = TextEditingController();
     _petFactorNumberController = TextEditingController();
     _petWeightController = TextEditingController();
-    _viewModel = AddPetProfileViewModel();
+    _viewModel = UpdatePetProfileViewModel();
     _petTypeList = [
       "สุนัข",
       "แมว",
@@ -72,7 +71,6 @@ class _AddPetProfileWithNoAuthenticationViewState
       'ม้า',
     ];
     _petChronicDiseaseList = ["โรคเบาหวาน", "โรคความดัน", "โรคตับ", "โรคไต"];
-    _petName = widget.petProfileInfo.petName;
     _petType = widget.petProfileInfo.petType;
     _petPhysiologyStatus = widget.petProfileInfo.petPhysiologyStatus;
     _petNeuteringStatus = widget.petProfileInfo.petNeuteringStatus;
@@ -96,11 +94,7 @@ class _AddPetProfileWithNoAuthenticationViewState
   @override
   Widget build(BuildContext context) {
     _isEnable = true;
-    if (_petName == "-1" ||
-        _petName == "" ||
-        _petType == "-1" ||
-        _factorType == "factorType" ||
-        _petWeight == -1) {
+    if (_petType == "-1" || _factorType == "factorType" || _petWeight == -1) {
       _isEnable = false;
     }
     if (_factorType == PetFactorType.customize.toString().split('.').last &&
@@ -163,8 +157,6 @@ class _AddPetProfileWithNoAuthenticationViewState
       child: Column(
         children: [
           const SizedBox(height: 10),
-          _petNameField(),
-          const SizedBox(height: 15),
           Row(
             children: [
               _petTypeField(),
@@ -228,7 +220,7 @@ class _AddPetProfileWithNoAuthenticationViewState
                             ? _petFactorNumber
                             : _viewModel.calculatePetFactorNumber(
                                 petID: _petID,
-                                petName: _petName,
+                                petName: "",
                                 petType: _petType,
                                 petWeight: _petWeight,
                                 petNeuteringStatus: _petNeuteringStatus,
@@ -307,6 +299,7 @@ class _AddPetProfileWithNoAuthenticationViewState
               _petPhysiologyStatus = value;
               setState(() {});
             },
+            searchText: 'สถานะทางสรีระ',
           ),
         ),
       ],
@@ -659,57 +652,6 @@ class _AddPetProfileWithNoAuthenticationViewState
           ),
         ],
       ),
-    );
-  }
-
-  Widget _petNameField() {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _headerText(text: "ชื่อสัตว์เลี้ยง"),
-        const SizedBox(height: 5),
-        SizedBox(
-          height: _textBoxHeight,
-          child: TextField(
-            onTap: () {
-              _petNameController.selection = TextSelection(
-                baseOffset: 0,
-                extentOffset: _petNameController.text.length,
-              );
-            },
-            controller: _petNameController,
-            style: TextStyle(fontSize: _inputTextSize, color: Colors.black),
-            cursorColor: Colors.black,
-            decoration: InputDecoration(
-              floatingLabelStyle: const TextStyle(
-                color: Colors.black,
-                fontSize: 22,
-                height: 0.9,
-              ),
-              fillColor: Colors.white,
-              filled: true,
-              hintText: "ชื่อสัตว์เลี้ยง",
-              hintStyle: TextStyle(fontSize: _labelTextSize),
-              contentPadding:
-                  const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-              enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(15.0),
-                borderSide: const BorderSide(color: Colors.black, width: 2),
-              ),
-              focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(15.0),
-                borderSide: const BorderSide(color: Colors.black, width: 2),
-              ),
-            ),
-            onChanged: (value) {
-              setState(() {
-                _petName = value;
-              });
-            },
-          ),
-        ),
-      ],
     );
   }
 }

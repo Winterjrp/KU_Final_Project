@@ -137,7 +137,7 @@ class _RecipeTableCellState extends State<RecipeTableCell> {
       child: Padding(
         padding: _tableCellPaddingInset,
         child: Text(
-          widget.recipeInfo.recipesName,
+          widget.recipeInfo.recipeName,
           style: const TextStyle(fontSize: 16),
         ),
       ),

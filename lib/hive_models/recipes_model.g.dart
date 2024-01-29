@@ -18,11 +18,11 @@ class RecipeModelAdapter extends TypeAdapter<RecipeModel> {
     };
     return RecipeModel(
       recipeId: fields[0] as String,
-      recipesName: fields[1] as String,
+      recipeName: fields[1] as String,
       petTypeName: fields[2] as String,
       ingredientInRecipeList:
           (fields[3] as List).cast<IngredientInRecipeModel>(),
-      nutrient: (fields[4] as List).cast<NutrientModel>(),
+      freshNutrientList: (fields[4] as List).cast<NutrientModel>(),
     );
   }
 
@@ -33,13 +33,13 @@ class RecipeModelAdapter extends TypeAdapter<RecipeModel> {
       ..writeByte(0)
       ..write(obj.recipeId)
       ..writeByte(1)
-      ..write(obj.recipesName)
+      ..write(obj.recipeName)
       ..writeByte(2)
       ..write(obj.petTypeName)
       ..writeByte(3)
       ..write(obj.ingredientInRecipeList)
       ..writeByte(4)
-      ..write(obj.nutrient);
+      ..write(obj.freshNutrientList);
   }
 
   @override

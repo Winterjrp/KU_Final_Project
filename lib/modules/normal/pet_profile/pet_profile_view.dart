@@ -3,7 +3,7 @@ import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/constants/enum/pet_activity_enum.dart';
 import 'package:untitled1/constants/enum/pet_age_type_enum.dart';
 import 'package:untitled1/constants/enum/pet_factor_type_enum.dart';
-import 'package:untitled1/constants/enum/pet_neuture_status_enum.dart';
+import 'package:untitled1/constants/enum/pet_neutering_status_enum.dart';
 import 'package:untitled1/constants/pet_physiology_status_list.dart';
 import 'package:untitled1/hive_models/pet_profile_model.dart';
 import 'package:untitled1/modules/normal/widgets/popup/delete_confirm_popup.dart';

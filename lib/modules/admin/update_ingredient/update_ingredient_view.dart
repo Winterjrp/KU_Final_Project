@@ -9,6 +9,7 @@ import 'package:untitled1/modules/admin/widgets/loading_screen/admin_loading_scr
 import 'package:untitled1/modules/admin/widgets/popup/admin_confirm_popup.dart';
 import 'package:untitled1/modules/admin/widgets/popup/admin_cancel_popup.dart';
 import 'package:untitled1/modules/admin/ingredient_management/ingredient_management_view.dart';
+import 'package:untitled1/modules/admin/widgets/popup/admin_error_popup.dart';
 import 'package:untitled1/modules/admin/widgets/popup/admin_success_popup.dart';
 import 'package:untitled1/modules/admin/widgets/popup/admin_warning_popup.dart';
 import 'package:untitled1/utility/navigation_with_animation.dart';
@@ -55,10 +56,12 @@ class _UpdateIngredientViewState extends State<UpdateIngredientView> {
     3: FlexColumnWidth(0.12),
   };
 
-  final TextStyle _headerTextStyle =
-      const TextStyle(fontSize: 17, color: Colors.white);
-  final double _tableHeaderPadding = 12;
+  static const TextStyle _headerTextStyle =
+      TextStyle(fontSize: 17, color: Colors.white);
+  static const double _tableHeaderPadding = 12;
+
   Timer? _debounce;
+
   @override
   void initState() {
     super.initState();
@@ -194,7 +197,11 @@ class _UpdateIngredientViewState extends State<UpdateIngredientView> {
               context: context, successText: 'เพิ่มข้อมูลวัตถุดิบสำเร็จ!!')
           .show();
     } catch (e) {
-      print(e);
+      Navigator.pop(context);
+      Future.delayed(const Duration(milliseconds: 2200), () {
+        Navigator.pop(context);
+      });
+      AdminErrorPopup(context: context, errorMessage: e.toString()).show();
     }
   }
 
@@ -233,7 +240,11 @@ class _UpdateIngredientViewState extends State<UpdateIngredientView> {
               context: context, successText: 'แก้ไขข้อมูลวัตถุดิบสำเร็จ!!')
           .show();
     } catch (e) {
-      print(e);
+      Navigator.pop(context);
+      Future.delayed(const Duration(milliseconds: 2200), () {
+        Navigator.pop(context);
+      });
+      AdminErrorPopup(context: context, errorMessage: e.toString()).show();
     }
   }
 
@@ -379,9 +390,9 @@ class _UpdateIngredientViewState extends State<UpdateIngredientView> {
   Widget _tableHeader() {
     return Table(
       columnWidths: _tableColumnWidth,
-      children: [
+      children: const [
         TableRow(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: Color.fromRGBO(16, 16, 29, 1),
             borderRadius: BorderRadius.only(
               topLeft: Radius.circular(15),

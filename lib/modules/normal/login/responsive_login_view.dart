@@ -32,14 +32,23 @@ class LoginViewState extends State<LoginView> {
     _viewModel = LoginViewModel();
   }
 
-  Future<void> login() async {
-    // bool isCredentialsValid = validateCredentials(username, password);
-    bool isCredentialsValid = true;
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _passwordController.dispose();
+    _usernameFocusNode.dispose();
+    _passwordFocusNode.dispose();
+    super.dispose();
+  }
+
+  Future<void> _login() async {
+    bool isCredentialsValid;
     try {
-      await _viewModel.login(
+      isCredentialsValid = await _viewModel.login(
           username: _usernameController.text,
           password: _passwordController.text);
     } catch (e) {
+      isCredentialsValid = false;
       print(e);
     }
     if (isCredentialsValid) {
@@ -54,8 +63,6 @@ class LoginViewState extends State<LoginView> {
             builder: (context) => const MyPetView(),
           ),
         );
-        // _viewModel.userInfoData.userRole.isUserManagementAdmin = false;
-        // _viewModel.userInfoData.userRole.isPetFoodManagementAdmin = false;
       } else {
         if (!context.mounted) return;
         Navigator.pushReplacement(
@@ -67,14 +74,17 @@ class LoginViewState extends State<LoginView> {
       }
     } else {
       if (_usernameController.text == '') {
+        if (!context.mounted) return;
         context
             .read<AuthenticationProvider>()
             .updateErrorStatus(errorMessage: 'Please enter your username');
       } else if (_passwordController.text == '') {
+        if (!context.mounted) return;
         context
             .read<AuthenticationProvider>()
             .updateErrorStatus(errorMessage: 'Please enter your password');
       } else {
+        if (!context.mounted) return;
         context
             .read<AuthenticationProvider>()
             .updateErrorStatus(errorMessage: 'Invalid username or password');
@@ -90,14 +100,14 @@ class LoginViewState extends State<LoginView> {
       if (constraints.maxWidth < 600) {
         _isMobile = true;
         return MobileLoginView(
-            onUserTappedLogInCallBack: login,
+            onUserTappedLogInCallBack: _login,
             usernameController: _usernameController,
             passwordController: _passwordController,
             usernameFocusNode: _usernameFocusNode,
             passwordFocusNode: _passwordFocusNode);
       } else {
         return DesktopLoginView(
-            onUserTappedLogInCallBack: login,
+            onUserTappedLogInCallBack: _login,
             usernameController: _usernameController,
             passwordController: _passwordController,
             usernameFocusNode: _usernameFocusNode,
