@@ -7,7 +7,7 @@ import 'package:untitled1/constants/enum/pet_age_type_enum.dart';
 import 'package:untitled1/constants/enum/pet_factor_type_enum.dart';
 import 'package:untitled1/constants/enum/pet_neutering_status_enum.dart';
 import 'package:untitled1/constants/pet_physiology_status_list.dart';
-import 'package:untitled1/hive_models/pet_profile_model.dart';
+import 'package:untitled1/utility/hive_models/pet_profile_model.dart';
 import 'package:untitled1/modules/normal/widgets/popup/add_confirm_popup.dart';
 import 'package:untitled1/modules/normal/widgets/popup/cancel_confirm_popup.dart';
 import 'package:untitled1/modules/normal/widgets/popup/success_popup.dart';

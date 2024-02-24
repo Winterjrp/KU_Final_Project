@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
-import 'package:untitled1/hive_models/ingredient_model.dart';
-
-// typedef OnShopGroupRemoveCallback = void Function(String shopGroupID);
-typedef IngredientAmountChangeCallback = void Function();
+import 'package:untitled1/utility/hive_models/ingredient_model.dart';
 
 class NutrientInfoTableCell extends StatelessWidget {
   const NutrientInfoTableCell({

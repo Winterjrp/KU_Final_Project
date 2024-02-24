@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import 'package:untitled1/hive_models/recipes_model.dart';
+import 'package:untitled1/utility/hive_models/recipes_model.dart';
 import 'package:untitled1/services/recipes_management/recipes_management _service_interface.dart';
 
 class RecipesManagementMockService implements RecipeManagementServiceInterface {

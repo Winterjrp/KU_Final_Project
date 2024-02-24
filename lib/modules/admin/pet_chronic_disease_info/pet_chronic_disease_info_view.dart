@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/constants/size.dart';
-import 'package:untitled1/hive_models/nutrient_limit_info_model.dart';
-import 'package:untitled1/hive_models/pet_type_info_model.dart';
+import 'package:untitled1/utility/hive_models/nutrient_limit_info_model.dart';
+import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
 import 'package:untitled1/modules/admin/update_pet_chronic_disease/update_pet_chronic_disease_view.dart';
 import 'package:untitled1/modules/admin/pet_type_info/widgets/nutrient_limit_info_table_cell.dart';
 import 'package:untitled1/modules/admin/widgets/button/admin_delete_object_button.dart';

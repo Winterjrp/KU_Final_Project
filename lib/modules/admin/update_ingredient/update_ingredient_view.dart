@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/constants/size.dart';
-import 'package:untitled1/hive_models/ingredient_model.dart';
+import 'package:untitled1/utility/hive_models/ingredient_model.dart';
 import 'package:untitled1/modules/admin/ingredient_info/ingredient_info_view.dart';
 import 'package:untitled1/modules/admin/update_ingredient/widgets/update_ingredient_table_cell.dart';
 import 'package:untitled1/modules/admin/widgets/loading_screen/admin_loading_screen.dart';
@@ -282,7 +282,7 @@ class _UpdateIngredientViewState extends State<UpdateIngredientView> {
   Widget _header() {
     return SizedBox(
       child: Text(
-        widget.isCreate ? "เพิ่มข้อมูลวัถุดิบ" : "แก้ไขข้อมูลวัตถุดิบ",
+        widget.isCreate ? "เพิ่มข้อมูลวัตถุดิบ" : "แก้ไขข้อมูลวัตถุดิบ",
         style: const TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 36,

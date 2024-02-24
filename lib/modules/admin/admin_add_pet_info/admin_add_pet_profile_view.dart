@@ -12,10 +12,13 @@ import 'package:untitled1/constants/enum/select_ingredient_type_enum.dart';
 import 'package:untitled1/constants/main_page_index_constants.dart';
 import 'package:untitled1/constants/pet_physiology_status_list.dart';
 import 'package:untitled1/constants/size.dart';
-import 'package:untitled1/hive_models/ingredient_model.dart';
-import 'package:untitled1/hive_models/pet_profile_model.dart';
-import 'package:untitled1/hive_models/pet_type_info_model.dart';
+import 'package:untitled1/utility/hive_models/ingredient_model.dart';
+import 'package:untitled1/utility/hive_models/pet_profile_model.dart';
+import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
 import 'package:untitled1/modules/admin/admin_add_pet_info/admin_add_pet_profile_view_model.dart';
+import 'package:untitled1/modules/admin/admin_add_pet_info/models/post_for_recipe_model.dart';
+import 'package:untitled1/modules/admin/admin_get_recipe/admin_get_recipe_view.dart';
+import 'package:untitled1/modules/admin/admin_get_recipe/get_recipe_model.dart';
 import 'package:untitled1/modules/admin/admin_home/admin_home_view.dart';
 import 'package:untitled1/modules/admin/widgets/admin_appbar.dart';
 import 'package:untitled1/modules/admin/widgets/admin_drawer.dart';
@@ -53,6 +56,7 @@ class _AdminAddPetProfileViewState extends State<AdminAddPetProfileView> {
   late String _selectIngredientType;
   late double _petFactorNumber;
   late double _petWeight;
+  late int _selectedType;
   late bool _isEnable;
   late List<String> _petChronicDiseaseList;
   late List<String> _petChronicDisease;
@@ -79,6 +83,7 @@ class _AdminAddPetProfileViewState extends State<AdminAddPetProfileView> {
     _petWeightController = TextEditingController();
     _scrollController = ScrollController();
     _selectIngredientType = "";
+    _selectedType = -1;
     _petChronicDiseaseList = [];
     _petType = widget.petProfileInfo.petType;
     _petPhysiologyStatus = widget.petProfileInfo.petPhysiologyStatus;
@@ -104,6 +109,9 @@ class _AdminAddPetProfileViewState extends State<AdminAddPetProfileView> {
   @override
   Widget build(BuildContext context) {
     _isEnable = true;
+    if (_selectedType == -1) {
+      _isEnable = false;
+    }
     if (_petType == "-1" || _factorType == "factorType" || _petWeight == -1) {
       _isEnable = false;
     }
@@ -187,6 +195,18 @@ class _AdminAddPetProfileViewState extends State<AdminAddPetProfileView> {
   }
 
   Future<void> _handleSearchRecipe() async {
+    _petFactorNumber = _factorType == PetFactorTypeEnum.petFactorTypeChoice1
+        ? _petFactorNumber
+        : _viewModel.calculatePetFactorNumber(
+            petID: _petID,
+            petName: "",
+            petType: _petType,
+            petWeight: _petWeight,
+            petNeuteringStatus: _petNeuteringStatus,
+            petAgeType: _petAgeType,
+            petPhysiologyStatus: _petPhysiologyStatus,
+            petChronicDisease: _petChronicDisease,
+            petActivityType: _petActivityType);
     Navigator.pop(context);
     showDialog(
         barrierDismissible: false,
@@ -195,17 +215,28 @@ class _AdminAddPetProfileViewState extends State<AdminAddPetProfileView> {
           return const Center(child: AdminLoadingScreen());
         });
     try {
-      // widget.onUserAddPetChronicDiseaseCallBack(
-      //     nutrientLimitInfo: _viewModel.nutrientLimitList,
-      //     // petChronicDiseaseID: Random().nextInt(999).toString(), //แก้ให้ตรงกับการทำงานของ backend
-      //     petChronicDiseaseID: "",
-      //     petChronicDiseaseName: _petChronicDiseaseNameController.text);
+      PostDataForRecipeModel postDataForRecipe = PostDataForRecipeModel(
+          petFactorNumber: _petFactorNumber,
+          petTypeName: _petType,
+          petChronicDiseaseList: _petChronicDisease,
+          petWeight: _petWeight,
+          selectedIngredientList: _viewModel.selectedIngredient
+              .map((e) => SelectedIngredientList(
+                  ingredientId: e.ingredientId,
+                  ingredientName: e.ingredientName))
+              .toList(),
+          selectedType: _selectedType);
+      GetRecipeModel getRecipeData = await _viewModel.onUserSearchRecipe(
+          postDataForRecipe: postDataForRecipe);
       if (!context.mounted) return;
       Navigator.pop(context);
-      // Future.delayed(const Duration(milliseconds: 1600), () {
-      //   Navigator.pop(context);
-      //   Navigator.pop(context);
-      // });
+      Navigator.push(
+        context,
+        NavigationUpward(
+          targetPage: AdminGetRecipeView(getRecipeData: getRecipeData),
+          durationInMilliSec: 500,
+        ),
+      );
     } catch (e) {
       Navigator.pop(context);
       Future.delayed(const Duration(milliseconds: 2200), () {
@@ -218,6 +249,11 @@ class _AdminAddPetProfileViewState extends State<AdminAddPetProfileView> {
   void _searchRecipeFunction() {
     if (_viewModel.selectedIngredient.isEmpty) {
       AdminWarningPopup(context: context, warningText: 'กรุณาเลือกวัตถุดิบ!')
+          .show();
+    } else if (_selectedType == -1) {
+      AdminWarningPopup(
+              context: context,
+              warningText: 'กรุณาเลือกประเภทสูตรอาหารที่ต้องการ!')
           .show();
     } else if (!_isEnable) {
       AdminWarningPopup(
@@ -235,19 +271,6 @@ class _AdminAddPetProfileViewState extends State<AdminAddPetProfileView> {
 
   Row _acceptButton(BuildContext context) {
     bool isButtonDisable = _viewModel.selectedIngredient.isEmpty || !_isEnable;
-    _petFactorNumber = _factorType == PetFactorTypeEnum.petFactorTypeChoice1
-        ? _petFactorNumber
-        : _viewModel.calculatePetFactorNumber(
-            petID: _petID,
-            petName: "",
-            petType: _petType,
-            petWeight: _petWeight,
-            petNeuteringStatus: _petNeuteringStatus,
-            petAgeType: _petAgeType,
-            petPhysiologyStatus: _petPhysiologyStatus,
-            petChronicDisease: _petChronicDisease,
-            petActivityType: _petActivityType);
-
     return Row(
       children: [
         const Spacer(),
@@ -329,6 +352,7 @@ class _AdminAddPetProfileViewState extends State<AdminAddPetProfileView> {
           onChanged: (value) {
             setState(() {
               _selectIngredientType = value!;
+              _selectedType = 1;
             });
           },
           activeColor: _mainColor,
@@ -344,6 +368,7 @@ class _AdminAddPetProfileViewState extends State<AdminAddPetProfileView> {
           onChanged: (value) {
             setState(() {
               _selectIngredientType = value!;
+              _selectedType = 2;
             });
           },
           activeColor: _mainColor,
@@ -359,8 +384,6 @@ class _AdminAddPetProfileViewState extends State<AdminAddPetProfileView> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        // _headerText(text: "เลือกวัตถุดิบที่ต้องการในสูตรอาหาร"),
-        // const SizedBox(height: 15),
         DropdownSearch<IngredientModel>.multiSelection(
           dropdownButtonProps: const DropdownButtonProps(
             color: _mainColor,

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/constants/size.dart';
 import 'package:untitled1/modules/admin/ingredient_info/widgets/ingredient_info_table_cell.dart';
-import 'package:untitled1/hive_models/ingredient_model.dart';
+import 'package:untitled1/utility/hive_models/ingredient_model.dart';
 import 'package:untitled1/modules/admin/ingredient_management/ingredient_management_view.dart';
 import 'package:untitled1/modules/admin/update_ingredient/update_ingredient_view.dart';
 import 'package:untitled1/modules/admin/widgets/button/admin_delete_object_button.dart';

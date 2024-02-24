@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
-import 'package:untitled1/hive_models/pet_profile_model.dart';
+import 'package:untitled1/utility/hive_models/pet_profile_model.dart';
 import 'package:untitled1/utility/navigation_with_animation.dart';
 import 'package:untitled1/modules/normal/pet_profile/pet_profile_view.dart';
 

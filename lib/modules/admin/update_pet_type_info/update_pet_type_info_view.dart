@@ -4,8 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/constants/size.dart';
 import 'package:untitled1/modules/admin/update_pet_chronic_disease/update_pet_chronic_disease_view.dart';
-import 'package:untitled1/hive_models/nutrient_limit_info_model.dart';
-import 'package:untitled1/hive_models/pet_type_info_model.dart';
+import 'package:untitled1/utility/hive_models/nutrient_limit_info_model.dart';
+import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
 import 'package:untitled1/modules/admin/update_pet_chronic_disease/widgets/nutrient_limit_table_cell.dart';
 import 'package:untitled1/modules/admin/pet_type_info/pet_type_info_view.dart';
 import 'package:untitled1/modules/admin/pet_type_info_management/pet_type_info_management_view.dart';
@@ -50,14 +50,14 @@ class _UpdatePetTypeInfoViewState extends State<UpdatePetTypeInfoView> {
     1: FlexColumnWidth(0.2),
     2: FlexColumnWidth(0.2),
   };
-  static const Map<int, TableColumnWidth>
-      _defaultNutrientLimitTableColumnWidth = <int, TableColumnWidth>{
-    0: FlexColumnWidth(0.1),
-    1: FlexColumnWidth(0.2),
-    2: FlexColumnWidth(0.1),
-    3: FlexColumnWidth(0.15),
-    4: FlexColumnWidth(0.15),
-  };
+  // static const Map<int, TableColumnWidth>
+  //     _defaultNutrientLimitTableColumnWidth = <int, TableColumnWidth>{
+  //   0: FlexColumnWidth(0.1),
+  //   1: FlexColumnWidth(0.2),
+  //   2: FlexColumnWidth(0.1),
+  //   3: FlexColumnWidth(0.15),
+  //   4: FlexColumnWidth(0.15),
+  // };
   static const double _tableHeaderPadding = 12;
   static const TextStyle _tableHeaderTextStyle =
       TextStyle(fontSize: 17, color: Colors.white);
@@ -142,7 +142,7 @@ class _UpdatePetTypeInfoViewState extends State<UpdatePetTypeInfoView> {
                     const SizedBox(height: 5),
                     _header(),
                     const SizedBox(height: 10),
-                    _defaultNutrientLimitTable(),
+                    _petPhysiologicalNutrientLimitTable(),
                     const SizedBox(height: 20),
                     _petChronicDiseaseTable(),
                     const SizedBox(height: 15),
@@ -159,124 +159,124 @@ class _UpdatePetTypeInfoViewState extends State<UpdatePetTypeInfoView> {
     );
   }
 
-  Widget _defaultNutrientLimitTable() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          "การจำกัดโภชนาการเริ่มต้น",
-          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
-        ),
-        const SizedBox(height: 6),
-        _defaultNutrientLimitTableHeader(),
-        _defaultNutrientLimitTableBody(),
-      ],
-    );
-  }
+  // Widget _defaultNutrientLimitTable() {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       const Text(
+  //         "การจำกัดโภชนาการเริ่มต้น",
+  //         style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
+  //       ),
+  //       const SizedBox(height: 6),
+  //       _defaultNutrientLimitTableHeader(),
+  //       _defaultNutrientLimitTableBody(),
+  //     ],
+  //   );
+  // }
 
-  void _minAmountChange({required int index, required double amount}) {
-    setState(() {
-      _viewModel.onMinAmountChange(index: index, amount: amount);
-    });
-  }
+  // void _minAmountChange({required int index, required double amount}) {
+  //   setState(() {
+  //     _viewModel.onMinAmountChange(index: index, amount: amount);
+  //   });
+  // }
+  //
+  // void _maxAmountChange({required int index, required double amount}) {
+  //   setState(() {
+  //     _viewModel.onMaxAmountChange(index: index, amount: amount);
+  //   });
+  // }
 
-  void _maxAmountChange({required int index, required double amount}) {
-    setState(() {
-      _viewModel.onMaxAmountChange(index: index, amount: amount);
-    });
-  }
-
-  Widget _defaultNutrientLimitTableBody() {
-    return SizedBox(
-      height: _tableHeight,
-      child: ListView.builder(
-        itemCount: _viewModel.defaultNutrientLimitList.length,
-        itemBuilder: (context, index) {
-          return NutrientLimitTableCell(
-            index: index,
-            tableColumnWidth: _defaultNutrientLimitTableColumnWidth,
-            minAmountChangeCallback: _minAmountChange,
-            maxAmountChangeCallback: _maxAmountChange,
-            nutrientLimitInfo: _viewModel.defaultNutrientLimitList[index],
-          );
-        },
-      ),
-    );
-  }
-
-  Widget _defaultNutrientLimitTableHeader() {
-    return Table(
-      columnWidths: _defaultNutrientLimitTableColumnWidth,
-      children: const [
-        TableRow(
-          decoration: BoxDecoration(
-            color: specialBlack,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(15),
-              topRight: Radius.circular(15),
-            ),
-          ),
-          children: [
-            TableCell(
-              child: Padding(
-                padding: EdgeInsets.all(_tableHeaderPadding),
-                child: Center(
-                  child: Text(
-                    'ลำดับที่',
-                    style: _tableHeaderTextStyle,
-                  ),
-                ),
-              ),
-            ),
-            TableCell(
-              child: Padding(
-                padding: EdgeInsets.all(_tableHeaderPadding),
-                child: Center(
-                  child: Text(
-                    'สารอาหาร',
-                    style: _tableHeaderTextStyle,
-                  ),
-                ),
-              ),
-            ),
-            TableCell(
-              child: Padding(
-                padding: EdgeInsets.all(_tableHeaderPadding),
-                child: Center(
-                  child: Text(
-                    'หน่วย',
-                    style: _tableHeaderTextStyle,
-                  ),
-                ),
-              ),
-            ),
-            TableCell(
-              child: Padding(
-                padding: EdgeInsets.all(_tableHeaderPadding),
-                child: Center(
-                  child: Text(
-                    'min (%DM)',
-                    style: _tableHeaderTextStyle,
-                  ),
-                ),
-              ),
-            ),
-            TableCell(
-              child: Padding(
-                padding: EdgeInsets.all(_tableHeaderPadding),
-                child: Center(
-                  child: Text(
-                    'max (%DM)',
-                    style: _tableHeaderTextStyle,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
+  // Widget _defaultNutrientLimitTableBody() {
+  //   return SizedBox(
+  //     height: _tableHeight,
+  //     child: ListView.builder(
+  //       itemCount: _viewModel.defaultNutrientLimitList.length,
+  //       itemBuilder: (context, index) {
+  //         return NutrientLimitTableCell(
+  //           index: index,
+  //           tableColumnWidth: _defaultNutrientLimitTableColumnWidth,
+  //           minAmountChangeCallback: _minAmountChange,
+  //           maxAmountChangeCallback: _maxAmountChange,
+  //           nutrientLimitInfo: _viewModel.defaultNutrientLimitList[index],
+  //         );
+  //       },
+  //     ),
+  //   );
+  // }
+  //
+  // Widget _defaultNutrientLimitTableHeader() {
+  //   return Table(
+  //     columnWidths: _defaultNutrientLimitTableColumnWidth,
+  //     children: const [
+  //       TableRow(
+  //         decoration: BoxDecoration(
+  //           color: specialBlack,
+  //           borderRadius: BorderRadius.only(
+  //             topLeft: Radius.circular(15),
+  //             topRight: Radius.circular(15),
+  //           ),
+  //         ),
+  //         children: [
+  //           TableCell(
+  //             child: Padding(
+  //               padding: EdgeInsets.all(_tableHeaderPadding),
+  //               child: Center(
+  //                 child: Text(
+  //                   'ลำดับที่',
+  //                   style: _tableHeaderTextStyle,
+  //                 ),
+  //               ),
+  //             ),
+  //           ),
+  //           TableCell(
+  //             child: Padding(
+  //               padding: EdgeInsets.all(_tableHeaderPadding),
+  //               child: Center(
+  //                 child: Text(
+  //                   'สารอาหาร',
+  //                   style: _tableHeaderTextStyle,
+  //                 ),
+  //               ),
+  //             ),
+  //           ),
+  //           TableCell(
+  //             child: Padding(
+  //               padding: EdgeInsets.all(_tableHeaderPadding),
+  //               child: Center(
+  //                 child: Text(
+  //                   'หน่วย',
+  //                   style: _tableHeaderTextStyle,
+  //                 ),
+  //               ),
+  //             ),
+  //           ),
+  //           TableCell(
+  //             child: Padding(
+  //               padding: EdgeInsets.all(_tableHeaderPadding),
+  //               child: Center(
+  //                 child: Text(
+  //                   'min (%DM)',
+  //                   style: _tableHeaderTextStyle,
+  //                 ),
+  //               ),
+  //             ),
+  //           ),
+  //           TableCell(
+  //             child: Padding(
+  //               padding: EdgeInsets.all(_tableHeaderPadding),
+  //               child: Center(
+  //                 child: Text(
+  //                   'max (%DM)',
+  //                   style: _tableHeaderTextStyle,
+  //                 ),
+  //               ),
+  //             ),
+  //           ),
+  //         ],
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Text _routingGuide() {
     return Text(
@@ -399,6 +399,29 @@ class _UpdatePetTypeInfoViewState extends State<UpdatePetTypeInfoView> {
                 ],
               ),
             ),
+    );
+  }
+
+  Widget _petPhysiologicalNutrientLimitTable() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "ลักษณะทางสรีระวิทยา",
+          style: TextStyle(fontWeight: FontWeight.bold, fontSize: 28),
+        ),
+        const SizedBox(height: 10),
+        Row(
+          children: [
+            _searchBar(),
+            const Spacer(),
+            _addPetChronicDiseaseButton(),
+          ],
+        ),
+        const SizedBox(height: 10),
+        _tableHeader(),
+        _petChronicDiseaseTableBody(),
+      ],
     );
   }
 

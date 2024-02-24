@@ -3,11 +3,11 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/constants/size.dart';
-import 'package:untitled1/hive_models/recipes_model.dart';
+import 'package:untitled1/utility/hive_models/recipes_model.dart';
 import 'package:untitled1/modules/admin/update_recipe/update_recipes_view_model.dart';
 import 'package:untitled1/modules/admin/update_recipe/widgets/update_recipes_table_cell.dart';
 import 'package:untitled1/modules/admin/update_recipe/widgets/nutrient_table_cell.dart';
-import 'package:untitled1/hive_models/ingredient_model.dart';
+import 'package:untitled1/utility/hive_models/ingredient_model.dart';
 import 'package:untitled1/modules/admin/recipes_info/recipe_info_view.dart';
 import 'package:untitled1/modules/admin/recipes_management/recipes_management_view.dart';
 import 'package:untitled1/modules/admin/widgets/dropdown/admin_dropdown_search.dart';
@@ -494,14 +494,12 @@ class _UpdateRecipesViewState extends State<UpdateRecipesView> {
   }
 
   Widget _header() {
-    return const SizedBox(
-      child: Text(
-        "เพิ่มข้อมูลสูตรอาหาร",
-        style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: headerInputTextFontSize,
-          // color: kPrimaryDarkColor,
-        ),
+    return Text(
+      widget.isCreate ? "เพิ่มข้อมูลสูตรอาหาร" : "แก้ไขข้อมูลสูตรอาหาร",
+      style: const TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: headerTextFontSize,
+        // color: kPrimaryDarkColor,
       ),
     );
   }

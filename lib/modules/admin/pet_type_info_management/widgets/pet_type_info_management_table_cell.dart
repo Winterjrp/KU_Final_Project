@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
-import 'package:untitled1/hive_models/ingredient_model.dart';
-import 'package:untitled1/hive_models/pet_type_info_model.dart';
-import 'package:untitled1/hive_models/recipes_model.dart';
+import 'package:untitled1/utility/hive_models/ingredient_model.dart';
+import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
+import 'package:untitled1/utility/hive_models/recipes_model.dart';
 import 'package:untitled1/modules/admin/pet_type_info/pet_type_info_view.dart';
 import 'package:untitled1/utility/navigation_with_animation.dart';
 

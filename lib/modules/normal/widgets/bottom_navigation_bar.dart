@@ -64,7 +64,7 @@ class ProjectNavigationBar extends StatelessWidget {
                 _buildNavItem(
                     icon: Icons.person,
                     // label: 'Settings',
-                    navigationIndex: MainPageIndexConstants.userManagementIndex,
+                    navigationIndex: 6,
                     context: context),
               ],
             ),

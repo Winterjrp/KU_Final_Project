@@ -1,4 +1,4 @@
-import 'package:untitled1/hive_models/pet_type_info_model.dart';
+import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
 
 class PetTypeInfoViewModel {
   late List<PetChronicDiseaseModel> filteredPetChronicDiseaseList;

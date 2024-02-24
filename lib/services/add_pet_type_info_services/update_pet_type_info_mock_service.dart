@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import 'package:untitled1/hive_models/pet_type_info_model.dart';
+import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
 import 'package:untitled1/modules/admin/update_pet_type_info/model/edited_pet_type_model.dart';
 import 'package:untitled1/services/add_pet_type_info_services/update_pet_type_info_service_interface.dart';
 

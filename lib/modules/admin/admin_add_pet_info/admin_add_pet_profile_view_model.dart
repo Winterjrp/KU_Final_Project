@@ -1,8 +1,10 @@
 import 'package:untitled1/constants/enum/pet_activity_enum.dart';
 import 'package:untitled1/constants/enum/pet_age_type_enum.dart';
 import 'package:untitled1/constants/enum/pet_neutering_status_enum.dart';
-import 'package:untitled1/hive_models/ingredient_model.dart';
-import 'package:untitled1/hive_models/pet_type_info_model.dart';
+import 'package:untitled1/utility/hive_models/ingredient_model.dart';
+import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
+import 'package:untitled1/modules/admin/admin_add_pet_info/models/post_for_recipe_model.dart';
+import 'package:untitled1/modules/admin/admin_get_recipe/get_recipe_model.dart';
 import 'package:untitled1/services/admin_add_pet_profile_service/admin_add_pet_profile_service.dart';
 import 'package:untitled1/services/admin_add_pet_profile_service/admin_add_pet_profile_service_interface.dart';
 
@@ -17,7 +19,7 @@ class AdminAddPetProfileViewModel {
   AdminAddPetProfileViewModel() {
     services = AdminAddPetProfileService();
     selectedIngredient = [];
-    fetchPetTypeData();
+    // fetchPetTypeData();
   }
 
   Future<void> fetchPetTypeData() async {
@@ -30,61 +32,10 @@ class AdminAddPetProfileViewModel {
     ingredientList = await ingredientListData;
   }
 
-  // Future<http.Response> onUserAddPetProfile(
-  //     {required String petID,
-  //     required String petName,
-  //     required String petType,
-  //     required String factorType,
-  //     required double petFactorNumber,
-  //     required double petWeight,
-  //     required String petNeuteringStatus,
-  //     required String petAgeType,
-  //     required String petPhysiologyStatus,
-  //     required List<String> petChronicDisease,
-  //     required String petActivityType}) async {
-  //   PetProfileModel petInfo = PetProfileModel(
-  //       petId: petID,
-  //       petName: petName,
-  //       petType: petType,
-  //       factorType: factorType,
-  //       petFactorNumber: petFactorNumber,
-  //       petWeight: petWeight,
-  //       petNeuteringStatus: petNeuteringStatus,
-  //       petAgeType: petAgeType,
-  //       petPhysiologyStatus: petPhysiologyStatus,
-  //       petChronicDisease: petChronicDisease,
-  //       petActivityType: petActivityType,
-  //       updateRecent: '');
-  //   return await services.addPetInfo(petProfile: petInfo);
-  // }
-  //
-  // Future<http.Response> onUserEditPetProfile(
-  //     {required String petID,
-  //     required String petName,
-  //     required String petType,
-  //     required String factorType,
-  //     required double petFactorNumber,
-  //     required double petWeight,
-  //     required String petNeuteringStatus,
-  //     required String petAgeType,
-  //     required String petPhysiologyStatus,
-  //     required List<String> petChronicDisease,
-  //     required String petActivityType}) async {
-  //   PetProfileModel petInfo = PetProfileModel(
-  //       petId: petID,
-  //       petName: petName,
-  //       petType: petType,
-  //       factorType: factorType,
-  //       petFactorNumber: petFactorNumber,
-  //       petWeight: petWeight,
-  //       petNeuteringStatus: petNeuteringStatus,
-  //       petAgeType: petAgeType,
-  //       petPhysiologyStatus: petPhysiologyStatus,
-  //       petChronicDisease: petChronicDisease,
-  //       petActivityType: petActivityType,
-  //       updateRecent: '');
-  //   return await services.updatePetInfo(petInfo: petInfo);
-  // }
+  Future<GetRecipeModel> onUserSearchRecipe(
+      {required PostDataForRecipeModel postDataForRecipe}) async {
+    return await services.searchRecipe(postDataForRecipe: postDataForRecipe);
+  }
 
   double calculatePetFactorNumber(
       {required String petID,

@@ -1,4 +1,4 @@
-import 'package:untitled1/hive_models/nutrient_limit_info_model.dart';
+import 'package:untitled1/utility/hive_models/nutrient_limit_info_model.dart';
 
 class AddPetChronicDiseaseViewModel {
   late List<NutrientLimitInfoModel> nutrientLimitList;

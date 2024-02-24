@@ -10,7 +10,7 @@ import 'package:untitled1/modules/admin/update_ingredient/update_ingredient_view
 import 'package:untitled1/modules/admin/widgets/admin_appbar.dart';
 import 'package:untitled1/modules/admin/widgets/admin_drawer.dart';
 import 'package:untitled1/modules/admin/ingredient_management/ingredient_management_view_model.dart';
-import 'package:untitled1/hive_models/ingredient_model.dart';
+import 'package:untitled1/utility/hive_models/ingredient_model.dart';
 import 'package:untitled1/modules/admin/ingredient_management/widgets/ingredient_management_table_cell.dart';
 import 'package:untitled1/modules/admin/widgets/filter_search_bar.dart';
 import 'package:untitled1/modules/admin/widgets/loading_screen/admin_loading_screen_with_text.dart';

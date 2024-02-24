@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import 'package:untitled1/hive_models/pet_profile_model.dart';
+import 'package:untitled1/utility/hive_models/pet_profile_model.dart';
 import 'package:untitled1/modules/normal/my_pet/models/home_model.dart';
 import 'package:untitled1/services/home_services/home_service_interface.dart';
 

@@ -5,7 +5,8 @@ import 'package:untitled1/constants/enum/pet_age_type_enum.dart';
 import 'package:untitled1/constants/enum/pet_factor_type_enum.dart';
 import 'package:untitled1/constants/enum/pet_neutering_status_enum.dart';
 import 'package:untitled1/constants/pet_physiology_status_list.dart';
-import 'package:untitled1/hive_models/pet_profile_model.dart';
+import 'package:untitled1/utility/hive_models/pet_profile_model.dart';
+import 'package:untitled1/modules/admin/widgets/popup/admin_error_popup.dart';
 import 'package:untitled1/modules/normal/widgets/popup/delete_confirm_popup.dart';
 import 'package:untitled1/modules/normal/widgets/popup/success_popup.dart';
 import 'package:untitled1/utility/navigation_with_animation.dart';
@@ -29,6 +30,7 @@ class PetProfileView extends StatefulWidget {
 }
 
 class _PetProfileViewState extends State<PetProfileView> {
+  late int _selectedType;
   late double _petFactorNumber;
   late double _petWeight;
   late String _petType;
@@ -48,6 +50,7 @@ class _PetProfileViewState extends State<PetProfileView> {
   void initState() {
     super.initState();
     _viewModel = PetProfileViewModel();
+    _selectedType = -2;
     _petName = widget.petProfileInfo.petName;
     _petType = widget.petProfileInfo.petType;
     _petPhysiologyStatus = widget.petProfileInfo.petPhysiologyStatus;
@@ -66,7 +69,7 @@ class _PetProfileViewState extends State<PetProfileView> {
       appBar: AppBar(
         elevation: 0,
         leading: IconButton(
-          icon: Icon(Icons.keyboard_backspace_rounded, color: primary),
+          icon: const Icon(Icons.keyboard_backspace_rounded, color: primary),
           onPressed: () {
             widget.isJustUpdate
                 ? Navigator.pushReplacement(
@@ -76,7 +79,7 @@ class _PetProfileViewState extends State<PetProfileView> {
                 : Navigator.of(context).pop();
           },
         ),
-        title: Center(
+        title: const Center(
             child: Text(
           "ข้อมูลสัตว์เลี้ยง      ",
           style: TextStyle(color: primary, fontWeight: FontWeight.bold),
@@ -188,7 +191,11 @@ class _PetProfileViewState extends State<PetProfileView> {
       SuccessPopup(context: context, successText: 'ลบข้อมูลสัตว์เลี้ยงสำเร็จ!!')
           .show();
     } catch (e) {
-      print(e);
+      Navigator.pop(context);
+      Future.delayed(const Duration(milliseconds: 2200), () {
+        Navigator.pop(context);
+      });
+      AdminErrorPopup(context: context, errorMessage: e.toString()).show();
     }
   }
 
@@ -260,8 +267,17 @@ class _PetProfileViewState extends State<PetProfileView> {
       height: 55,
       child: ElevatedButton(
         onPressed: () async {
-          Navigator.push(context,
-              NavigationForward(targetPage: const SelectIngredientView()));
+          Navigator.push(
+            context,
+            NavigationForward(
+              targetPage: SelectIngredientView(
+                petFactorNumber: _petFactorNumber,
+                petType: _petType,
+                petChronicDiseaseList: _petChronicDisease,
+                petWeight: _petWeight,
+              ),
+            ),
+          );
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: primary,

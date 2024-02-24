@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
-import 'package:untitled1/hive_models/ingredient_model.dart';
+import 'package:untitled1/utility/hive_models/ingredient_model.dart';
 
 typedef IngredientAmountChangeCallback = void Function();
 

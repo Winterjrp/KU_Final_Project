@@ -1,5 +1,5 @@
 import 'package:hive/hive.dart';
-import 'package:untitled1/hive_models/pet_type_info_model.dart';
+import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
 import 'package:untitled1/services/pet_type_info_management/pet_type_info_management_service_interface.dart';
 
 class PetTypeInfoManagementMockService

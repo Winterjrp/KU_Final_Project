@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/constants/size.dart';
-import 'package:untitled1/hive_models/pet_type_info_model.dart';
+import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
 import 'package:untitled1/modules/admin/pet_type_info/pet_type_info_view_model.dart';
 import 'package:untitled1/modules/admin/pet_type_info/widgets/nutrient_limit_info_table_cell.dart';
 import 'package:untitled1/modules/admin/pet_type_info/widgets/pet_chronic_disease_info_table_cell.dart';

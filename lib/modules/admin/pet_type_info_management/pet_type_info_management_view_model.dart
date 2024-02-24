@@ -1,4 +1,4 @@
-import 'package:untitled1/hive_models/pet_type_info_model.dart';
+import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
 import 'package:untitled1/manager/service_manager.dart';
 import 'package:untitled1/services/pet_type_info_management/pet_type_info_management_mock_service.dart';
 import 'package:untitled1/services/pet_type_info_management/pet_type_info_management_service.dart';

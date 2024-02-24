@@ -5,8 +5,8 @@ import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/constants/main_page_index_constants.dart';
 import 'package:untitled1/constants/nutrient_list_template.dart';
 import 'package:untitled1/constants/size.dart';
-import 'package:untitled1/hive_models/nutrient_limit_info_model.dart';
-import 'package:untitled1/hive_models/pet_type_info_model.dart';
+import 'package:untitled1/utility/hive_models/nutrient_limit_info_model.dart';
+import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
 import 'package:untitled1/modules/admin/admin_home/admin_home_view.dart';
 import 'package:untitled1/modules/admin/pet_type_info_management/widgets/pet_type_info_management_table_cell.dart';
 import 'package:untitled1/modules/admin/widgets/admin_appbar.dart';
@@ -286,13 +286,14 @@ class _PetTypeInfoManagementViewState extends State<PetTypeInfoManagementView> {
                       petTypeName: "",
                       petChronicDisease: [],
                       defaultNutrientLimitList: List.from(
-                        secondaryFreshNutrientListTemplate.map(
-                          (e) => NutrientLimitInfoModel(
-                              nutrientName: e.nutrientName,
-                              min: 0,
-                              max: 100,
-                              unit: e.unit),
-                        ),
+                        secondaryFreshNutrientListTemplate.asMap().entries.map(
+                              (entry) => NutrientLimitInfoModel(
+                                nutrientName: entry.value.nutrientName,
+                                min: 0,
+                                max: entry.key == 0 ? 999999 : 999999,
+                                unit: entry.value.unit,
+                              ),
+                            ),
                       ),
                     ),
                     onUserDeletePetTypeInfoCallBack: (

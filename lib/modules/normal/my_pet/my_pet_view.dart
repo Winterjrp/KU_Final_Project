@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/constants/main_page_index_constants.dart';
-import 'package:untitled1/hive_models/pet_profile_model.dart';
+import 'package:untitled1/utility/hive_models/pet_profile_model.dart';
 import 'package:untitled1/utility/navigation_with_animation.dart';
 import 'package:untitled1/modules/normal/my_pet/my_pet_view_model.dart';
 import 'package:untitled1/modules/normal/my_pet/widgets/user_pet_info_card.dart';
@@ -243,7 +243,7 @@ class _MyPetViewState extends State<MyPetView> {
               borderRadius: BorderRadius.circular(10),
             ),
           ),
-          child: Row(
+          child: const Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(

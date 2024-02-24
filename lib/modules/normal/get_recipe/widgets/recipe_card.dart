@@ -1,66 +1,70 @@
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
-import 'package:untitled1/constants/size.dart';
 import 'package:untitled1/modules/admin/admin_get_recipe/get_recipe_model.dart';
-import 'package:untitled1/modules/admin/recipes_info/widgets/nutrient_info_table_cell.dart';
-import 'package:untitled1/modules/admin/recipes_info/widgets/recipes_info_table_cell.dart';
+import 'package:untitled1/modules/normal/get_recipe/widgets/ingredient_in_searched_recipe_table_cell.dart';
+import 'package:untitled1/modules/normal/get_recipe/widgets/nutrient_in_searched_recipe_table_cell.dart';
 
 class RecipeCard extends StatelessWidget {
+  final bool isFromAlgorithm;
   final SearchPetRecipeModel searchPetRecipeData;
 
   const RecipeCard({
     required this.searchPetRecipeData,
     Key? key,
+    required this.isFromAlgorithm,
   }) : super(key: key);
 
   static const Map<int, TableColumnWidth> _nutrientTableColumnWidth =
       <int, TableColumnWidth>{
-    0: FlexColumnWidth(0.2),
-    1: FlexColumnWidth(0.6),
-    2: FlexColumnWidth(0.4),
-    3: FlexColumnWidth(0.3),
+    0: FlexColumnWidth(0.5),
+    1: FlexColumnWidth(0.5),
   };
   static const _ingredientTableColumnWidth = <int, TableColumnWidth>{
-    0: FlexColumnWidth(0.2),
-    1: FlexColumnWidth(0.4),
-    2: FlexColumnWidth(0.35),
+    0: FlexColumnWidth(0.4),
+    1: FlexColumnWidth(0.35),
   };
   static const double _tableHeaderPadding = 12;
-  static const TextStyle _headerTextStyle =
+  static const TextStyle _ingredientHeaderTextStyle =
       TextStyle(fontSize: 17, color: specialBlack);
+  static const TextStyle _nutrientHeaderTextStyle =
+      TextStyle(fontSize: 15, color: Colors.white);
 
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    double width = size.width;
     return Container(
-      height: 800,
-      color: Colors.white,
-      child: _body(context, width),
-    );
-  }
-
-  Center _body(BuildContext context, double width) {
-    return Center(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-        constraints: const BoxConstraints(maxWidth: adminScreenMaxWidth),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const SizedBox(height: 5),
-            _header(),
-            Expanded(
-              child: Column(
-                children: [
-                  _ingredient(width),
-                  // const SizedBox(width: 30),
-                  // _nutrient(context),
-                ],
-              ),
+      decoration: BoxDecoration(
+        color: hoverColor,
+        borderRadius: BorderRadius.circular(20.0),
+      ),
+      height: 600,
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      margin: const EdgeInsets.only(bottom: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 5),
+          _header(),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(child: _ingredient()),
+                const SizedBox(
+                  height: 20,
+                ),
+                Text(
+                  "amount: ${(1000 * searchPetRecipeData.amount / searchPetRecipeData.recipeData.freshNutrientList[0].amount).toStringAsFixed(3)} g",
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                // const SizedBox(height: 30),
+                // _nutrient(context),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -72,9 +76,9 @@ class RecipeCard extends StatelessWidget {
         children: [
           const Text(
             "สารอาหาร",
-            style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 10),
+          const SizedBox(height: 5),
           _nutrientTable(),
         ],
       ),
@@ -115,19 +119,8 @@ class RecipeCard extends StatelessWidget {
                 padding: EdgeInsets.all(_tableHeaderPadding),
                 child: Center(
                   child: Text(
-                    'ลำดับที่',
-                    style: _headerTextStyle,
-                  ),
-                ),
-              ),
-            ),
-            TableCell(
-              child: Padding(
-                padding: EdgeInsets.all(_tableHeaderPadding),
-                child: Center(
-                  child: Text(
                     'สารอาหาร',
-                    style: _headerTextStyle,
+                    style: _nutrientHeaderTextStyle,
                   ),
                 ),
               ),
@@ -138,18 +131,7 @@ class RecipeCard extends StatelessWidget {
                 child: Center(
                   child: Text(
                     'ปริมาณสารอาหาร (%FM)',
-                    style: _headerTextStyle,
-                  ),
-                ),
-              ),
-            ),
-            TableCell(
-              child: Padding(
-                padding: EdgeInsets.all(_tableHeaderPadding),
-                child: Center(
-                  child: Text(
-                    'หน่วย',
-                    style: _headerTextStyle,
+                    style: _nutrientHeaderTextStyle,
                   ),
                 ),
               ),
@@ -182,7 +164,7 @@ class RecipeCard extends StatelessWidget {
         child: ListView.builder(
           itemCount: searchPetRecipeData.recipeData.freshNutrientList.length,
           itemBuilder: (context, index) {
-            return NutrientInfoTableCell(
+            return NutrientInSearchedRecipeTableCell(
               index: index,
               tableColumnWidth: _nutrientTableColumnWidth,
               nutrientInfo:
@@ -194,59 +176,64 @@ class RecipeCard extends StatelessWidget {
     );
   }
 
-  Widget _ingredient(double width) {
-    return SizedBox(
-      height: 500,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text(
-            "วัตถุดิบ",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 5),
-          _ingredientTable(),
-        ],
-      ),
+  Widget _ingredient() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // const Text(
+        //   "วัตถุดิบ",
+        //   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        // ),
+        const SizedBox(height: 5),
+        _ingredientTable(),
+      ],
     );
   }
 
   Widget _header() {
-    return Row(
+    return Column(
       children: [
-        const Text(
-          "ข้อมูลสูตรอาหาร:",
-          style: TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          ),
-        ),
-        const SizedBox(width: 10),
-        Text(
-          searchPetRecipeData.recipeData.recipeName,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          ),
-        ),
-        const SizedBox(width: 10),
-        Container(
-          margin: const EdgeInsets.only(top: 4),
-          child: const Text(
-            "ของ",
-            style: TextStyle(
-              fontSize: 18,
+        Row(
+          children: [
+            const Text(
+              "ข้อมูลสูตรอาหาร:",
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
             ),
-          ),
+            const SizedBox(width: 10),
+            Text(
+              searchPetRecipeData.recipeData.recipeName,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+            ),
+          ],
         ),
-        const SizedBox(width: 10),
-        Text(
-          searchPetRecipeData.recipeData.petTypeName,
-          style: const TextStyle(
-            fontWeight: FontWeight.bold,
-            fontSize: 20,
-          ),
+        Row(
+          children: [
+            Container(
+              margin: const EdgeInsets.only(top: 4),
+              child: const Text(
+                "ของ",
+                style: TextStyle(
+                  fontSize: 18,
+                ),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              searchPetRecipeData.recipeData.petTypeName,
+              style: const TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 20,
+              ),
+            ),
+          ],
         ),
+        const SizedBox(height: 5),
       ],
     );
   }
@@ -290,19 +277,8 @@ class RecipeCard extends StatelessWidget {
                 padding: EdgeInsets.all(_tableHeaderPadding),
                 child: Center(
                   child: Text(
-                    'ลำดับที่',
-                    style: _headerTextStyle,
-                  ),
-                ),
-              ),
-            ),
-            TableCell(
-              child: Padding(
-                padding: EdgeInsets.all(_tableHeaderPadding),
-                child: Center(
-                  child: Text(
                     'วัตถุดิบ',
-                    style: _headerTextStyle,
+                    style: _ingredientHeaderTextStyle,
                   ),
                 ),
               ),
@@ -313,7 +289,7 @@ class RecipeCard extends StatelessWidget {
                 child: Center(
                   child: Text(
                     'ปริมาณวัตถุดิบ (%)',
-                    style: _headerTextStyle,
+                    style: _ingredientHeaderTextStyle,
                   ),
                 ),
               ),
@@ -326,20 +302,16 @@ class RecipeCard extends StatelessWidget {
 
   Widget _ingredientTableBody() {
     return Expanded(
-      child: Container(
-        decoration: BoxDecoration(gradient: tableBackGroundGradient),
-        child: ListView.builder(
-          itemCount:
-              searchPetRecipeData.recipeData.ingredientInRecipeList.length,
-          itemBuilder: (context, index) {
-            return RecipesInfoTableCell(
-              index: index,
-              tableColumnWidth: _ingredientTableColumnWidth,
-              ingredientInRecipesList:
-                  searchPetRecipeData.recipeData.ingredientInRecipeList,
-            );
-          },
-        ),
+      child: ListView.builder(
+        itemCount: searchPetRecipeData.recipeData.ingredientInRecipeList.length,
+        itemBuilder: (context, index) {
+          return IngredientInSearchedRecipeTableCell(
+            index: index,
+            tableColumnWidth: _ingredientTableColumnWidth,
+            ingredientInRecipesList:
+                searchPetRecipeData.recipeData.ingredientInRecipeList,
+          );
+        },
       ),
     );
   }

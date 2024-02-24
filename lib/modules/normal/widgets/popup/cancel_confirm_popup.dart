@@ -10,6 +10,7 @@ class CancelPopup {
 
   void show() {
     AwesomeDialog(
+      width: 450,
       context: context,
       dialogType: DialogType.question,
       headerAnimationLoop: false,

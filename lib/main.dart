@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:hive_flutter/adapters.dart';
 import 'package:provider/provider.dart';
-import 'package:untitled1/hive_models/ingredient_in_recipes_model.dart';
-import 'package:untitled1/hive_models/ingredient_model.dart';
-import 'package:untitled1/hive_models/pet_profile_model.dart';
-import 'package:untitled1/hive_models/pet_type_info_model.dart';
-import 'package:untitled1/hive_models/nutrient_limit_info_model.dart';
-import 'package:untitled1/hive_models/recipes_model.dart';
+import 'package:untitled1/utility/hive_models/ingredient_in_recipes_model.dart';
+import 'package:untitled1/utility/hive_models/ingredient_model.dart';
+import 'package:untitled1/utility/hive_models/pet_profile_model.dart';
+import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
+import 'package:untitled1/utility/hive_models/nutrient_limit_info_model.dart';
+import 'package:untitled1/utility/hive_models/recipes_model.dart';
 import 'package:untitled1/modules/admin/admin_get_recipe/admin_get_recipe_view.dart';
 import 'package:untitled1/modules/normal/login/responsive_login_view.dart';
+import 'package:untitled1/modules/normal/my_pet/my_pet_view.dart';
 import 'package:untitled1/modules/normal/my_pet_with_no_authen/my_pet_with_no_authen_view.dart';
 import 'package:untitled1/modules/test.dart';
 import 'package:untitled1/provider/authentication_provider.dart';
@@ -33,6 +34,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     bool isAuthen = true;
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter Demo',
       theme: ThemeData(
         textTheme: GoogleFonts.mitrTextTheme(),
@@ -42,9 +44,10 @@ class MyApp extends StatelessWidget {
         child: LayoutBuilder(
           builder: (context, constraints) {
             if (constraints.maxWidth < 600) {
+              // return const MyPetView();
               return const MyPetWithNoAuthenticationView();
             }
-            return const AdminGetRecipeView();
+            // return const AdminGetRecipeView();
             return const LoginView();
           },
         ),

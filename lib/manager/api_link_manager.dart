@@ -1,5 +1,5 @@
 class ApiLinkManager {
-  static const String baseUrl = "http://10.31.123.143:3000";
+  static const String baseUrl = "http://158.108.238.19:3000";
 
   // Auth Endpoints
   static String login() => "$baseUrl/api/auth/login";
@@ -30,7 +30,9 @@ class ApiLinkManager {
   static String getAdminHomeData() => "$baseUrl/api/adminHome/totalAmount";
 
   //searchRecipe
-  static String searchRecipe() => "$baseUrl/api/searchPetRecipes/test";
+  static String searchRecipe() => "$baseUrl/api/searchPetRecipes/getPetRecipes";
+  static String searchRecipeFromAlgorithm() =>
+      "$baseUrl/api/searchPetRecipes/getPetRecipes/algorithm";
 
   // User Endpoints
   // static String getUserProfile(String userId) => "$baseUrl/users/$userId";

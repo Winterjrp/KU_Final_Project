@@ -1,6 +1,6 @@
 import 'package:untitled1/constants/nutrient_list_template.dart';
-import 'package:untitled1/hive_models/nutrient_limit_info_model.dart';
-import 'package:untitled1/hive_models/pet_type_info_model.dart';
+import 'package:untitled1/utility/hive_models/nutrient_limit_info_model.dart';
+import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
 import 'package:untitled1/manager/service_manager.dart';
 import 'package:untitled1/modules/admin/update_pet_type_info/model/edited_pet_type_model.dart';
 import 'package:untitled1/services/add_pet_type_info_services/update_pet_type_info_mock_service.dart';
@@ -22,10 +22,14 @@ class UpdatePetTypeInfoViewModel {
         ? UpdatePetTypeInfoService()
         : UpdatePetTypeInfoMockService();
     petChronicDiseaseNutrientLimitList = List.from(
-      secondaryFreshNutrientListTemplate.map(
-        (e) => NutrientLimitInfoModel(
-            nutrientName: e.nutrientName, min: 0, max: 100, unit: e.unit),
-      ),
+      secondaryFreshNutrientListTemplate.asMap().entries.map(
+            (entry) => NutrientLimitInfoModel(
+              nutrientName: entry.value.nutrientName,
+              min: 0,
+              max: entry.key == 0 ? 999999 : 999999,
+              unit: entry.value.unit,
+            ),
+          ),
     );
     deletedPetChronicDiseaseList = [];
   }

@@ -1,3 +1,3 @@
 class ServiceManager {
-  static const bool isRealService = true;
+  static const bool isRealService = false;
 }

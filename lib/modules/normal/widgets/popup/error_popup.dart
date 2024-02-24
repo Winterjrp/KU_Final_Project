@@ -9,6 +9,7 @@ class ErrorPopup {
 
   void show() {
     AwesomeDialog(
+      width: 450,
       dismissOnTouchOutside: false,
       context: context,
       dialogType: DialogType.error,
@@ -20,10 +21,11 @@ class ErrorPopup {
         margin: const EdgeInsets.only(bottom: 30),
         height: 60,
         child: Center(
-            child: Text(
-          successText,
-          style: const TextStyle(fontSize: 18),
-        )),
+          child: Text(
+            successText,
+            style: const TextStyle(fontSize: 18),
+          ),
+        ),
       ),
     ).show();
   }

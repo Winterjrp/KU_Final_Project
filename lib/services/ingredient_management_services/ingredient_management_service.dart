@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:untitled1/data/secure_stroage.dart';
-import 'package:untitled1/hive_models/ingredient_model.dart';
+import 'package:untitled1/data/secure_storage.dart';
+import 'package:untitled1/utility/hive_models/ingredient_model.dart';
 import 'package:untitled1/manager/api_link_manager.dart';
 import 'package:untitled1/services/ingredient_management_services/ingredient_management_service_interface.dart';
 
@@ -41,6 +41,9 @@ class IngredientManagementService
   @override
   Future<void> addIngredientData(
       {required IngredientModel ingredientData}) async {
+    // print("Im here");
+    // print(json.encode(ingredientData.toJson()));
+    // print("end here");
     String token = await SecureStorage().readSecureData(key: "token");
     try {
       final response = await http

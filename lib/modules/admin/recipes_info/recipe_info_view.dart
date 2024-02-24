@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/constants/size.dart';
-import 'package:untitled1/hive_models/recipes_model.dart';
+import 'package:untitled1/utility/hive_models/recipes_model.dart';
 import 'package:untitled1/modules/admin/update_recipe/update_recipe_view.dart';
 import 'package:untitled1/modules/admin/recipes_info/widgets/nutrient_info_table_cell.dart';
 import 'package:untitled1/modules/admin/recipes_info/widgets/recipes_info_table_cell.dart';

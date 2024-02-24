@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:hive/hive.dart';
-import 'package:untitled1/hive_models/nutrient_limit_info_model.dart';
+import 'package:untitled1/utility/hive_models/nutrient_limit_info_model.dart';
 
 part 'pet_type_info_model.g.dart';
 
@@ -78,14 +78,19 @@ class PetChronicDiseaseModel {
         petChronicDiseaseId: json["petChronicDiseaseId"],
         petChronicDiseaseName: json["petChronicDiseaseName"],
         nutrientLimitInfo: List<NutrientLimitInfoModel>.from(
-            json["NutrientLimitInfo"]
-                .map((x) => NutrientLimitInfoModel.fromJson(x))),
+          json["NutrientLimitInfo"].map(
+            (x) => NutrientLimitInfoModel.fromJson(x),
+          ),
+        ),
       );
 
   Map<String, dynamic> toJson() => {
         "petChronicDiseaseId": petChronicDiseaseId,
         "petChronicDiseaseName": petChronicDiseaseName,
-        "NutrientLimitInfo":
-            List<dynamic>.from(nutrientLimitInfo.map((x) => x.toJson())),
+        "NutrientLimitInfo": List<dynamic>.from(
+          nutrientLimitInfo.map(
+            (x) => x.toJson(),
+          ),
+        ),
       };
 }

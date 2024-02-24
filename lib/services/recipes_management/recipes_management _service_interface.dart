@@ -1,4 +1,4 @@
-import 'package:untitled1/hive_models/recipes_model.dart';
+import 'package:untitled1/utility/hive_models/recipes_model.dart';
 
 abstract class RecipeManagementServiceInterface {
   Future<List<RecipeModel>> getRecipeListData();

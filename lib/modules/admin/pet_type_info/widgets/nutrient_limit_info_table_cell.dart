@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:untitled1/hive_models/nutrient_limit_info_model.dart';
+import 'package:untitled1/utility/hive_models/nutrient_limit_info_model.dart';
 
 class NutrientLimitInfoTableCell extends StatelessWidget {
   final int index;

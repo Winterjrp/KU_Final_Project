@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
-import 'package:untitled1/data/secure_stroage.dart';
-import 'package:untitled1/hive_models/ingredient_model.dart';
-import 'package:untitled1/hive_models/pet_type_info_model.dart';
-import 'package:untitled1/hive_models/recipes_model.dart';
+import 'package:untitled1/data/secure_storage.dart';
+import 'package:untitled1/utility/hive_models/ingredient_model.dart';
+import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
+import 'package:untitled1/utility/hive_models/recipes_model.dart';
 import 'package:untitled1/manager/api_link_manager.dart';
 import 'package:untitled1/services/update_recipes_services/update_recipes_service_interface.dart';
 

@@ -1,9 +1,9 @@
 import 'package:untitled1/constants/nutrient_list_template.dart';
 import 'package:untitled1/constants/size.dart';
-import 'package:untitled1/hive_models/ingredient_in_recipes_model.dart';
-import 'package:untitled1/hive_models/ingredient_model.dart';
-import 'package:untitled1/hive_models/pet_type_info_model.dart';
-import 'package:untitled1/hive_models/recipes_model.dart';
+import 'package:untitled1/utility/hive_models/ingredient_in_recipes_model.dart';
+import 'package:untitled1/utility/hive_models/ingredient_model.dart';
+import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
+import 'package:untitled1/utility/hive_models/recipes_model.dart';
 import 'package:untitled1/manager/service_manager.dart';
 import 'package:untitled1/services/update_recipes_services/update_recipe_service.dart';
 import 'package:untitled1/services/update_recipes_services/update_recipes_mock_service.dart';

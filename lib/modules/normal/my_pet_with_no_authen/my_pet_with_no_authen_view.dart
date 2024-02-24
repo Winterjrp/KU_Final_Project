@@ -1,9 +1,12 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import 'package:untitled1/constants/color.dart';
-import 'package:untitled1/hive_models/pet_profile_model.dart';
+import 'package:untitled1/utility/hive_models/pet_profile_model.dart';
 import 'package:untitled1/modules/normal/add_pet_profile_with_no_authen/add_pet_profile_with_no_authen_view.dart';
+import 'package:untitled1/modules/normal/login/responsive_login_view.dart';
+import 'package:untitled1/provider/authentication_provider.dart';
 import 'package:untitled1/utility/navigation_with_animation.dart';
 import 'package:untitled1/modules/normal/widgets/background.dart';
 
@@ -21,6 +24,29 @@ class MyPetWithNoAuthenticationView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            Row(
+              children: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.pushReplacement(
+                      context,
+                      NavigationForward(
+                        targetPage:
+                            ChangeNotifierProvider<AuthenticationProvider>(
+                                create: (context) => AuthenticationProvider(),
+                                child: const LoginView()),
+                      ),
+                    );
+                  },
+                  child: const Text(
+                    "Sign In",
+                    style: TextStyle(
+                      decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
+              ],
+            ),
             Container(
               alignment: Alignment.centerLeft,
               margin: const EdgeInsets.only(left: 20),

@@ -1,4 +1,4 @@
-import 'package:untitled1/hive_models/recipes_model.dart';
+import 'package:untitled1/utility/hive_models/recipes_model.dart';
 import 'package:untitled1/manager/service_manager.dart';
 import 'package:untitled1/services/recipes_management/recipe_management_service.dart';
 import 'package:untitled1/services/recipes_management/recipes_management_mock_service.dart';

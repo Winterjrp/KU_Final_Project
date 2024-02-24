@@ -1,4 +1,4 @@
-import 'package:untitled1/hive_models/ingredient_model.dart';
+import 'package:untitled1/utility/hive_models/ingredient_model.dart';
 
 List<NutrientModel> primaryFreshNutrientListTemplate = [
   NutrientModel(nutrientName: "Crude protein", amount: 0.0, unit: 'g/100g'),

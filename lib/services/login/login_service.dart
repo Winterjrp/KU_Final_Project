@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:untitled1/data/secure_stroage.dart';
+import 'package:untitled1/data/secure_storage.dart';
 import 'package:untitled1/manager/api_link_manager.dart';
 import 'package:untitled1/models/user_info_model.dart';
 import 'package:untitled1/services/login/login_service_interface.dart';
@@ -28,6 +28,7 @@ class LoginService implements LoginServiceInterface {
       if (response.statusCode == 200) {
         Map<String, dynamic> jsonData = json.decode(response.body);
         userInfoData = UserInfoModel.fromJson(jsonData);
+        // print(jsonData['accessToken']);
         await SecureStorage()
             .writeSecureData(key: "token", value: jsonData['accessToken']);
         // print(jsonData['accessToken']);

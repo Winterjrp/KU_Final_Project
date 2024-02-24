@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:untitled1/constants/color.dart';
-import 'package:untitled1/hive_models/nutrient_limit_info_model.dart';
+import 'package:untitled1/utility/hive_models/nutrient_limit_info_model.dart';
 
 typedef MinAmountChangeCallback = void Function(
     {required int index, required double amount});
@@ -160,9 +160,9 @@ class _NutrientLimitTableCellState extends State<NutrientLimitTableCell> {
       if (value == "") {
         _maxAmountController.text = "0";
       } else {
-        if (double.parse(value) > 100) {
-          _maxAmountController.text = "100";
-        }
+        // if (double.parse(value) > 100 && widget.index != 0) {
+        //   _maxAmountController.text = "100";
+        // }
       }
       widget.maxAmountChangeCallback(
         index: widget.index,

@@ -6,19 +6,21 @@ import 'package:untitled1/constants/size.dart';
 import 'package:untitled1/modules/admin/admin_get_recipe/admin_get_recipe_view_model.dart';
 import 'package:untitled1/modules/admin/admin_get_recipe/get_recipe_model.dart';
 import 'package:untitled1/modules/admin/admin_get_recipe/widgets/pet_requirement_info_table_cell.dart';
-import 'package:untitled1/modules/admin/admin_get_recipe/widgets/recipe_card.dart';
+import 'package:untitled1/modules/admin/admin_get_recipe/widgets/admin_recipe_card.dart';
 import 'package:untitled1/modules/admin/widgets/loading_screen/admin_loading_screen_with_text.dart';
 import 'package:untitled1/modules/admin/widgets/popup/admin_cancel_popup.dart';
 
 class AdminGetRecipeView extends StatefulWidget {
-  const AdminGetRecipeView({Key? key}) : super(key: key);
+  final GetRecipeModel getRecipeData;
+  const AdminGetRecipeView({Key? key, required this.getRecipeData})
+      : super(key: key);
 
   @override
   State<AdminGetRecipeView> createState() => _AdminGetRecipeViewState();
 }
 
 class _AdminGetRecipeViewState extends State<AdminGetRecipeView> {
-  late AdminGetRecipeViewModel _viewModel;
+  // late AdminGetRecipeViewModel _viewModel;
 
   static const Map<int, TableColumnWidth> _nutrientLimitTableColumnWidth =
       <int, TableColumnWidth>{
@@ -35,7 +37,7 @@ class _AdminGetRecipeViewState extends State<AdminGetRecipeView> {
   @override
   void initState() {
     super.initState();
-    _viewModel = AdminGetRecipeViewModel();
+    // _viewModel = AdminGetRecipeViewModel();
   }
 
   @override
@@ -57,53 +59,41 @@ class _AdminGetRecipeViewState extends State<AdminGetRecipeView> {
   }
 
   Widget _body() {
-    return FutureBuilder<GetRecipeModel>(
-      future: _viewModel.getRecipeDataFetch,
-      builder: (context, AsyncSnapshot<GetRecipeModel> snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
-          return const AdminLoadingScreenWithText();
-        } else if (snapshot.hasError) {
-          return Text('Error: ${snapshot.error}');
-        } else if (snapshot.hasData) {
-          return Center(
-            child: Container(
-              constraints: const BoxConstraints(maxWidth: adminScreenMaxWidth),
-              padding: const EdgeInsets.symmetric(horizontal: 30),
-              child: Column(
+    return Center(
+      child: Container(
+        constraints: const BoxConstraints(maxWidth: adminScreenMaxWidth),
+        padding: const EdgeInsets.symmetric(horizontal: 30),
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+            Expanded(
+              child: Row(
                 children: [
-                  const SizedBox(height: 20),
-                  Expanded(
-                    child: Row(
-                      children: [
-                        _petRequirement(),
-                        const SizedBox(
-                          width: 30,
-                        ),
-                        const VerticalDivider(
-                          color: Colors.black,
-                          thickness: 2,
-                        ),
-                        const SizedBox(
-                          width: 30,
-                        ),
-                        _searchedRecipe(),
-                      ],
-                    ),
+                  _petRequirement(),
+                  const SizedBox(
+                    width: 30,
                   ),
-                  const SizedBox(height: 10),
-                  _updateIngredientButton(),
-                  const SizedBox(height: 20),
+                  const VerticalDivider(
+                    color: Colors.black,
+                    thickness: 2,
+                  ),
+                  const SizedBox(
+                    width: 30,
+                  ),
+                  _searchedRecipe(),
                 ],
               ),
             ),
-          );
-        }
-        return const Text('No data available');
-      },
+            const SizedBox(height: 10),
+            _backToHomeButton(),
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
     );
   }
 
-  Row _updateIngredientButton() {
+  Row _backToHomeButton() {
     return Row(
       children: [
         const Spacer(),
@@ -111,7 +101,9 @@ class _AdminGetRecipeViewState extends State<AdminGetRecipeView> {
           height: 45,
           width: 200,
           child: ElevatedButton(
-            onPressed: () async {},
+            onPressed: () async {
+              Navigator.of(context).popUntil((route) => route.isFirst);
+            },
             style: ElevatedButton.styleFrom(
               backgroundColor: acceptButtonBackground,
               shape: RoundedRectangleBorder(
@@ -141,17 +133,14 @@ class _AdminGetRecipeViewState extends State<AdminGetRecipeView> {
             ),
             const SizedBox(height: 10),
             Expanded(
-              child: Container(
-                color: Colors.white,
-                child: ListView.builder(
-                  itemCount: _viewModel.searchedPetRecipesList.length,
-                  itemBuilder: (context, index) {
-                    return RecipeCard(
-                      searchPetRecipeData:
-                          _viewModel.searchedPetRecipesList[index],
-                    );
-                  },
-                ),
+              child: ListView.builder(
+                itemCount: widget.getRecipeData.searchPetRecipesList.length,
+                itemBuilder: (context, index) {
+                  return AdminRecipeCard(
+                    searchPetRecipeData:
+                        widget.getRecipeData.searchPetRecipesList[index],
+                  );
+                },
               ),
             ),
           ],
@@ -193,12 +182,13 @@ class _AdminGetRecipeViewState extends State<AdminGetRecipeView> {
       child: Container(
         color: Colors.white,
         child: ListView.builder(
-          itemCount: _viewModel.nutrientLimitList.length,
+          itemCount: widget.getRecipeData.defaultNutrientLimitList.length,
           itemBuilder: (context, index) {
             return PetRequirementInfoTableCell(
               index: index,
               tableColumnWidth: _nutrientLimitTableColumnWidth,
-              nutrientLimitInfo: _viewModel.nutrientLimitList[index],
+              nutrientLimitInfo:
+                  widget.getRecipeData.defaultNutrientLimitList[index],
             );
           },
         ),

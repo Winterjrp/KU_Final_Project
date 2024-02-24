@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/constants/size.dart';
-import 'package:untitled1/hive_models/ingredient_in_recipes_model.dart';
-import 'package:untitled1/hive_models/ingredient_model.dart';
+import 'package:untitled1/utility/hive_models/ingredient_in_recipes_model.dart';
+import 'package:untitled1/utility/hive_models/ingredient_model.dart';
 import 'package:untitled1/modules/admin/update_recipe/update_recipes_view_model.dart';
 
 typedef OnUserDeleteIngredientCallback = void Function({required int index});
@@ -209,7 +209,7 @@ class _AddRecipesTableCellState extends State<AddRecipesTableCell> {
                     title: Row(
                       children: [
                         SizedBox(
-                          width: 220,
+                          width: 200,
                           child: Text(
                             option.ingredientName,
                             style:
@@ -240,7 +240,7 @@ class _AddRecipesTableCellState extends State<AddRecipesTableCell> {
                     title: Row(
                       children: [
                         SizedBox(
-                          width: 220,
+                          width: 200,
                           child: Text(
                             option.ingredientName,
                             style: const TextStyle(fontSize: 17),

@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'package:hive/hive.dart';
-import 'package:untitled1/hive_models/ingredient_in_recipes_model.dart';
-import 'package:untitled1/hive_models/ingredient_model.dart';
+import 'package:untitled1/utility/hive_models/ingredient_in_recipes_model.dart';
+import 'package:untitled1/utility/hive_models/ingredient_model.dart';
 
 part 'recipes_model.g.dart';
 

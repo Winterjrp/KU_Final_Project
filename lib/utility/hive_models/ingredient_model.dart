@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:hive/hive.dart';
-
 part 'ingredient_model.g.dart';
 
 IngredientModel ingredientModelFromJson(String str) =>

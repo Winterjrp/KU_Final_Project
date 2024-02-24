@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/modules/normal/login/widgets/authen.dart';
 
 typedef LogInCallback = void Function();
@@ -22,8 +23,8 @@ class DesktopLoginView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // backgroundColor: lightGrey,
-      backgroundColor: Colors.green,
+      backgroundColor: lightGrey,
+      // backgroundColor: Colors.green,
       body: Center(
         child: Container(
           padding: const EdgeInsets.only(left: 30, right: 30, bottom: 30),
