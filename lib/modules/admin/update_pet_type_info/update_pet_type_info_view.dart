@@ -2,11 +2,14 @@ import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
+import 'package:untitled1/constants/nutrient_list_template.dart';
 import 'package:untitled1/constants/size.dart';
 import 'package:untitled1/modules/admin/update_pet_chronic_disease/update_pet_chronic_disease_view.dart';
+import 'package:untitled1/modules/admin/update_pet_physiological/update_pet_physiological_view.dart';
+import 'package:untitled1/modules/admin/update_pet_type_info/widgets/pet_physiological_table_cell.dart';
 import 'package:untitled1/utility/hive_models/nutrient_limit_info_model.dart';
+import 'package:untitled1/utility/hive_models/pet_physiological_nutrient_limit_model.dart';
 import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
-import 'package:untitled1/modules/admin/update_pet_chronic_disease/widgets/nutrient_limit_table_cell.dart';
 import 'package:untitled1/modules/admin/pet_type_info/pet_type_info_view.dart';
 import 'package:untitled1/modules/admin/pet_type_info_management/pet_type_info_management_view.dart';
 import 'package:untitled1/modules/admin/update_pet_type_info/update_pet_type_info_view_model.dart';
@@ -74,11 +77,14 @@ class _UpdatePetTypeInfoViewState extends State<UpdatePetTypeInfoView> {
     _petTypeNameFocusNode = FocusNode();
     _viewModel.petChronicDiseaseList = widget.petTypeInfo.petChronicDisease;
     _viewModel.filteredPetChronicDiseaseList = _viewModel.petChronicDiseaseList;
-    _viewModel.defaultNutrientLimitList = List.from(
-      widget.petTypeInfo.defaultNutrientLimitList.map(
-        (e) => NutrientLimitInfoModel(
-            nutrientName: e.nutrientName, unit: e.unit, min: e.min, max: e.max),
-      ),
+    _viewModel.petPhysiologicalList = List.from(
+      widget.petTypeInfo.petPhysiological.map((e) => PetPhysiologicalModel(
+          petTypeName: e.petTypeName,
+          petTypeId: e.petTypeId,
+          petPhysiologicalId: e.petPhysiologicalId,
+          petPhysiologicalName: e.petPhysiologicalName,
+          description: e.description,
+          nutrientLimitInfo: e.nutrientLimitInfo)),
     );
     _petTypeNameController.text = widget.petTypeInfo.petTypeName;
     _petTypeNameFocusNode.addListener(() {
@@ -142,7 +148,7 @@ class _UpdatePetTypeInfoViewState extends State<UpdatePetTypeInfoView> {
                     const SizedBox(height: 5),
                     _header(),
                     const SizedBox(height: 10),
-                    _petPhysiologicalNutrientLimitTable(),
+                    _petPhysiologicalTable(),
                     const SizedBox(height: 20),
                     _petChronicDiseaseTable(),
                     const SizedBox(height: 15),
@@ -402,7 +408,7 @@ class _UpdatePetTypeInfoViewState extends State<UpdatePetTypeInfoView> {
     );
   }
 
-  Widget _petPhysiologicalNutrientLimitTable() {
+  Widget _petPhysiologicalTable() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -415,14 +421,126 @@ class _UpdatePetTypeInfoViewState extends State<UpdatePetTypeInfoView> {
           children: [
             _searchBar(),
             const Spacer(),
-            _addPetChronicDiseaseButton(),
+            _updatePetPhysiologicalButton(),
           ],
         ),
         const SizedBox(height: 10),
         _tableHeader(),
-        _petChronicDiseaseTableBody(),
+        _petPhysiologicalTableBody(),
       ],
     );
+  }
+
+  Widget _petPhysiologicalTableBody() {
+    return SizedBox(
+      height: _tableHeight,
+      child: _viewModel.petPhysiologicalList.isEmpty
+          ? Container(
+              width: double.infinity,
+              decoration: BoxDecoration(gradient: tableBackGroundGradient),
+              child: const Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    "ไม่มีข้อมูลลักษณะทางสรีระวิทยา",
+                    style: TextStyle(fontSize: 20),
+                  ),
+                  SizedBox(height: 50)
+                ],
+              ),
+            )
+          : Container(
+              decoration: BoxDecoration(gradient: tableBackGroundGradient),
+              height: 75.0 * _viewModel.petPhysiologicalList.length,
+              child: ListView.builder(
+                itemCount: _viewModel.petPhysiologicalList.length,
+                itemBuilder: (context, index) {
+                  return PetPhysiologicalTableCell(
+                    index: index,
+                    tableColumnWidth: _petChronicDiseaseTableColumnWidth,
+                    petPhysiologicalInfo:
+                        _viewModel.petPhysiologicalList[index],
+                    // petTypeName: _petTypeNameController.text,
+                    onUserDeletePetPhysiologicalCallBack:
+                        _onUserDeletePetPhysiological,
+                    onUserAddPetPhysiologicalCallBack:
+                        _onUserAddPetPhysiological,
+                    onUserEditPetChronicDiseaseCallBack: (
+                        {required String petChronicDiseaseId}) {
+                      _onUserEditPetChronicDisease(
+                          petChronicDiseaseId: petChronicDiseaseId);
+                    },
+                  );
+                },
+              ),
+            ),
+    );
+  }
+
+  void _onUserAddPetPhysiological({
+    required List<NutrientLimitInfoModel> nutrientLimitInfo,
+    required String petPhysiologicalId,
+    required String petPhysiologicalName,
+    required String petType,
+    required String petTypeId,
+    required String description,
+  }) {
+    _viewModel.onUserAddPetPhysiological(
+      nutrientLimitInfo: nutrientLimitInfo,
+      petPhysiologicalId: petPhysiologicalId,
+      petPhysiologicalName: petPhysiologicalName,
+      petType: petType,
+      petTypeId: petTypeId,
+      description: description,
+    );
+    setState(() {});
+  }
+
+  Widget _updatePetPhysiologicalButton() {
+    return SizedBox(
+      height: 43,
+      child: AdminAddObjectButton(
+          addObjectCallback: () async {
+            Navigator.push(
+              context,
+              NavigationUpward(
+                  targetPage: UpdatePetPhysiologicalView(
+                    onUserAddPetPhysiologicalCallBack:
+                        _onUserAddPetPhysiological,
+                    isCreate: true,
+                    petPhysiologicalInfo: PetPhysiologicalModel(
+                      petTypeName: _petTypeNameController.text,
+                      petTypeId: widget.petTypeInfo.petTypeId,
+                      petPhysiologicalId: Random().nextInt(999).toString(),
+                      petPhysiologicalName: "",
+                      description: "",
+                      nutrientLimitInfo: List.from(
+                        secondaryFreshNutrientListTemplate.asMap().entries.map(
+                              (entry) => NutrientLimitInfoModel(
+                                nutrientName: entry.value.nutrientName,
+                                min: 0,
+                                max: entry.key == 0 ? 999999 : 999999,
+                                unit: entry.value.unit,
+                              ),
+                            ),
+                      ),
+                    ),
+                    onUserEditPetChronicDiseaseCallBack: () {},
+                    onUserDeletePetPhysiologicalCallBack:
+                        _onUserDeletePetPhysiological,
+                  ),
+                  durationInMilliSec: 900),
+            );
+          },
+          addObjectText: " เพิ่มข้อมูลลักษณะทางสรีระวิทยา"),
+    );
+  }
+
+  void _onUserDeletePetPhysiological(
+      {required PetPhysiologicalModel petPhysiologicalData}) async {
+    _viewModel.onUserDeletePetPhysiological(
+        petPhysiologicalData: petPhysiologicalData);
+    setState(() {});
   }
 
   Widget _petChronicDiseaseTable() {
@@ -595,10 +713,19 @@ class _UpdatePetTypeInfoViewState extends State<UpdatePetTypeInfoView> {
                     petTypeName: _petTypeNameController.text,
                     isCreate: true,
                     petChronicDiseaseInfo: PetChronicDiseaseModel(
-                        petChronicDiseaseId: Random().nextInt(999).toString(),
-                        petChronicDiseaseName: "",
-                        nutrientLimitInfo:
-                            _viewModel.petChronicDiseaseNutrientLimitList),
+                      petChronicDiseaseId: Random().nextInt(999).toString(),
+                      petChronicDiseaseName: "",
+                      nutrientLimitInfo: List.from(
+                        secondaryFreshNutrientListTemplate.asMap().entries.map(
+                              (entry) => NutrientLimitInfoModel(
+                                nutrientName: entry.value.nutrientName,
+                                min: 0,
+                                max: entry.key == 0 ? 999999 : 999999,
+                                unit: entry.value.unit,
+                              ),
+                            ),
+                      ),
+                    ),
                     onUserEditPetChronicDiseaseCallBack: (
                         {required String petChronicDiseaseId}) {
                       _onUserEditPetChronicDisease(
@@ -662,7 +789,7 @@ class _UpdatePetTypeInfoViewState extends State<UpdatePetTypeInfoView> {
       PetTypeInfoModel petTypeInfoData = PetTypeInfoModel(
           petTypeId: widget.petTypeInfo.petTypeId,
           petTypeName: _petTypeNameController.text,
-          defaultNutrientLimitList: _viewModel.defaultNutrientLimitList,
+          petPhysiological: _viewModel.petPhysiologicalList,
           petChronicDisease: _viewModel.petChronicDiseaseList);
       await _viewModel.onUserEditPetTypeInfo(
           petTypeID: widget.petTypeInfo.petTypeId,

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:untitled1/constants/color.dart';
+import 'package:untitled1/constants/format.dart';
 import 'package:untitled1/utility/hive_models/ingredient_model.dart';
 
 typedef IngredientAmountChangeCallback = void Function(
@@ -152,7 +153,7 @@ class _UpdateIngredientTableCellState extends State<UpdateIngredientTableCell> {
             textAlign: TextAlign.center,
             keyboardType: const TextInputType.numberWithOptions(decimal: true),
             inputFormatters: [
-              FilteringTextInputFormatter.allow(RegExp(r'^\d*\.?\d*')),
+              inputDecimalFormat,
             ],
             onTap: () {
               _nutrientAmountController.selection = TextSelection(

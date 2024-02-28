@@ -1,6 +1,5 @@
 import 'package:hive/hive.dart';
 import 'package:untitled1/utility/hive_models/ingredient_model.dart';
-
 part 'ingredient_in_recipes_model.g.dart';
 
 @HiveType(typeId: 6)

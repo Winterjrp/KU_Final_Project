@@ -1,24 +1,22 @@
 import 'dart:convert';
 import 'package:untitled1/utility/hive_models/nutrient_limit_info_model.dart';
 
-PetPhysiologicalNutrientLimitModel petPhysiologicalNutrientLimitModelFromJson(
-        String str) =>
-    PetPhysiologicalNutrientLimitModel.fromJson(json.decode(str));
+PetPhysiologicalModel petPhysiologicalNutrientLimitModelFromJson(String str) =>
+    PetPhysiologicalModel.fromJson(json.decode(str));
 
-String petPhysiologicalNutrientLimitModelToJson(
-        PetPhysiologicalNutrientLimitModel data) =>
+String petPhysiologicalNutrientLimitModelToJson(PetPhysiologicalModel data) =>
     json.encode(data.toJson());
 
-class PetPhysiologicalNutrientLimitModel {
-  String petType;
+class PetPhysiologicalModel {
+  String petTypeName;
   String petTypeId;
   String petPhysiologicalId;
   String petPhysiologicalName;
   String description;
   List<NutrientLimitInfoModel> nutrientLimitInfo;
 
-  PetPhysiologicalNutrientLimitModel({
-    required this.petType,
+  PetPhysiologicalModel({
+    required this.petTypeName,
     required this.petTypeId,
     required this.petPhysiologicalId,
     required this.petPhysiologicalName,
@@ -26,10 +24,9 @@ class PetPhysiologicalNutrientLimitModel {
     required this.nutrientLimitInfo,
   });
 
-  factory PetPhysiologicalNutrientLimitModel.fromJson(
-          Map<String, dynamic> json) =>
-      PetPhysiologicalNutrientLimitModel(
-        petType: json["petType"],
+  factory PetPhysiologicalModel.fromJson(Map<String, dynamic> json) =>
+      PetPhysiologicalModel(
+        petTypeName: json["petType"],
         petTypeId: json["petTypeId"],
         petPhysiologicalId: json["petPhysiologicalId"],
         petPhysiologicalName: json["petPhysiologicalName"],
@@ -42,7 +39,7 @@ class PetPhysiologicalNutrientLimitModel {
       );
 
   Map<String, dynamic> toJson() => {
-        "petType": petType,
+        "petType": petTypeName,
         "petTypeId": petTypeId,
         "petPhysiologicalId": petPhysiologicalId,
         "petPhysiologicalName": petPhysiologicalName,

@@ -89,7 +89,7 @@ class NutrientTableCell extends StatelessWidget {
     return TableCell(
       child: Padding(
         padding:
-            const EdgeInsets.only(left: 45, right: 20, top: 10, bottom: 10),
+            const EdgeInsets.only(left: 80, right: 20, top: 10, bottom: 10),
         child: Text(
           nutrientInfo.amount.toString(),
           style: const TextStyle(

@@ -1,5 +1,5 @@
-import 'package:untitled1/constants/nutrient_list_template.dart';
 import 'package:untitled1/utility/hive_models/nutrient_limit_info_model.dart';
+import 'package:untitled1/utility/hive_models/pet_physiological_nutrient_limit_model.dart';
 import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
 import 'package:untitled1/manager/service_manager.dart';
 import 'package:untitled1/modules/admin/update_pet_type_info/model/edited_pet_type_model.dart';
@@ -11,8 +11,7 @@ class UpdatePetTypeInfoViewModel {
   late Future<List<PetChronicDiseaseModel>> petChronicDiseaseListData;
   late List<PetChronicDiseaseModel> petChronicDiseaseList;
   late List<PetChronicDiseaseModel> filteredPetChronicDiseaseList;
-  late List<NutrientLimitInfoModel> defaultNutrientLimitList;
-  late List<NutrientLimitInfoModel> petChronicDiseaseNutrientLimitList;
+  late List<PetPhysiologicalModel> petPhysiologicalList;
   late List<String> deletedPetChronicDiseaseList;
   late UpdatePetTypeInfoServiceInterface service;
 
@@ -21,16 +20,6 @@ class UpdatePetTypeInfoViewModel {
     service = ServiceManager.isRealService
         ? UpdatePetTypeInfoService()
         : UpdatePetTypeInfoMockService();
-    petChronicDiseaseNutrientLimitList = List.from(
-      secondaryFreshNutrientListTemplate.asMap().entries.map(
-            (entry) => NutrientLimitInfoModel(
-              nutrientName: entry.value.nutrientName,
-              min: 0,
-              max: entry.key == 0 ? 999999 : 999999,
-              unit: entry.value.unit,
-            ),
-          ),
-    );
     deletedPetChronicDiseaseList = [];
   }
 
@@ -38,12 +27,29 @@ class UpdatePetTypeInfoViewModel {
     return [];
   }
 
-  void onMinAmountChange({required int index, required double amount}) async {
-    defaultNutrientLimitList[index].min = amount;
-  }
-
-  void onMaxAmountChange({required int index, required double amount}) async {
-    defaultNutrientLimitList[index].max = amount;
+  // void onMinAmountChange({required int index, required double amount}) async {
+  //   petPhysiologicalList[index].min = amount;
+  // }
+  //
+  // void onMaxAmountChange({required int index, required double amount}) async {
+  //   petPhysiologicalList[index].max = amount;
+  // }
+  void onUserAddPetPhysiological({
+    required List<NutrientLimitInfoModel> nutrientLimitInfo,
+    required String petPhysiologicalId,
+    required String petPhysiologicalName,
+    required String petType,
+    required String petTypeId,
+    required String description,
+  }) {
+    PetPhysiologicalModel petPhysiologicalData = PetPhysiologicalModel(
+        petPhysiologicalId: petPhysiologicalId,
+        petPhysiologicalName: petPhysiologicalName,
+        nutrientLimitInfo: nutrientLimitInfo,
+        petTypeName: petType,
+        petTypeId: petTypeId,
+        description: description);
+    petPhysiologicalList.add(petPhysiologicalData);
   }
 
   void onUserAddPetChronicDisease(
@@ -81,7 +87,7 @@ class UpdatePetTypeInfoViewModel {
         petTypeId: petTypeID,
         petTypeName: petTypeName,
         petChronicDisease: petChronicDiseaseList,
-        defaultNutrientLimitList: defaultNutrientLimitList);
+        petPhysiological: petPhysiologicalList);
     await service.addPetTypeInfoData(petTypeInfoData: petTypeInfoData);
   }
 
@@ -91,7 +97,7 @@ class UpdatePetTypeInfoViewModel {
         petTypeId: petTypeID,
         petTypeName: petTypeName,
         petChronicDisease: petChronicDiseaseList,
-        defaultNutrientLimitList: defaultNutrientLimitList);
+        petPhysiological: petPhysiologicalList);
     EditedPetTypeModel editedPetTypeData = EditedPetTypeModel(
         petTypeInfo: petTypeInfoData,
         deletedPetChronicDiseaseList: deletedPetChronicDiseaseList);
@@ -120,6 +126,13 @@ class UpdatePetTypeInfoViewModel {
     deletedPetChronicDiseaseList.add(petChronicDiseaseData.petChronicDiseaseId);
     petChronicDiseaseList.remove(petChronicDiseaseData);
     filteredPetChronicDiseaseList.remove(petChronicDiseaseData);
+  }
+
+  void onUserDeletePetPhysiological(
+      {required PetPhysiologicalModel petPhysiologicalData}) {
+    // deletedPetChronicDiseaseList.add(petChronicDiseaseData.petChronicDiseaseId);
+    petPhysiologicalList.remove(petPhysiologicalData);
+    // filteredPetChronicDiseaseList.remove(petChronicDiseaseData);
   }
 
   void onUserEditPetChronicDisease({required String petChronicDiseaseId}) {

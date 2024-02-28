@@ -3,9 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/constants/main_page_index_constants.dart';
-import 'package:untitled1/constants/nutrient_list_template.dart';
 import 'package:untitled1/constants/size.dart';
-import 'package:untitled1/utility/hive_models/nutrient_limit_info_model.dart';
 import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
 import 'package:untitled1/modules/admin/admin_home/admin_home_view.dart';
 import 'package:untitled1/modules/admin/pet_type_info_management/widgets/pet_type_info_management_table_cell.dart';
@@ -16,7 +14,6 @@ import 'package:untitled1/modules/admin/update_pet_type_info/update_pet_type_inf
 import 'package:untitled1/modules/admin/widgets/button/admin_add_object_button.dart';
 import 'package:untitled1/modules/admin/widgets/filter_search_bar.dart';
 import 'package:untitled1/modules/admin/widgets/loading_screen/admin_loading_screen_with_text.dart';
-import 'package:untitled1/modules/admin/widgets/popup/admin_error_popup.dart';
 import 'package:untitled1/utility/navigation_with_animation.dart';
 
 // typedef OnUserDeletePetChronicDiseaseCallBackFunction = void Function(
@@ -285,16 +282,7 @@ class _PetTypeInfoManagementViewState extends State<PetTypeInfoManagementView> {
                       petTypeId: Random().nextInt(999).toString(),
                       petTypeName: "",
                       petChronicDisease: [],
-                      defaultNutrientLimitList: List.from(
-                        secondaryFreshNutrientListTemplate.asMap().entries.map(
-                              (entry) => NutrientLimitInfoModel(
-                                nutrientName: entry.value.nutrientName,
-                                min: 0,
-                                max: entry.key == 0 ? 999999 : 999999,
-                                unit: entry.value.unit,
-                              ),
-                            ),
-                      ),
+                      petPhysiological: [],
                     ),
                     onUserDeletePetTypeInfoCallBack: (
                         {required String petTypeId}) async {

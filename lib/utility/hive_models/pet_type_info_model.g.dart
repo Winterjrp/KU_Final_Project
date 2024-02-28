@@ -19,8 +19,7 @@ class PetTypeInfoModelAdapter extends TypeAdapter<PetTypeInfoModel> {
     return PetTypeInfoModel(
       petTypeId: fields[0] as String,
       petTypeName: fields[1] as String,
-      defaultNutrientLimitList:
-          (fields[2] as List).cast<NutrientLimitInfoModel>(),
+      petPhysiological: (fields[2] as List).cast<PetPhysiologicalModel>(),
       petChronicDisease: (fields[3] as List).cast<PetChronicDiseaseModel>(),
     );
   }
@@ -34,7 +33,7 @@ class PetTypeInfoModelAdapter extends TypeAdapter<PetTypeInfoModel> {
       ..writeByte(1)
       ..write(obj.petTypeName)
       ..writeByte(2)
-      ..write(obj.defaultNutrientLimitList)
+      ..write(obj.petPhysiological)
       ..writeByte(3)
       ..write(obj.petChronicDisease);
   }

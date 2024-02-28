@@ -2,9 +2,10 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/constants/size.dart';
-import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
-import 'package:untitled1/modules/admin/update_pet_chronic_disease/update_pet_chronic_disease_view_model.dart';
+import 'package:untitled1/modules/admin/modules/pet_type/utils/typedef.dart';
+import 'package:untitled1/modules/admin/update_pet_physiological/update_pet_physiological_view_model.dart';
 import 'package:untitled1/utility/hive_models/nutrient_limit_info_model.dart';
+import 'package:untitled1/utility/hive_models/pet_physiological_nutrient_limit_model.dart';
 import 'package:untitled1/modules/admin/update_pet_chronic_disease/widgets/nutrient_limit_table_cell.dart';
 import 'package:untitled1/modules/admin/widgets/loading_screen/admin_loading_screen.dart';
 import 'package:untitled1/modules/admin/widgets/popup/admin_cancel_popup.dart';
@@ -13,47 +14,38 @@ import 'package:untitled1/modules/admin/widgets/popup/admin_error_popup.dart';
 import 'package:untitled1/modules/admin/widgets/popup/admin_success_popup.dart';
 import 'package:untitled1/modules/admin/widgets/popup/admin_warning_popup.dart';
 
-typedef OnUserAddPetChronicDiseaseCallBackFunction = void Function(
-    {required List<NutrientLimitInfoModel> nutrientLimitInfo,
-    required String petChronicDiseaseID,
-    required String petChronicDiseaseName});
-typedef OnUserEditPetChronicDiseaseCallBackFunction = void Function(
-    {required String petChronicDiseaseId});
-typedef OnUserDeletePetChronicDiseaseCallBackFunction = void Function(
-    {required PetChronicDiseaseModel petChronicDiseaseData});
-
-class UpdatePetChronicDiseaseView extends StatefulWidget {
+class UpdatePetPhysiologicalView extends StatefulWidget {
   final bool isCreate;
-  final String petTypeName;
-  PetChronicDiseaseModel petChronicDiseaseInfo;
-  final OnUserAddPetChronicDiseaseCallBackFunction
-      onUserAddPetChronicDiseaseCallBack;
-  final OnUserEditPetChronicDiseaseCallBackFunction
+  PetPhysiologicalModel petPhysiologicalInfo;
+  final OnUserAddPetPhysiologicalCallBackFunction
+      onUserAddPetPhysiologicalCallBack;
+  final OnUserEditPetPhysiologicalCallBackFunction
       onUserEditPetChronicDiseaseCallBack;
-  final OnUserDeletePetChronicDiseaseCallBackFunction
-      onUserDeletePetChronicDiseaseCallBack;
+  final OnUserDeletePetPhysiologicalCallBackFunction
+      onUserDeletePetPhysiologicalCallBack;
 
-  UpdatePetChronicDiseaseView(
-      {required this.onUserAddPetChronicDiseaseCallBack,
-      required this.petTypeName,
+  UpdatePetPhysiologicalView(
+      {required this.onUserAddPetPhysiologicalCallBack,
       Key? key,
       required this.isCreate,
-      required this.petChronicDiseaseInfo,
+      required this.petPhysiologicalInfo,
       required this.onUserEditPetChronicDiseaseCallBack,
-      required this.onUserDeletePetChronicDiseaseCallBack})
+      required this.onUserDeletePetPhysiologicalCallBack})
       : super(key: key);
 
   @override
-  State<UpdatePetChronicDiseaseView> createState() =>
-      _UpdatePetChronicDiseaseViewState();
+  State<UpdatePetPhysiologicalView> createState() =>
+      _UpdatePetPhysiologicalViewState();
 }
 
-class _UpdatePetChronicDiseaseViewState
-    extends State<UpdatePetChronicDiseaseView> {
-  late AddPetChronicDiseaseViewModel _viewModel;
-  late TextEditingController _petChronicDiseaseNameController;
-  late FocusNode _petChronicDiseaseNameFocusNode;
-  late String _petTypeName;
+class _UpdatePetPhysiologicalViewState
+    extends State<UpdatePetPhysiologicalView> {
+  late UpdatePetPhysiologicalViewModel _viewModel;
+  late TextEditingController _petPhysiologicalNameController;
+  late FocusNode _petPhysiologicalNameFocusNode;
+  late String _petPhysiologicalName;
+  late List<NutrientLimitInfoModel> nutrientLimitList;
+  late PetPhysiologicalModel petPhysiologicalEdit;
 
   static const TextStyle _tableHeaderTextStyle =
       TextStyle(fontSize: 17, color: Colors.white);
@@ -72,35 +64,37 @@ class _UpdatePetChronicDiseaseViewState
   @override
   void initState() {
     super.initState();
-    _viewModel = AddPetChronicDiseaseViewModel();
-    _petChronicDiseaseNameController = TextEditingController();
-    _petChronicDiseaseNameFocusNode = FocusNode();
-    _petChronicDiseaseNameController.text =
-        widget.petChronicDiseaseInfo.petChronicDiseaseName;
-    _petTypeName = widget.petTypeName;
+    _viewModel = UpdatePetPhysiologicalViewModel();
+    petPhysiologicalEdit = widget.petPhysiologicalInfo;
+    nutrientLimitList = widget.petPhysiologicalInfo.nutrientLimitInfo;
     _viewModel.nutrientLimitList = List.from(
-      widget.petChronicDiseaseInfo.nutrientLimitInfo.map(
+      widget.petPhysiologicalInfo.nutrientLimitInfo.map(
         (e) => NutrientLimitInfoModel(
           nutrientName: e.nutrientName,
-          unit: e.unit,
           min: e.min,
           max: e.max,
+          unit: e.unit,
         ),
       ),
     );
-    if (widget.petTypeName == "") {
-      _petTypeName = "...";
+    _petPhysiologicalNameController = TextEditingController();
+    _petPhysiologicalNameFocusNode = FocusNode();
+    _petPhysiologicalNameController.text =
+        widget.petPhysiologicalInfo.petPhysiologicalName;
+    _petPhysiologicalName = widget.petPhysiologicalInfo.petTypeName;
+    if (widget.petPhysiologicalInfo.petTypeName == "") {
+      _petPhysiologicalName = "...";
     }
-    _petChronicDiseaseNameFocusNode.addListener(() {
+    _petPhysiologicalNameFocusNode.addListener(() {
       setState(() {});
     });
   }
 
   @override
   void dispose() {
-    _petChronicDiseaseNameController.dispose();
-    _petChronicDiseaseNameFocusNode.removeListener;
-    _petChronicDiseaseNameFocusNode.dispose();
+    _petPhysiologicalNameController.dispose();
+    _petPhysiologicalNameFocusNode.removeListener;
+    _petPhysiologicalNameFocusNode.dispose();
     super.dispose();
   }
 
@@ -111,11 +105,11 @@ class _UpdatePetChronicDiseaseViewState
         Completer<bool> completer = Completer<bool>();
         widget.isCreate
             ? AdminCancelPopup(
-                    cancelText: 'ยกเลิกการเพิ่มข้อมูลโรคประจำตัวสัตว์เลี้ยง',
+                    cancelText: 'ยกเลิกการเพิ่มข้อมูลลักษณะทางสรีระวิทยา?',
                     context: context)
                 .show()
             : AdminCancelPopup(
-                    cancelText: 'ยกเลิกการเเก้ไขข้อมูลโรคประจำตัวสัตว์เลี้ยง',
+                    cancelText: 'ยกเลิกการเเก้ไขข้อมูลลักษณะทางสรีระวิทยา?',
                     context: context)
                 .show();
         return completer.future;
@@ -128,39 +122,75 @@ class _UpdatePetChronicDiseaseViewState
   }
 
   Widget _body(BuildContext context) {
-    return Center(
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 13),
-        constraints: const BoxConstraints(maxWidth: adminScreenMaxWidth),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _routingGuide(),
-            const SizedBox(height: 5),
-            _header(),
-            const SizedBox(height: 5),
-            _petChronicDiseaseName(),
-            const SizedBox(height: 10),
-            _nutrientLimitTable(),
-            const SizedBox(height: 10),
-            _acceptButton(context),
-            const SizedBox(height: 20),
-          ],
+    return SingleChildScrollView(
+      child: Center(
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 13),
+          constraints: const BoxConstraints(maxWidth: adminScreenMaxWidth),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _routingGuide(),
+              const SizedBox(height: 5),
+              _header(),
+              const SizedBox(height: 5),
+              _petChronicDiseaseName(),
+              const SizedBox(height: 10),
+              _nutrientLimitTable(),
+              const SizedBox(height: 20),
+              _description(),
+              const SizedBox(height: 10),
+              _acceptButton(context),
+              const SizedBox(height: 20),
+            ],
+          ),
         ),
       ),
+    );
+  }
+
+  Column _description() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Text(
+          "คำอธิบาย",
+          style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(height: 5),
+        TextField(
+          cursorColor: Colors.black,
+          maxLines: 5,
+          decoration: InputDecoration(
+            fillColor: Colors.white,
+            filled: true,
+            hintText: "คำอธิบายเพิ่มเติม",
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 15, vertical: 15),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15.0),
+              borderSide: const BorderSide(color: Colors.black, width: 2),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(15.0),
+              borderSide: const BorderSide(color: Colors.black, width: 2),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
   Text _routingGuide() {
     return Text(
       widget.isCreate
-          ? "จัดการข้อมูลชนิดสัตว์เลี้ยง / เพิ่มข้อมูลชนิดสัตว์เลี้ยง / เพิ่มข้อมูลโรคประจำตัวสัตว์เลี้ยง"
-          : "จัดการข้อมูลชนิดสัตว์เลี้ยง / ข้อมูลชนิดสัตว์เลี้ยง / แก้ไขข้อมูลโรคประจำตัวสัตว์เลี้ยง",
+          ? "จัดการข้อมูลชนิดสัตว์เลี้ยง / เพิ่มข้อมูลชนิดสัตว์เลี้ยง / เพิ่มข้อมูลลักษณะทางสรีระวิทยา"
+          : "จัดการข้อมูลชนิดสัตว์เลี้ยง / ข้อมูลชนิดสัตว์เลี้ยง / แก้ไขข้อมูลลักษณะทางสรีระวิทยา",
       style: const TextStyle(color: Colors.grey, fontSize: 20),
     );
   }
 
-  Future<void> _handleAddPetChronicDiseaseInfo() async {
+  Future<void> _handleAddPetPhysiologicalInfo() async {
     Navigator.pop(context);
     showDialog(
         barrierDismissible: false,
@@ -169,11 +199,14 @@ class _UpdatePetChronicDiseaseViewState
           return const Center(child: AdminLoadingScreen());
         });
     try {
-      widget.onUserAddPetChronicDiseaseCallBack(
-          nutrientLimitInfo: _viewModel.nutrientLimitList,
-          // petChronicDiseaseID: Random().nextInt(999).toString(), //แก้ให้ตรงกับการทำงานของ backend
-          petChronicDiseaseID: "",
-          petChronicDiseaseName: _petChronicDiseaseNameController.text);
+      widget.onUserAddPetPhysiologicalCallBack(
+        nutrientLimitInfo: _viewModel.nutrientLimitList,
+        petPhysiologicalId: "", //แก้ให้ตรงกับการทำงานของ backend มั้ง?
+        petPhysiologicalName: _petPhysiologicalNameController.text,
+        petType: _petPhysiologicalName,
+        petTypeId: widget.petPhysiologicalInfo.petTypeId,
+        description: "",
+      );
       if (!context.mounted) return;
       Navigator.pop(context);
       Future.delayed(const Duration(milliseconds: 1600), () {
@@ -182,7 +215,7 @@ class _UpdatePetChronicDiseaseViewState
       });
       AdminSuccessPopup(
               context: context,
-              successText: 'เพิ่มข้อมูลโรคประจำตัวสัตว์เลี้ยงสำเร็จ!!')
+              successText: 'เพิ่มข้อมูลลักษณะทางสรีระวิทยาสำเร็จ!!')
           .show();
     } catch (e) {
       Navigator.pop(context);
@@ -193,7 +226,7 @@ class _UpdatePetChronicDiseaseViewState
     }
   }
 
-  Future<void> _handleEditPetChronicDiseaseInfo() async {
+  Future<void> _handleEditPetPhysiologicalInfo() async {
     Navigator.pop(context);
     showDialog(
         barrierDismissible: false,
@@ -202,13 +235,22 @@ class _UpdatePetChronicDiseaseViewState
           return const Center(child: AdminLoadingScreen());
         });
     try {
-      widget.petChronicDiseaseInfo.petChronicDiseaseName =
-          _petChronicDiseaseNameController.text;
-      widget.petChronicDiseaseInfo.nutrientLimitInfo =
-          _viewModel.nutrientLimitList;
-      widget.onUserEditPetChronicDiseaseCallBack(
-          petChronicDiseaseId:
-              widget.petChronicDiseaseInfo.petChronicDiseaseId);
+      // nutrientLimitList[0].min = 90;
+      // widget.petPhysiologicalInfo.petPhysiologicalName =
+      //     _petPhysiologicalNameController.text;
+      // widget.petPhysiologicalInfo.nutrientLimitInfo =
+      //     _viewModel.nutrientLimitList;
+      PetPhysiologicalModel petPhysiologicalData = PetPhysiologicalModel(
+        petPhysiologicalId: widget.petPhysiologicalInfo.petPhysiologicalId,
+        petPhysiologicalName: _petPhysiologicalNameController.text,
+        nutrientLimitInfo: _viewModel.nutrientLimitList,
+        petTypeName: widget.petPhysiologicalInfo.petTypeName,
+        petTypeId: widget.petPhysiologicalInfo.petTypeId,
+        description: "",
+      );
+
+      petPhysiologicalEdit = petPhysiologicalData;
+      widget.onUserEditPetChronicDiseaseCallBack();
 
       if (!context.mounted) return;
       Navigator.pop(context);
@@ -221,7 +263,7 @@ class _UpdatePetChronicDiseaseViewState
       );
       AdminSuccessPopup(
               context: context,
-              successText: 'แก้ไขข้อมูลโรคประจำตัวสัตว์เลี้ยงสำเร็จ!!')
+              successText: 'แก้ไขข้อมูลลักษณะทางสรีระวิทยาสำเร็จ!!')
           .show();
     } catch (e) {
       Navigator.pop(context);
@@ -233,28 +275,28 @@ class _UpdatePetChronicDiseaseViewState
   }
 
   void _updatePetChronicDiseaseFunction() {
-    if (_petChronicDiseaseNameController.text.isEmpty) {
+    if (_petPhysiologicalNameController.text.isEmpty) {
       AdminWarningPopup(
               context: context,
-              warningText: 'กรุณากรอกชื่อโรคประจำตัวสัตว์เลี้ยง!')
+              warningText: 'กรุณากรอกชื่อลักษณะทางสรีระวิทยา!')
           .show();
     } else {
       widget.isCreate
           ? AdminConfirmPopup(
               context: context,
-              confirmText: 'ยืนยันการเพิ่มข้อมูลโรคประจำตัวสัตว์เลี้ยง?',
-              callback: _handleAddPetChronicDiseaseInfo,
+              confirmText: 'ยืนยันการเพิ่มข้อมูลลักษณะทางสรีระวิทยา?',
+              callback: _handleAddPetPhysiologicalInfo,
             ).show()
           : AdminConfirmPopup(
               context: context,
-              confirmText: 'ยืนยันการเเก้ไขข้อมูลโรคประจำตัวสัตว์เลี้ยง?',
-              callback: _handleEditPetChronicDiseaseInfo,
+              confirmText: 'ยืนยันการเเก้ไขข้อมูลลักษณะทางสรีระวิทยา?',
+              callback: _handleEditPetPhysiologicalInfo,
             ).show();
     }
   }
 
   Row _acceptButton(BuildContext context) {
-    bool isButtonDisable = _petChronicDiseaseNameController.text.isEmpty;
+    bool isButtonDisable = _petPhysiologicalNameController.text.isEmpty;
 
     return Row(
       children: [
@@ -287,8 +329,8 @@ class _UpdatePetChronicDiseaseViewState
   Widget _header() {
     return Text(
       widget.isCreate
-          ? "เพิ่มโรคประจำตัวสัตว์เลี้ยง"
-          : "แก้ไขโรคประจำตัวสัตว์เลี้ยง",
+          ? "เพิ่มข้อมูลลักษณะทางสรีระวิทยา"
+          : "แก้ไขข้อมูลลักษณะทางสรีระวิทยา",
       style: const TextStyle(
         fontWeight: FontWeight.bold,
         fontSize: headerTextFontSize,
@@ -312,14 +354,14 @@ class _UpdatePetChronicDiseaseViewState
           width: 500,
           child: TextField(
             onTap: () {
-              _petChronicDiseaseNameController.selection = TextSelection(
+              _petPhysiologicalNameController.selection = TextSelection(
                 baseOffset: 0,
-                extentOffset: _petChronicDiseaseNameController.text.length,
+                extentOffset: _petPhysiologicalNameController.text.length,
               );
             },
             onChanged: _onPetChronicDiseaseNameChange,
-            focusNode: _petChronicDiseaseNameFocusNode,
-            controller: _petChronicDiseaseNameController,
+            focusNode: _petPhysiologicalNameFocusNode,
+            controller: _petPhysiologicalNameController,
             style: const TextStyle(fontSize: headerInputTextFontSize),
             cursorColor: Colors.black,
             decoration: InputDecoration(
@@ -329,7 +371,7 @@ class _UpdatePetChronicDiseaseViewState
               prefixIcon: _petChronicDiseaseNamePrefixWord(),
               fillColor: Colors.white,
               filled: true,
-              labelText: "ชื่อโรคประจำตัวสัตว์เลี้ยง",
+              labelText: "ชื่อลักษณะทางสรีระวิทยา",
               floatingLabelStyle: const TextStyle(
                 color: Colors.black,
                 fontSize: 26,
@@ -339,12 +381,11 @@ class _UpdatePetChronicDiseaseViewState
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(15.0),
                 borderSide: BorderSide(
-                    color: _petChronicDiseaseNameController.text.isEmpty
+                    color: _petPhysiologicalNameController.text.isEmpty
                         ? Colors.red
                         : Colors.black,
-                    width: _petChronicDiseaseNameController.text.isEmpty
-                        ? 1.4
-                        : 2),
+                    width:
+                        _petPhysiologicalNameController.text.isEmpty ? 1.4 : 2),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(15.0),
@@ -365,7 +406,7 @@ class _UpdatePetChronicDiseaseViewState
         Container(
           margin: const EdgeInsets.only(top: 5),
           child: Text(
-            _petTypeName,
+            _petPhysiologicalName,
             style: const TextStyle(fontSize: 26, fontWeight: FontWeight.bold),
           ),
         ),
@@ -376,15 +417,15 @@ class _UpdatePetChronicDiseaseViewState
   Container _petChronicDiseaseNamePrefixWord() {
     return Container(
       margin: const EdgeInsets.only(left: 5),
-      child: _petChronicDiseaseNameFocusNode.hasFocus ||
-              _petChronicDiseaseNameController.text.isNotEmpty
+      child: _petPhysiologicalNameFocusNode.hasFocus ||
+              _petPhysiologicalNameController.text.isNotEmpty
           ? const SizedBox()
           : const MouseRegion(
               cursor: SystemMouseCursors.text,
               child: Row(
                 children: [
                   Text(
-                    " ชื่อโรคประจำตัวสัตว์เลี้ยง",
+                    " ชื่อลักษณะทางสรีระวิทยา",
                     style: TextStyle(color: Colors.grey, fontSize: 19),
                   ),
                   Text(
@@ -398,13 +439,11 @@ class _UpdatePetChronicDiseaseViewState
   }
 
   Widget _nutrientLimitTable() {
-    return Expanded(
-      child: Column(
-        children: [
-          _tableHeader(),
-          _tableBody(),
-        ],
-      ),
+    return Column(
+      children: [
+        _tableHeader(),
+        _tableBody(),
+      ],
     );
   }
 
@@ -459,7 +498,7 @@ class _UpdatePetChronicDiseaseViewState
                 padding: EdgeInsets.all(_tableHeaderPadding),
                 child: Center(
                   child: Text(
-                    'min (%DM)',
+                    'min',
                     style: _tableHeaderTextStyle,
                   ),
                 ),
@@ -470,7 +509,7 @@ class _UpdatePetChronicDiseaseViewState
                 padding: EdgeInsets.all(_tableHeaderPadding),
                 child: Center(
                   child: Text(
-                    'max (%DM)',
+                    'max',
                     style: _tableHeaderTextStyle,
                   ),
                 ),
@@ -495,7 +534,8 @@ class _UpdatePetChronicDiseaseViewState
   }
 
   Widget _tableBody() {
-    return Expanded(
+    return SizedBox(
+      height: 600,
       child: ListView.builder(
         itemCount: _viewModel.nutrientLimitList.length,
         itemBuilder: (context, index) {

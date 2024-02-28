@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:hive/hive.dart';
 import 'package:untitled1/utility/hive_models/nutrient_limit_info_model.dart';
+import 'package:untitled1/utility/hive_models/pet_physiological_nutrient_limit_model.dart';
 
 part 'pet_type_info_model.g.dart';
 
@@ -18,7 +19,7 @@ class PetTypeInfoModel {
   String petTypeName;
 
   @HiveField(2)
-  List<NutrientLimitInfoModel> defaultNutrientLimitList;
+  List<PetPhysiologicalModel> petPhysiological;
 
   @HiveField(3)
   List<PetChronicDiseaseModel> petChronicDisease;
@@ -26,7 +27,7 @@ class PetTypeInfoModel {
   PetTypeInfoModel({
     required this.petTypeId,
     required this.petTypeName,
-    required this.defaultNutrientLimitList,
+    required this.petPhysiological,
     required this.petChronicDisease,
   });
 
@@ -34,9 +35,9 @@ class PetTypeInfoModel {
       PetTypeInfoModel(
         petTypeId: json["petTypeId"],
         petTypeName: json["petTypeName"],
-        defaultNutrientLimitList: List<NutrientLimitInfoModel>.from(
-          json["defaultNutrientLimitList"].map(
-            (x) => NutrientLimitInfoModel.fromJson(x),
+        petPhysiological: List<PetPhysiologicalModel>.from(
+          json["petPhysiological"].map(
+            (x) => PetPhysiologicalModel.fromJson(x),
           ),
         ),
         petChronicDisease: List<PetChronicDiseaseModel>.from(
@@ -49,8 +50,8 @@ class PetTypeInfoModel {
   Map<String, dynamic> toJson() => {
         "petTypeId": petTypeId,
         "petTypeName": petTypeName,
-        "defaultNutrientLimitList":
-            List<dynamic>.from(defaultNutrientLimitList.map((x) => x.toJson())),
+        "petPhysiological":
+            List<dynamic>.from(petPhysiological.map((x) => x.toJson())),
         "petChronicDisease":
             List<dynamic>.from(petChronicDisease.map((x) => x.toJson())),
       };
