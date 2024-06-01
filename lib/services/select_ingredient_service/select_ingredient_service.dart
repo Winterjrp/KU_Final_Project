@@ -2,10 +2,10 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:untitled1/data/secure_storage.dart';
+import 'package:untitled1/modules/normal/select_ingredient/normal_user_search_pet_recipe_info.dart';
 import 'package:untitled1/utility/hive_models/ingredient_model.dart';
 import 'package:http/http.dart' as http;
-import 'package:untitled1/manager/api_link_manager.dart';
-import 'package:untitled1/modules/admin/admin_add_pet_info/models/post_for_recipe_model.dart';
+import 'package:untitled1/manager/service_manager.dart';
 import 'package:untitled1/modules/admin/admin_get_recipe/get_recipe_model.dart';
 import 'package:untitled1/services/select_ingredient_service/select_ingredient_service_interface.dart';
 
@@ -41,11 +41,11 @@ class SelectIngredientService implements SelectIngredientServiceInterface {
 
   @override
   Future<GetRecipeModel> searchRecipe(
-      {required PostDataForRecipeModel postDataForRecipe}) async {
+      {required NormalUserSearchPetRecipeInfoModel postDataForRecipe}) async {
     String token = await SecureStorage().readSecureData(key: "token");
     try {
       final response = await http
-          .post(Uri.parse(ApiLinkManager.searchRecipe()),
+          .post(Uri.parse(ApiLinkManager.normalUserSearchRecipe()),
               headers: <String, String>{
                 // 'Accept': 'application/json',
                 'Content-Type': 'application/json; charset=UTF-8',

@@ -31,9 +31,9 @@ class Authentication extends StatelessWidget {
         Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _logo(),
+            // _logo(),
             const SizedBox(
-              height: 25,
+              height: 70,
             ),
             Column(
               children: [
@@ -101,15 +101,15 @@ class Authentication extends StatelessWidget {
               filled: true,
               fillColor: darkGrey,
               hintText: "Enter your username or email",
-              hintStyle: TextStyle(color: tGrey, height: 2, fontSize: 14),
+              hintStyle: const TextStyle(color: tGrey, height: 2, fontSize: 14),
               contentPadding: const EdgeInsets.only(left: 15),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10.0),
-                borderSide: BorderSide(color: tGrey),
+                borderSide: const BorderSide(color: tGrey),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10.0),
-                borderSide: BorderSide(color: tGrey),
+                borderSide: const BorderSide(color: tGrey),
               ),
             ),
             onSubmitted: (value) {
@@ -165,15 +165,15 @@ class Authentication extends StatelessWidget {
               filled: true,
               fillColor: darkGrey,
               hintText: "Enter password",
-              hintStyle: TextStyle(color: tGrey, height: 2, fontSize: 14),
+              hintStyle: const TextStyle(color: tGrey, height: 2, fontSize: 14),
               contentPadding: const EdgeInsets.only(left: 15),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10.0),
-                borderSide: BorderSide(color: tGrey),
+                borderSide: const BorderSide(color: tGrey),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10.0),
-                borderSide: BorderSide(color: tGrey),
+                borderSide: const BorderSide(color: tGrey),
               ),
             ),
             textInputAction: TextInputAction.done,

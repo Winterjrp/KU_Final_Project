@@ -1,5 +1,4 @@
 import 'package:hive/hive.dart';
-
 part 'nutrient_limit_info_model.g.dart';
 
 @HiveType(typeId: 5)

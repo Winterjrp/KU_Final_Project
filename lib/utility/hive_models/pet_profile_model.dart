@@ -28,7 +28,7 @@ class PetProfileModel {
   String petAgeType;
 
   @HiveField(8)
-  String petPhysiologyStatus;
+  List<String> petPhysiologyStatus;
 
   @HiveField(9)
   List<String> petChronicDisease;
@@ -38,6 +38,9 @@ class PetProfileModel {
 
   @HiveField(11)
   String updateRecent;
+
+  @HiveField(12)
+  List<String> nutritionalRequirementBase;
 
   PetProfileModel({
     required this.petId,
@@ -52,6 +55,7 @@ class PetProfileModel {
     required this.petChronicDisease,
     required this.petActivityType,
     required this.updateRecent,
+    required this.nutritionalRequirementBase,
   });
 
   factory PetProfileModel.fromJson(Map<String, dynamic> json) =>
@@ -64,11 +68,13 @@ class PetProfileModel {
         petWeight: json["petWeight"],
         petNeuteringStatus: json["petNeuteringStatus"],
         petAgeType: json["petAgeType"],
-        petPhysiologyStatus: json["petPhysiologyStatus"],
+        petPhysiologyStatus:
+            List<String>.from(json["petPhysiologyStatus"].map((x) => x)),
         petChronicDisease:
             List<String>.from(json["petChronicDisease"].map((x) => x)),
         petActivityType: json["petActivityType"],
         updateRecent: json["updateRecent"],
+        nutritionalRequirementBase: json["nutritionalRequirementBase"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -80,10 +86,13 @@ class PetProfileModel {
         "petWeight": petWeight,
         "petNeuteringStatus": petNeuteringStatus,
         "petAgeType": petAgeType,
-        "petPhysiologyStatus": petPhysiologyStatus,
+        "petPhysiologyStatus":
+            List<dynamic>.from(petPhysiologyStatus.map((x) => x)),
         "petChronicDisease":
             List<dynamic>.from(petChronicDisease.map((x) => x)),
         "petActivityType": petActivityType,
         "updateRecent": updateRecent,
+        "nutritionalRequirementBase":
+            List<dynamic>.from(nutritionalRequirementBase.map((x) => x)),
       };
 }

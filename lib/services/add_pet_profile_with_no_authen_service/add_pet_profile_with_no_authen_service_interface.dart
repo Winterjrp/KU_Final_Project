@@ -1,5 +1,5 @@
-import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
+import 'package:untitled1/modules/admin/pet_type/update_pet_type_info/pet_type_info_model.dart';
 
 abstract class AddPetProfileWithNoAuthenticationServiceInterface {
-  Future<List<PetTypeInfoModel>> getPetTypeInfoData();
+  Future<List<PetTypeModel>> getPetTypeInfoData();
 }

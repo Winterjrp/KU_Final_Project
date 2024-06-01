@@ -1,8 +1,8 @@
 import 'package:untitled1/utility/hive_models/ingredient_model.dart';
 
 abstract class IngredientManagementServiceInterface {
-  Future<List<IngredientModel>> getIngredientListData();
-  Future<void> deleteIngredientInfo({required String ingredientId});
-  Future<void> addIngredientData({required IngredientModel ingredientData});
-  Future<void> editIngredientData({required IngredientModel ingredientData});
+  Future<List<IngredientModel>> getIngredientList();
+  Future<void> deleteIngredient({required String ingredientId});
+  Future<void> addIngredient({required IngredientModel ingredientData});
+  Future<void> editIngredient({required IngredientModel ingredientData});
 }

@@ -10,11 +10,10 @@ import 'package:untitled1/constants/enum/pet_factor_type_enum.dart';
 import 'package:untitled1/constants/enum/pet_neutering_status_enum.dart';
 import 'package:untitled1/constants/enum/select_ingredient_type_enum.dart';
 import 'package:untitled1/constants/main_page_index_constants.dart';
-import 'package:untitled1/constants/pet_physiology_status_list.dart';
 import 'package:untitled1/constants/size.dart';
 import 'package:untitled1/utility/hive_models/ingredient_model.dart';
 import 'package:untitled1/utility/hive_models/pet_profile_model.dart';
-import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
+import 'package:untitled1/modules/admin/pet_type/update_pet_type_info/pet_type_info_model.dart';
 import 'package:untitled1/modules/admin/admin_add_pet_info/admin_add_pet_profile_view_model.dart';
 import 'package:untitled1/modules/admin/admin_add_pet_info/models/post_for_recipe_model.dart';
 import 'package:untitled1/modules/admin/admin_get_recipe/admin_get_recipe_view.dart';
@@ -28,8 +27,9 @@ import 'package:untitled1/modules/admin/widgets/popup/admin_confirm_popup.dart';
 import 'package:untitled1/modules/admin/widgets/popup/admin_error_popup.dart';
 import 'package:untitled1/modules/admin/widgets/popup/admin_warning_popup.dart';
 import 'package:untitled1/utility/navigation_with_animation.dart';
-import 'package:untitled1/widgets/dropdown/dropdown.dart';
 import 'package:untitled1/widgets/dropdown/multiple_dropdown_search.dart';
+
+import '../widgets/dropdown/admin_multiple_dropdown_search.dart';
 
 class AdminAddPetProfileView extends StatefulWidget {
   final PetProfileModel petProfileInfo;
@@ -49,17 +49,20 @@ class _AdminAddPetProfileViewState extends State<AdminAddPetProfileView> {
   late String _petType;
   late String _petActivityType;
   late String _factorType;
-  late String _petPhysiologyStatus;
   late String _petNeuteringStatus;
   late String _petAgeType;
-  late String _petID;
+  late String _petTypeId;
   late String _selectIngredientType;
   late double _petFactorNumber;
   late double _petWeight;
   late int _selectedType;
   late bool _isEnable;
-  late List<String> _petChronicDiseaseList;
+  late List<String> _petChronicDiseaseNameList;
   late List<String> _petChronicDisease;
+  late List<String> _petPhysiologicalNameList;
+  late List<String> _petPhysiological;
+  late List<String> _nutritionalRequirementBaseNameList;
+  late List<String> _nutritionalRequirementBase;
 
   static const double _labelTextSize = 20;
   static const double _inputTextSize = 19;
@@ -67,6 +70,10 @@ class _AdminAddPetProfileViewState extends State<AdminAddPetProfileView> {
   static const double _textBoxHeight = 60;
   static const Color _mainColor = Colors.black;
 
+  final GlobalKey<DropdownSearchState<String>> _nutritionalRequirementKey =
+      GlobalKey<DropdownSearchState<String>>();
+  final GlobalKey<DropdownSearchState<String>> _petPhysiologicalKey =
+      GlobalKey<DropdownSearchState<String>>();
   final GlobalKey<DropdownSearchState<String>> _petChronicDiseaseKey =
       GlobalKey<DropdownSearchState<String>>();
   final GlobalKey<DropdownSearchState<IngredientModel>> _selectIngredientKey =
@@ -84,9 +91,14 @@ class _AdminAddPetProfileViewState extends State<AdminAddPetProfileView> {
     _scrollController = ScrollController();
     _selectIngredientType = "";
     _selectedType = -1;
-    _petChronicDiseaseList = [];
+    _petChronicDiseaseNameList = [];
+    _petPhysiologicalNameList = [];
+    _nutritionalRequirementBaseNameList = [];
+    _petChronicDisease = widget.petProfileInfo.petChronicDisease;
+    _petPhysiological = widget.petProfileInfo.petPhysiologyStatus;
+    _nutritionalRequirementBase =
+        widget.petProfileInfo.nutritionalRequirementBase;
     _petType = widget.petProfileInfo.petType;
-    _petPhysiologyStatus = widget.petProfileInfo.petPhysiologyStatus;
     _petNeuteringStatus = widget.petProfileInfo.petNeuteringStatus;
     _petAgeType = widget.petProfileInfo.petAgeType;
     _factorType = widget.petProfileInfo.factorType;
@@ -94,7 +106,7 @@ class _AdminAddPetProfileViewState extends State<AdminAddPetProfileView> {
     _petChronicDisease = widget.petProfileInfo.petChronicDisease;
     _petFactorNumber = widget.petProfileInfo.petFactorNumber;
     _petWeight = widget.petProfileInfo.petWeight;
-    _petID = widget.petProfileInfo.petId;
+    _petTypeId = widget.petProfileInfo.petId;
   }
 
   @override
@@ -109,28 +121,28 @@ class _AdminAddPetProfileViewState extends State<AdminAddPetProfileView> {
   @override
   Widget build(BuildContext context) {
     _isEnable = true;
-    if (_selectedType == -1) {
-      _isEnable = false;
-    }
-    if (_petType == "-1" || _factorType == "factorType" || _petWeight == -1) {
-      _isEnable = false;
-    }
-    if (_factorType == PetFactorType.customize.toString().split('.').last &&
-        _petFactorNumber == -1) {
-      _isEnable = false;
-    }
-    if (_factorType == PetFactorType.recommend.toString().split('.').last &&
-        (_petNeuteringStatus == "-1" ||
-            _petAgeType == "-1" ||
-            _petPhysiologyStatus == "-1" ||
-            _petActivityType == "-1")) {
-      _isEnable = false;
-    }
-    if (_factorType == PetFactorType.recommend.toString().split('.').last &&
-        _petPhysiologyStatus == PetPhysiologyStatusList.petSickStatus &&
-        _petChronicDisease.isEmpty) {
-      _isEnable = false;
-    }
+    // if (_selectedType == -1) {
+    //   _isEnable = false;
+    // }
+    // if (_petType == "-1" || _factorType == "factorType" || _petWeight == -1) {
+    //   _isEnable = false;
+    // }
+    // if (_factorType == PetFactorType.customize.toString().split('.').last &&
+    //     _petFactorNumber == -1) {
+    //   _isEnable = false;
+    // }
+    // if (_factorType == PetFactorType.recommend.toString().split('.').last &&
+    //     (_petNeuteringStatus == "-1" ||
+    //         _petAgeType == "-1" ||
+    //         _petPhysiologyStatus == "-1" ||
+    //         _petActivityType == "-1")) {
+    //   _isEnable = false;
+    // }
+    // if (_factorType == PetFactorType.recommend.toString().split('.').last &&
+    //     _petPhysiologyStatus == PetPhysiologyStatusList.petSickStatus &&
+    //     _petChronicDisease.isEmpty) {
+    //   _isEnable = false;
+    // }
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).requestFocus(FocusNode());
@@ -195,18 +207,18 @@ class _AdminAddPetProfileViewState extends State<AdminAddPetProfileView> {
   }
 
   Future<void> _handleSearchRecipe() async {
-    _petFactorNumber = _factorType == PetFactorTypeEnum.petFactorTypeChoice1
-        ? _petFactorNumber
-        : _viewModel.calculatePetFactorNumber(
-            petID: _petID,
-            petName: "",
-            petType: _petType,
-            petWeight: _petWeight,
-            petNeuteringStatus: _petNeuteringStatus,
-            petAgeType: _petAgeType,
-            petPhysiologyStatus: _petPhysiologyStatus,
-            petChronicDisease: _petChronicDisease,
-            petActivityType: _petActivityType);
+    // _petFactorNumber = _factorType == PetFactorTypeEnum.petFactorTypeChoice1
+    //     ? _petFactorNumber
+    //     : _viewModel.calculatePetFactorNumber(
+    //         petID: _petID,
+    //         petName: "",
+    //         petType: _petType,
+    //         petWeight: _petWeight,
+    //         petNeuteringStatus: _petNeuteringStatus,
+    //         petAgeType: _petAgeType,
+    //         petPhysiologyStatus: _petPhysiologyStatus,
+    //         petChronicDisease: _petChronicDisease,
+    //         petActivityType: _petActivityType);
     Navigator.pop(context);
     showDialog(
         barrierDismissible: false,
@@ -215,17 +227,19 @@ class _AdminAddPetProfileViewState extends State<AdminAddPetProfileView> {
           return const Center(child: AdminLoadingScreen());
         });
     try {
-      PostDataForRecipeModel postDataForRecipe = PostDataForRecipeModel(
-          petFactorNumber: _petFactorNumber,
-          petTypeName: _petType,
-          petChronicDiseaseList: _petChronicDisease,
-          petWeight: _petWeight,
-          selectedIngredientList: _viewModel.selectedIngredient
-              .map((e) => SelectedIngredientList(
-                  ingredientId: e.ingredientId,
-                  ingredientName: e.ingredientName))
-              .toList(),
-          selectedType: _selectedType);
+      AdminSearchPetRecipeInfoModel postDataForRecipe =
+          AdminSearchPetRecipeInfoModel(
+        petFactorNumber: _petFactorNumber,
+        petTypeName: _petType,
+        petWeight: _petWeight,
+        selectedIngredientList:
+            _viewModel.selectedIngredient.map((e) => e.ingredientId).toList(),
+        selectedType: _selectedType,
+        petTypeId: _petTypeId,
+        nutritionalRequirementBase: _nutritionalRequirementBase,
+        petPhysiological: _petPhysiological,
+        petChronicDisease: _petChronicDisease,
+      );
       GetRecipeModel getRecipeData = await _viewModel.onUserSearchRecipe(
           postDataForRecipe: postDataForRecipe);
       if (!context.mounted) return;
@@ -538,6 +552,8 @@ class _AdminAddPetProfileViewState extends State<AdminAddPetProfileView> {
                           setState(() {});
                         },
                         icon: const Icon(Icons.close),
+                        splashRadius: 5,
+                        splashColor: Colors.transparent,
                         padding: EdgeInsets.zero,
                         constraints: const BoxConstraints(),
                         iconSize: 10,
@@ -574,9 +590,9 @@ class _AdminAddPetProfileViewState extends State<AdminAddPetProfileView> {
           child: _petInfoHeader(),
         ),
         const SizedBox(height: 10),
-        FutureBuilder<List<PetTypeInfoModel>>(
+        FutureBuilder<List<PetTypeModel>>(
           future: _viewModel.petTypeInfoListData,
-          builder: (context, AsyncSnapshot<List<PetTypeInfoModel>> snapshot) {
+          builder: (context, AsyncSnapshot<List<PetTypeModel>> snapshot) {
             if (snapshot.connectionState != ConnectionState.done) {
               return const AdminLoadingScreenWithText();
             } else if (snapshot.hasError) {
@@ -608,32 +624,37 @@ class _AdminAddPetProfileViewState extends State<AdminAddPetProfileView> {
                 ],
               ),
               const SizedBox(height: 20),
-              _factorTypeField(),
-              const SizedBox(height: 5),
-              _factorType == PetFactorType.customize.toString().split('.').last
-                  ? _petFactorNumberField()
-                  : _factorType != "factorType"
-                      ? Column(
-                          children: [
-                            _petNeuteredField(),
-                            const SizedBox(height: 5),
-                            _petAgeField(),
-                            const SizedBox(height: 20),
-                            _petPhysiologyStatusField(),
-                            _petPhysiologyStatus ==
-                                    PetPhysiologyStatusList.petSickStatus
-                                ? _petChronicDiseaseType()
-                                : const SizedBox(),
-                            const SizedBox(height: 20),
-                            _petActivityLevelField()
-                          ],
-                        )
-                      : const SizedBox(),
-              (_factorType ==
-                          PetFactorType.customize.toString().split('.').last &&
-                      _petFactorNumber != -1)
-                  ? const SizedBox(height: 150)
-                  : const SizedBox(height: 50),
+              _nutritionalRequirement(),
+              const SizedBox(height: 20),
+              _petPhysiologicalPart(),
+              const SizedBox(height: 20),
+              // _petPhysiologyStatusField(),
+              // _petPhysiologyStatus == PetPhysiologyStatusList.petSickStatus
+              //     ? _petChronicDiseasePart()
+              //     : const SizedBox(),
+              _petChronicDiseasePart(),
+              const SizedBox(height: 20),
+              _petFactorNumberField(),
+              // _factorTypeField(),
+              // const SizedBox(height: 5),
+              // _factorType == PetFactorType.customize.toString().split('.').last
+              //     ? _petFactorNumberField()
+              //     : _factorType != "factorType"
+              //         ? Column(
+              //             children: [
+              //               _petNeuteredField(),
+              //               const SizedBox(height: 5),
+              //               _petAgeField(),
+              //               const SizedBox(height: 20),
+              //               _petActivityLevelField()
+              //             ],
+              //           )
+              //         : const SizedBox(),
+              // (_factorType ==
+              //             PetFactorType.customize.toString().split('.').last &&
+              //         _petFactorNumber != -1)
+              //     ? const SizedBox(height: 150)
+              //     : const SizedBox(height: 50),
             ],
           ),
         ),
@@ -663,63 +684,114 @@ class _AdminAddPetProfileViewState extends State<AdminAddPetProfileView> {
     );
   }
 
-  Widget _petChronicDiseaseType() {
-    return Container(
-      margin: const EdgeInsets.only(top: 20),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _headerText(text: "โรคประจำตัว"),
-          const SizedBox(height: 5),
-          CustomMultipleDropdownSearch(
-            primaryColor: _mainColor,
-            isCreate: true,
-            value: _petChronicDisease,
-            choiceItemList: _petChronicDiseaseList,
-            updateValueCallback: ({required List<String> value}) {
-              _petChronicDisease = value;
-              setState(() {});
-              _scrollController.animateTo(
-                700,
-                duration: const Duration(seconds: 1),
-                curve: Curves.ease,
-              );
-            },
-            dropdownKey: _petChronicDiseaseKey,
-            labelTextSize: _labelTextSize,
-            searchText: 'ค้นหาโรคประจำตัวสัตว์เลี้ยง',
-            hintText: 'เลือกโรคประจำตัวสัตว์เลี้ยง',
-          )
-        ],
-      ),
-    );
-  }
-
-  Widget _petPhysiologyStatusField() {
+  Widget _petChronicDiseasePart() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _headerText(text: "สถานะทางสรีระ"),
+        _headerText(text: "โรคประจำตัว"),
+        const SizedBox(height: 5),
+        CustomMultipleDropdownSearch(
+          primaryColor: _mainColor,
+          isCreate: true,
+          value: _petChronicDisease,
+          choiceItemList: _petChronicDiseaseNameList,
+          updateValueCallback: ({required List<String> value}) {
+            _petChronicDisease = value;
+            setState(() {});
+            _scrollController.animateTo(
+              700,
+              duration: const Duration(seconds: 1),
+              curve: Curves.ease,
+            );
+          },
+          dropdownKey: _petChronicDiseaseKey,
+          labelTextSize: _labelTextSize,
+          searchText: 'ค้นหาโรคประจำตัวสัตว์เลี้ยง',
+          hintText: 'เลือกโรคประจำตัวสัตว์เลี้ยง',
+        )
+      ],
+    );
+  }
+
+  Widget _petPhysiologicalPart() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _headerText(text: "ลักษณะทางสรีระวิทยา"),
         const SizedBox(height: 5),
         SizedBox(
-          height: _textBoxHeight,
-          child: CustomDropdown(
-            primaryColor: _mainColor,
-            isCreate: true,
-            value: _petPhysiologyStatus,
-            inputTextSize: _inputTextSize,
-            labelTextSize: _labelTextSize,
-            choiceItemList: PetPhysiologyStatusList.petPhysiologyStatusList,
-            updateValueCallback: ({required String value}) {
-              _petPhysiologyStatus = value;
+          // height: _textBoxHeight,
+          child: AdminCustomMultipleDropdownSearch(
+            primaryColor: Colors.black,
+            isCreate: false,
+            value: _petPhysiological,
+            choiceItemList: _petPhysiologicalNameList,
+            labelTextSize: 16,
+            searchText: 'ค้นหาลักษณะทางสรีระวิทยา',
+            hintText: 'เลือกลักษณะทางสรีระวิทยา',
+            updateValueCallback: ({required List<String> value}) {
+              _petPhysiological = value;
               setState(() {});
             },
-            searchText: 'สถานะทางสรีระ',
+            dropdownKey: _petPhysiologicalKey,
           ),
         ),
       ],
     );
   }
+
+  Widget _nutritionalRequirement() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _headerText(text: "ความต้องการทางโภชนาการพื้นฐาน"),
+        const SizedBox(height: 5),
+        SizedBox(
+          // height: _textBoxHeight,
+          child: AdminCustomMultipleDropdownSearch(
+            primaryColor: Colors.black,
+            isCreate: false,
+            value: _nutritionalRequirementBase,
+            choiceItemList: _nutritionalRequirementBaseNameList,
+            labelTextSize: 16,
+            searchText: 'ค้นหาความต้องการทางโภชนาการพื้นฐาน',
+            hintText: '',
+            updateValueCallback: ({required List<String> value}) {
+              _nutritionalRequirementBase = value;
+              setState(() {});
+            },
+            dropdownKey: _nutritionalRequirementKey,
+          ),
+        ),
+      ],
+    );
+  }
+
+  // Widget _petPhysiologyStatusField() {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       _headerText(text: "สถานะทางสรีระ"),
+  //       const SizedBox(height: 5),
+  //       SizedBox(
+  //         height: _textBoxHeight,
+  //         child: CustomDropdown(
+  //           primaryColor: _mainColor,
+  //           isCreate: true,
+  //           value: _petPhysiologyStatus,
+  //           inputTextSize: _inputTextSize,
+  //           labelTextSize: _labelTextSize,
+  //           choiceItemList: PetPhysiologyStatusList.petPhysiologyStatusList,
+  //           updateValueCallback: ({required String value}) {
+  //             _petPhysiologyStatus = value;
+  //             setState(() {});
+  //           },
+  //           searchText: 'สถานะทางสรีระ',
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Column _petAgeField() {
     return Column(
@@ -1052,14 +1124,14 @@ class _AdminAddPetProfileViewState extends State<AdminAddPetProfileView> {
           const SizedBox(height: 5),
           SizedBox(
             height: _textBoxHeight,
-            child: DropdownSearch<PetTypeInfoModel>(
+            child: DropdownSearch<PetTypeModel>(
               dropdownButtonProps: const DropdownButtonProps(
                 color: _mainColor,
               ),
               selectedItem: null,
               popupProps: PopupProps.menu(
-                itemBuilder: (BuildContext context, PetTypeInfoModel item,
-                    bool isSelect) {
+                itemBuilder:
+                    (BuildContext context, PetTypeModel item, bool isSelect) {
                   return _petTypeItemForm(item);
                 },
                 menuProps: MenuProps(
@@ -1122,12 +1194,20 @@ class _AdminAddPetProfileViewState extends State<AdminAddPetProfileView> {
               items: _viewModel.petTypeInfoList,
               onChanged: (val) {
                 _petType = val!.petTypeName;
-                _petChronicDiseaseList = val.petChronicDisease
+                _petPhysiologicalNameList = val.petPhysiological
+                    .map((e) => e.petPhysiologicalName)
+                    .toList();
+                _petChronicDiseaseNameList = val.petChronicDisease
                     .map((e) => e.petChronicDiseaseName)
                     .toList();
+                _nutritionalRequirementBaseNameList = val
+                    .nutritionalRequirementBase
+                    .map((e) => e.petPhysiologicalName)
+                    .toList();
+                _petTypeId = val.petTypeId;
                 setState(() {});
               },
-              itemAsString: (PetTypeInfoModel? item) {
+              itemAsString: (PetTypeModel? item) {
                 return item?.petTypeName ?? "";
               },
             ),
@@ -1137,7 +1217,7 @@ class _AdminAddPetProfileViewState extends State<AdminAddPetProfileView> {
     );
   }
 
-  Padding _petTypeItemForm(PetTypeInfoModel item) {
+  Padding _petTypeItemForm(PetTypeModel item) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Column(

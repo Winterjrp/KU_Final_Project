@@ -4,13 +4,13 @@ import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:untitled1/data/secure_storage.dart';
 import 'package:untitled1/utility/hive_models/ingredient_model.dart';
-import 'package:untitled1/manager/api_link_manager.dart';
+import 'package:untitled1/manager/service_manager.dart';
 import 'package:untitled1/services/ingredient_management_services/ingredient_management_service_interface.dart';
 
 class IngredientManagementService
     implements IngredientManagementServiceInterface {
   @override
-  Future<List<IngredientModel>> getIngredientListData() async {
+  Future<List<IngredientModel>> getIngredientList() async {
     String token = await SecureStorage().readSecureData(key: "token");
     try {
       final response = await http.get(
@@ -39,8 +39,7 @@ class IngredientManagementService
   }
 
   @override
-  Future<void> addIngredientData(
-      {required IngredientModel ingredientData}) async {
+  Future<void> addIngredient({required IngredientModel ingredientData}) async {
     // print("Im here");
     // print(json.encode(ingredientData.toJson()));
     // print("end here");
@@ -67,8 +66,7 @@ class IngredientManagementService
   }
 
   @override
-  Future<void> editIngredientData(
-      {required IngredientModel ingredientData}) async {
+  Future<void> editIngredient({required IngredientModel ingredientData}) async {
     String token = await SecureStorage().readSecureData(key: "token");
     try {
       final response = await http
@@ -96,7 +94,7 @@ class IngredientManagementService
   }
 
   @override
-  Future<void> deleteIngredientInfo({required String ingredientId}) async {
+  Future<void> deleteIngredient({required String ingredientId}) async {
     String token = await SecureStorage().readSecureData(key: "token");
     try {
       final response = await http.delete(

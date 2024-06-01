@@ -1,6 +1,6 @@
-import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
+import 'package:untitled1/modules/admin/pet_type/update_pet_type_info/pet_type_info_model.dart';
 
 abstract class PetTypeInfoManagementServiceInterface {
-  Future<List<PetTypeInfoModel>> getPetTypeInfoData();
-  Future<void> deletePetTypeInfo({required String petTypeInfoID});
+  Future<List<PetTypeModel>> getPetTypeList();
+  Future<void> deletePetType({required String petTypeId});
 }

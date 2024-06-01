@@ -49,7 +49,6 @@ class LoginViewState extends State<LoginView> {
           password: _passwordController.text);
     } catch (e) {
       isCredentialsValid = false;
-      print(e);
     }
     if (isCredentialsValid) {
       _viewModel.login(

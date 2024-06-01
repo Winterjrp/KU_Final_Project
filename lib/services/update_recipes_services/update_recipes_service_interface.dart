@@ -1,9 +1,9 @@
 import 'package:untitled1/utility/hive_models/ingredient_model.dart';
-import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
-import 'package:untitled1/utility/hive_models/recipes_model.dart';
+import 'package:untitled1/modules/admin/pet_type/update_pet_type_info/pet_type_info_model.dart';
+import 'package:untitled1/modules/admin/recipe/update_recipe/recipes_model.dart';
 
-abstract class UpdateRecipesServiceInterface {
-  Future<List<IngredientModel>> getIngredientListData();
-  Future<List<PetTypeInfoModel>> getPetTypeInfoData();
-  Future<void> addRecipeData({required RecipeModel recipesData});
+abstract class UpdateRecipeServiceInterface {
+  Future<List<IngredientModel>> getIngredientList();
+  Future<List<PetTypeModel>> getPetTypeList();
+  Future<void> addRecipe({required RecipeModel recipeData});
 }

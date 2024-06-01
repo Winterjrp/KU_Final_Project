@@ -2,6 +2,7 @@ import 'package:dropdown_search/dropdown_search.dart';
 import 'package:flutter/material.dart';
 import 'package:untitled1/constants/color.dart';
 import 'package:untitled1/constants/enum/select_ingredient_type_enum.dart';
+import 'package:untitled1/modules/normal/select_ingredient/normal_user_search_pet_recipe_info.dart';
 import 'package:untitled1/utility/hive_models/ingredient_model.dart';
 import 'package:untitled1/modules/admin/admin_add_pet_info/models/post_for_recipe_model.dart';
 import 'package:untitled1/modules/admin/admin_get_recipe/get_recipe_model.dart';
@@ -19,6 +20,10 @@ class SelectIngredientView extends StatefulWidget {
   final double petWeight;
   final double petFactorNumber;
   final String petType;
+  final String petTypeId;
+  final String petNeuteringStatus;
+  final String petActivityType;
+  final String petAgeType;
   final List<String> petChronicDiseaseList;
   const SelectIngredientView({
     Key? key,
@@ -26,6 +31,10 @@ class SelectIngredientView extends StatefulWidget {
     required this.petType,
     required this.petChronicDiseaseList,
     required this.petWeight,
+    required this.petTypeId,
+    required this.petNeuteringStatus,
+    required this.petActivityType,
+    required this.petAgeType,
   }) : super(key: key);
 
   @override
@@ -136,17 +145,19 @@ class _SelectIngredientViewState extends State<SelectIngredientView> {
           return const Center(child: AdminLoadingScreen());
         });
     try {
-      PostDataForRecipeModel postDataForRecipe = PostDataForRecipeModel(
-          petFactorNumber: widget.petFactorNumber,
-          petTypeName: widget.petType,
-          petChronicDiseaseList: widget.petChronicDiseaseList,
-          petWeight: widget.petWeight,
-          selectedIngredientList: _viewModel.selectedIngredient
-              .map((e) => SelectedIngredientList(
-                  ingredientId: e.ingredientId,
-                  ingredientName: e.ingredientName))
-              .toList(),
-          selectedType: _selectedType);
+      NormalUserSearchPetRecipeInfoModel postDataForRecipe =
+          NormalUserSearchPetRecipeInfoModel(
+        petFactorNumber: widget.petFactorNumber,
+        petTypeName: widget.petType,
+        petWeight: widget.petWeight,
+        selectedIngredientList:
+            _viewModel.selectedIngredient.map((e) => e.ingredientId).toList(),
+        selectedType: _selectedType,
+        petTypeId: widget.petTypeId,
+        petNeuteringStatus: widget.petNeuteringStatus,
+        petActivityType: widget.petActivityType,
+        petAgeType: widget.petAgeType,
+      );
       GetRecipeModel getRecipeData = await _viewModel.onUserSearchRecipe(
           postDataForRecipe: postDataForRecipe);
       if (!context.mounted) return;
@@ -156,7 +167,7 @@ class _SelectIngredientViewState extends State<SelectIngredientView> {
         NavigationUpward(
           targetPage: GetRecipeView(
             getRecipeData: getRecipeData,
-            postDataForRecipe: postDataForRecipe,
+            // postDataForRecipe: postDataForRecipe,
             selectedType: _selectedType,
           ),
           durationInMilliSec: 500,

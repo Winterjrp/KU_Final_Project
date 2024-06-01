@@ -6,9 +6,8 @@ import 'package:untitled1/constants/enum/pet_activity_enum.dart';
 import 'package:untitled1/constants/enum/pet_age_type_enum.dart';
 import 'package:untitled1/constants/enum/pet_factor_type_enum.dart';
 import 'package:untitled1/constants/enum/pet_neutering_status_enum.dart';
-import 'package:untitled1/constants/pet_physiology_status_list.dart';
 import 'package:untitled1/utility/hive_models/pet_profile_model.dart';
-import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
+import 'package:untitled1/modules/admin/pet_type/update_pet_type_info/pet_type_info_model.dart';
 import 'package:untitled1/modules/admin/widgets/loading_screen/admin_loading_screen_with_text.dart';
 import 'package:untitled1/modules/normal/add_pet_profile_with_no_authen/add_pet_profile_with_no_authen_view_model.dart';
 import 'package:untitled1/modules/normal/select_ingredient/select_ingredient_view.dart';
@@ -16,7 +15,6 @@ import 'package:untitled1/modules/normal/widgets/popup/add_confirm_popup.dart';
 import 'package:untitled1/modules/normal/widgets/popup/cancel_confirm_popup.dart';
 import 'package:untitled1/utility/navigation_with_animation.dart';
 import 'package:untitled1/modules/normal/widgets/background.dart';
-import 'package:untitled1/widgets/dropdown/dropdown.dart';
 import 'package:untitled1/widgets/dropdown/multiple_dropdown_search.dart';
 
 class AddPetProfileWithNoAuthenticationView extends StatefulWidget {
@@ -39,10 +37,9 @@ class _AddPetProfileWithNoAuthenticationViewState
   late String _petType;
   late String _petActivityType;
   late String _factorType;
-  late String _petPhysiologyStatus;
   late String _petNeuteringStatus;
   late String _petAgeType;
-  late String _petID;
+  late String _petTypeId;
   late bool _isEnable;
   late AddPetProfileWithNoAuthenticationViewModel _viewModel;
   late TextEditingController _petNameController;
@@ -69,7 +66,6 @@ class _AddPetProfileWithNoAuthenticationViewState
     _viewModel.fetchPetTypeData();
     _petChronicDiseaseList = [];
     _petType = widget.petProfileInfo.petType;
-    _petPhysiologyStatus = widget.petProfileInfo.petPhysiologyStatus;
     _petNeuteringStatus = widget.petProfileInfo.petNeuteringStatus;
     _petAgeType = widget.petProfileInfo.petAgeType;
     _factorType = widget.petProfileInfo.factorType;
@@ -77,7 +73,7 @@ class _AddPetProfileWithNoAuthenticationViewState
     _petChronicDisease = widget.petProfileInfo.petChronicDisease;
     _petFactorNumber = widget.petProfileInfo.petFactorNumber;
     _petWeight = widget.petProfileInfo.petWeight;
-    _petID = widget.petProfileInfo.petId;
+    _petTypeId = widget.petProfileInfo.petId;
   }
 
   @override
@@ -91,25 +87,25 @@ class _AddPetProfileWithNoAuthenticationViewState
   @override
   Widget build(BuildContext context) {
     _isEnable = true;
-    if (_petType == "-1" || _factorType == "factorType" || _petWeight == -1) {
-      _isEnable = false;
-    }
-    if (_factorType == PetFactorType.customize.toString().split('.').last &&
-        _petFactorNumber == -1) {
-      _isEnable = false;
-    }
-    if (_factorType == PetFactorType.recommend.toString().split('.').last &&
-        (_petNeuteringStatus == "-1" ||
-            _petAgeType == "-1" ||
-            _petPhysiologyStatus == "-1" ||
-            _petActivityType == "-1")) {
-      _isEnable = false;
-    }
-    if (_factorType == PetFactorType.recommend.toString().split('.').last &&
-        _petPhysiologyStatus == PetPhysiologyStatusList.petSickStatus &&
-        _petChronicDisease.isEmpty) {
-      _isEnable = false;
-    }
+    // if (_petType == "-1" || _factorType == "factorType" || _petWeight == -1) {
+    //   _isEnable = false;
+    // }
+    // if (_factorType == PetFactorType.customize.toString().split('.').last &&
+    //     _petFactorNumber == -1) {
+    //   _isEnable = false;
+    // }
+    // if (_factorType == PetFactorType.recommend.toString().split('.').last &&
+    //     (_petNeuteringStatus == "-1" ||
+    //         _petAgeType == "-1" ||
+    //         _petPhysiologyStatus == "-1" ||
+    //         _petActivityType == "-1")) {
+    //   _isEnable = false;
+    // }
+    // if (_factorType == PetFactorType.recommend.toString().split('.').last &&
+    //     _petPhysiologyStatus == PetPhysiologyStatusList.petSickStatus &&
+    //     _petChronicDisease.isEmpty) {
+    //   _isEnable = false;
+    // }
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).requestFocus(FocusNode());
@@ -138,10 +134,9 @@ class _AddPetProfileWithNoAuthenticationViewState
             const BackGround(
                 topColor: Color.fromRGBO(222, 150, 154, 0.6),
                 bottomColor: Color.fromRGBO(241, 165, 165, 0.2)),
-            FutureBuilder<List<PetTypeInfoModel>>(
+            FutureBuilder<List<PetTypeModel>>(
               future: _viewModel.petTypeInfoListData,
-              builder:
-                  (context, AsyncSnapshot<List<PetTypeInfoModel>> snapshot) {
+              builder: (context, AsyncSnapshot<List<PetTypeModel>> snapshot) {
                 if (snapshot.connectionState != ConnectionState.done) {
                   return const AdminLoadingScreenWithText();
                 } else if (snapshot.hasError) {
@@ -175,39 +170,46 @@ class _AddPetProfileWithNoAuthenticationViewState
             ],
           ),
           const SizedBox(height: 20),
-          _factorTypeField(),
+          _petNeuteredField(),
           const SizedBox(height: 5),
-          _factorType == PetFactorType.customize.toString().split('.').last
-              ? _petFactorNumberField()
-              : _factorType != "factorType"
-                  ? Column(
-                      children: [
-                        _petNeuteredField(),
-                        const SizedBox(height: 5),
-                        _petAgeField(),
-                        const SizedBox(height: 20),
-                        _petPhysiologyStatusField(),
-                        _petPhysiologyStatus ==
-                                PetPhysiologyStatusList.petSickStatus
-                            ? _petChronicDiseaseType()
-                            : const SizedBox(),
-                        const SizedBox(height: 20),
-                        _petActivityLevelField()
-                      ],
-                    )
-                  : const SizedBox(),
-          (_factorType == PetFactorType.customize.toString().split('.').last &&
-                  _petFactorNumber != -1)
-              ? const SizedBox(height: 150)
-              : const SizedBox(height: 50),
-          const SizedBox(height: 20),
-          (_factorType == PetFactorType.customize.toString().split('.').last &&
-                      _petFactorNumber != -1) ||
-                  (_factorType ==
-                          PetFactorType.recommend.toString().split('.').last &&
-                      _petActivityType != "-1")
-              ? _acceptButton(context)
-              : const SizedBox(),
+          _petAgeField(),
+          const SizedBox(height: 5),
+          _petActivityLevelField(),
+          // _factorTypeField(),
+          // const SizedBox(height: 5),
+          // _factorType == PetFactorType.customize.toString().split('.').last
+          //     ? _petFactorNumberField()
+          //     : _factorType != "factorType"
+          //         ? Column(
+          //             children: [
+          //               _petNeuteredField(),
+          //               const SizedBox(height: 5),
+          //               _petAgeField(),
+          //               const SizedBox(height: 20),
+          //               // _petPhysiologyStatusField(),
+          //               // _petPhysiologyStatus ==
+          //               //         PetPhysiologyStatusList.petSickStatus
+          //               //     ? _petChronicDiseaseType()
+          //               //     : const SizedBox(),
+          //               // const SizedBox(height: 20),
+          //               _petActivityLevelField()
+          //             ],
+          //           )
+          //         : const SizedBox(),
+          // (_factorType == PetFactorType.customize.toString().split('.').last &&
+          //         _petFactorNumber != -1)
+          //     ? const SizedBox(height: 150)
+          //     : const SizedBox(height: 50),
+          // const SizedBox(height: 20),
+          // (_factorType == PetFactorType.customize.toString().split('.').last &&
+          //             _petFactorNumber != -1) ||
+          //         (_factorType ==
+          //                 PetFactorType.recommend.toString().split('.').last &&
+          //             _petActivityType != "-1")
+          //     ? _acceptButton(context)
+          //     : const SizedBox(),
+          const SizedBox(height: 50),
+          _acceptButton(context),
           const SizedBox(height: 40),
         ],
       ),
@@ -229,14 +231,12 @@ class _AddPetProfileWithNoAuthenticationViewState
                         _factorType == PetFactorTypeEnum.petFactorTypeChoice1
                             ? _petFactorNumber
                             : _viewModel.calculatePetFactorNumber(
-                                petID: _petID,
+                                petID: _petTypeId,
                                 petName: "",
                                 petType: _petType,
                                 petWeight: _petWeight,
                                 petNeuteringStatus: _petNeuteringStatus,
                                 petAgeType: _petAgeType,
-                                petPhysiologyStatus: _petPhysiologyStatus,
-                                petChronicDisease: _petChronicDisease,
                                 petActivityType: _petActivityType);
                     Navigator.of(context).pop();
                     Navigator.push(
@@ -247,6 +247,13 @@ class _AddPetProfileWithNoAuthenticationViewState
                           petType: _petType,
                           petChronicDiseaseList: _petChronicDisease,
                           petWeight: _petWeight,
+                          petTypeId: _petTypeId,
+                          petNeuteringStatus: _petNeuteringStatus ==
+                                  PetNeuterStatusEnum.neuterStatusChoice1
+                              ? "1"
+                              : "0",
+                          petAgeType: _petAgeType,
+                          petActivityType: _petActivityType,
                         ),
                       ),
                     );
@@ -297,7 +304,7 @@ class _AddPetProfileWithNoAuthenticationViewState
     );
   }
 
-  Padding _petTypeItemForm(PetTypeInfoModel item) {
+  Padding _petTypeItemForm(PetTypeModel item) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 15),
       child: Column(
@@ -334,34 +341,34 @@ class _AddPetProfileWithNoAuthenticationViewState
     );
   }
 
-  Widget _petPhysiologyStatusField() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _headerText(text: "สถานะทางสรีระ"),
-        const SizedBox(height: 5),
-        SizedBox(
-          height: _textBoxHeight,
-          child: CustomDropdown(
-            primaryColor: red,
-            isCreate: true,
-            value: _petPhysiologyStatus,
-            inputTextSize: _inputTextSize,
-            labelTextSize: _labelTextSize,
-            choiceItemList: PetPhysiologyStatusList.petPhysiologyStatusList,
-            updateValueCallback: ({required String value}) {
-              if (value != PetPhysiologyStatusList.petSickStatus) {
-                _petChronicDisease = [];
-              }
-              _petPhysiologyStatus = value;
-              setState(() {});
-            },
-            searchText: 'สถานะทางสรีระ',
-          ),
-        ),
-      ],
-    );
-  }
+  // Widget _petPhysiologyStatusField() {
+  //   return Column(
+  //     crossAxisAlignment: CrossAxisAlignment.start,
+  //     children: [
+  //       _headerText(text: "สถานะทางสรีระ"),
+  //       const SizedBox(height: 5),
+  //       SizedBox(
+  //         height: _textBoxHeight,
+  //         child: CustomDropdown(
+  //           primaryColor: red,
+  //           isCreate: true,
+  //           value: _petPhysiologyStatus,
+  //           inputTextSize: _inputTextSize,
+  //           labelTextSize: _labelTextSize,
+  //           choiceItemList: PetPhysiologyStatusList.petPhysiologyStatusList,
+  //           updateValueCallback: ({required String value}) {
+  //             if (value != PetPhysiologyStatusList.petSickStatus) {
+  //               _petChronicDisease = [];
+  //             }
+  //             _petPhysiologyStatus = value;
+  //             setState(() {});
+  //           },
+  //           searchText: 'สถานะทางสรีระ',
+  //         ),
+  //       ),
+  //     ],
+  //   );
+  // }
 
   Column _petAgeField() {
     return Column(
@@ -475,6 +482,7 @@ class _AddPetProfileWithNoAuthenticationViewState
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _headerText(text: "กิจกรรมต่อวัน"),
+        const SizedBox(height: 5),
         RadioListTile(
             title: const Text(PetActivityLevelEnum.activityLevelChoice1),
             groupValue: _petActivityType,
@@ -694,14 +702,14 @@ class _AddPetProfileWithNoAuthenticationViewState
           const SizedBox(height: 5),
           SizedBox(
             height: _textBoxHeight,
-            child: DropdownSearch<PetTypeInfoModel>(
+            child: DropdownSearch<PetTypeModel>(
               dropdownButtonProps: const DropdownButtonProps(
                 color: _mainColor,
               ),
               selectedItem: null,
               popupProps: PopupProps.menu(
-                itemBuilder: (BuildContext context, PetTypeInfoModel item,
-                    bool isSelect) {
+                itemBuilder:
+                    (BuildContext context, PetTypeModel item, bool isSelect) {
                   return _petTypeItemForm(item);
                 },
                 menuProps: MenuProps(
@@ -764,12 +772,13 @@ class _AddPetProfileWithNoAuthenticationViewState
               items: _viewModel.petTypeInfoList,
               onChanged: (val) {
                 _petType = val!.petTypeName;
+                _petTypeId = val.petTypeId;
                 _petChronicDiseaseList = val.petChronicDisease
                     .map((e) => e.petChronicDiseaseName)
                     .toList();
                 setState(() {});
               },
-              itemAsString: (PetTypeInfoModel? item) {
+              itemAsString: (PetTypeModel? item) {
                 return item?.petTypeName ?? "";
               },
             ),

@@ -1,23 +1,24 @@
-import 'package:hive/hive.dart';
-import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
+import 'package:untitled1/utility/hive_box.dart';
+import 'package:untitled1/modules/admin/pet_type/update_pet_type_info/pet_type_info_model.dart';
 import 'package:untitled1/services/pet_type_info_management/pet_type_info_management_service_interface.dart';
 
 class PetTypeInfoManagementMockService
     implements PetTypeInfoManagementServiceInterface {
   @override
-  Future<List<PetTypeInfoModel>> getPetTypeInfoData() async {
+  Future<List<PetTypeModel>> getPetTypeList() async {
     await Future.delayed(const Duration(milliseconds: 1000), () {});
-    final petTypeInfoListBox =
-        await Hive.openBox<PetTypeInfoModel>('petTypeInfoListBox');
-    List<PetTypeInfoModel> petTypeInfoListData =
-        petTypeInfoListBox.values.toList();
-    return petTypeInfoListData;
+    return petTypeBox.values.toList();
   }
 
   @override
-  Future<void> deletePetTypeInfo({required String petTypeInfoID}) async {
+  Future<void> deletePetType({required String petTypeId}) async {
     await Future.delayed(const Duration(milliseconds: 1000), () {});
-    Box petTypeInfoListBox = Hive.box<PetTypeInfoModel>('petTypeInfoListBox');
-    await petTypeInfoListBox.delete(petTypeInfoID);
+    await petTypeBox.delete(petTypeId);
+  }
+
+  @override
+  Future<void> updatePetType({required PetTypeModel petTypeModel}) async {
+    await Future.delayed(const Duration(milliseconds: 1000), () {});
+    await petTypeBox.put(petTypeModel.petTypeId, petTypeModel);
   }
 }

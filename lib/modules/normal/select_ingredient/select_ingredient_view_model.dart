@@ -1,5 +1,7 @@
+import 'package:untitled1/manager/service_manager.dart';
+import 'package:untitled1/modules/normal/select_ingredient/normal_user_search_pet_recipe_info.dart';
+import 'package:untitled1/services/select_ingredient_service/select_ingredient_mock_service.dart';
 import 'package:untitled1/utility/hive_models/ingredient_model.dart';
-import 'package:untitled1/modules/admin/admin_add_pet_info/models/post_for_recipe_model.dart';
 import 'package:untitled1/modules/admin/admin_get_recipe/get_recipe_model.dart';
 import 'package:untitled1/services/select_ingredient_service/select_ingredient_service.dart';
 import 'package:untitled1/services/select_ingredient_service/select_ingredient_service_interface.dart';
@@ -10,7 +12,9 @@ class SelectIngredientViewModel {
   late List<IngredientModel> ingredientList;
   late SelectIngredientServiceInterface service;
   SelectIngredientViewModel() {
-    service = SelectIngredientService();
+    service = ServiceManager.isRealService
+        ? SelectIngredientService()
+        : SelectIngredientMockService();
     selectedIngredient = [];
   }
 
@@ -20,7 +24,7 @@ class SelectIngredientViewModel {
   }
 
   Future<GetRecipeModel> onUserSearchRecipe(
-      {required PostDataForRecipeModel postDataForRecipe}) async {
+      {required NormalUserSearchPetRecipeInfoModel postDataForRecipe}) async {
     return await service.searchRecipe(postDataForRecipe: postDataForRecipe);
   }
 }

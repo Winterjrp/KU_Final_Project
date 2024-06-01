@@ -1,21 +1,19 @@
 import 'package:hive/hive.dart';
-import 'package:untitled1/utility/hive_models/recipes_model.dart';
+import 'package:untitled1/modules/admin/recipe/update_recipe/recipes_model.dart';
 import 'package:untitled1/services/recipes_management/recipes_management _service_interface.dart';
+import 'package:untitled1/utility/hive_box.dart';
 
 class RecipesManagementMockService implements RecipeManagementServiceInterface {
   @override
   Future<List<RecipeModel>> getRecipeListData() async {
-    await Future.delayed(const Duration(milliseconds: 1000), () {});
-    final recipesListBox = await Hive.openBox<RecipeModel>('recipesListBox');
-    List<RecipeModel> recipesListData = recipesListBox.values.toList();
-    return recipesListData;
+    await Future.delayed(const Duration(milliseconds: 500), () {});
+    return recipeBox.values.toList();
   }
 
   @override
   Future<void> deleteRecipeData({required String recipeId}) async {
-    await Future.delayed(const Duration(milliseconds: 1000), () {});
-    Box recipeListBox = Hive.box<RecipeModel>('recipesListBox');
-    await recipeListBox.delete(recipeId);
+    await Future.delayed(const Duration(milliseconds: 500), () {});
+    await recipeBox.delete(recipeId);
   }
 
   // @override
@@ -27,8 +25,7 @@ class RecipesManagementMockService implements RecipeManagementServiceInterface {
 
   @override
   Future<void> editRecipeData({required RecipeModel recipeData}) async {
-    await Future.delayed(const Duration(milliseconds: 1000), () {});
-    Box recipesListBox = Hive.box<RecipeModel>('recipesListBox');
-    await recipesListBox.put(recipeData.recipeId, recipeData);
+    await Future.delayed(const Duration(milliseconds: 500), () {});
+    await recipeBox.put(recipeData.recipeId, recipeData);
   }
 }

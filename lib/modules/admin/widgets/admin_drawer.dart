@@ -4,12 +4,11 @@ import 'package:untitled1/constants/main_page_index_constants.dart';
 import 'package:untitled1/utility/hive_models/pet_profile_model.dart';
 import 'package:untitled1/modules/admin/admin_add_pet_info/admin_add_pet_profile_view.dart';
 import 'package:untitled1/utility/navigation_with_animation.dart';
-import 'package:untitled1/models/user_info_model.dart';
+import 'package:untitled1/modules/normal/login/user_info_model.dart';
 import 'package:untitled1/modules/admin/admin_home/admin_home_view.dart';
-import 'package:untitled1/modules/admin/ingredient_management/ingredient_management_view.dart';
-import 'package:untitled1/modules/admin/pet_type_info_management/pet_type_info_management_view.dart';
-import 'package:untitled1/modules/admin/recipes_management/recipes_management_view.dart';
-import 'package:untitled1/modules/admin/user_management/user_management_view.dart';
+import 'package:untitled1/modules/admin/ingredient/ingredient_management/ingredient_management_view.dart';
+import 'package:untitled1/modules/admin/pet_type/pet_type_info_management/pet_type_info_management_view.dart';
+import 'package:untitled1/modules/admin/recipe/recipes_management/recipes_management_view.dart';
 import 'package:untitled1/services/shared_preferences_services/user_info.dart';
 
 class AdminDrawer extends StatelessWidget {
@@ -81,7 +80,7 @@ class AdminDrawer extends StatelessWidget {
                             currentIndex: currentIndex,
                             targetPage: AdminAddPetProfileView(
                               petProfileInfo: PetProfileModel(
-                                  petId: Random().nextInt(999).toString(),
+                                  petId: "-1",
                                   petName: "-1",
                                   petType: "-1",
                                   factorType: "factorType",
@@ -89,10 +88,11 @@ class AdminDrawer extends StatelessWidget {
                                   petWeight: -1,
                                   petNeuteringStatus: "-1",
                                   petAgeType: "-1",
-                                  petPhysiologyStatus: "-1",
+                                  petPhysiologyStatus: [],
                                   petChronicDisease: [],
                                   petActivityType: "-1",
-                                  updateRecent: ""),
+                                  updateRecent: "",
+                                  nutritionalRequirementBase: []),
                             ),
                             context: context,
                           ),

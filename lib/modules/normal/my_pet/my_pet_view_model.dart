@@ -1,4 +1,4 @@
-import 'package:untitled1/models/user_info_model.dart';
+import 'package:untitled1/modules/normal/login/user_info_model.dart';
 import 'package:untitled1/modules/normal/my_pet/models/home_model.dart';
 import 'package:untitled1/services/home_services/home_mock_service.dart';
 import 'package:untitled1/services/home_services/home_service_interface.dart';

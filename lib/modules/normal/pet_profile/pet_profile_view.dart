@@ -37,7 +37,7 @@ class _PetProfileViewState extends State<PetProfileView> {
   late String _petActivityType;
   late String _petName;
   late String _factorType;
-  late String _petPhysiologyStatus;
+  late List<String> _petPhysiologyStatus;
   late String _petNeuteringStatus;
   late String _petAgeType;
   late List<String> _petChronicDisease;
@@ -126,11 +126,12 @@ class _PetProfileViewState extends State<PetProfileView> {
                   children: [
                     _neuteredField(),
                     _petAgeField(),
-                    _physiologyStatusField(),
-                    _petPhysiologyStatus ==
-                            PetPhysiologyStatusList.petSickStatus
-                        ? _petChronicDiseaseType()
-                        : const SizedBox(),
+                    // _physiologyStatusField(),
+                    // _petPhysiologyStatus ==
+                    //         PetPhysiologyStatusList.petSickStatus
+                    //     ? _petChronicDiseaseType()
+                    //     : const SizedBox(),
+                    _petChronicDiseaseType(),
                     _petActivityLevelField()
                   ],
                 ),
@@ -267,17 +268,17 @@ class _PetProfileViewState extends State<PetProfileView> {
       height: 55,
       child: ElevatedButton(
         onPressed: () async {
-          Navigator.push(
-            context,
-            NavigationForward(
-              targetPage: SelectIngredientView(
-                petFactorNumber: _petFactorNumber,
-                petType: _petType,
-                petChronicDiseaseList: _petChronicDisease,
-                petWeight: _petWeight,
-              ),
-            ),
-          );
+          // Navigator.push(
+          //   context,
+          //   NavigationForward(
+          //     targetPage: SelectIngredientView(
+          //       petFactorNumber: _petFactorNumber,
+          //       petType: _petType,
+          //       petChronicDiseaseList: _petChronicDisease,
+          //       petWeight: _petWeight,
+          //     ),
+          //   ),
+          // );
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: primary,
@@ -311,25 +312,25 @@ class _PetProfileViewState extends State<PetProfileView> {
     );
   }
 
-  Widget _physiologyStatusField() {
-    return SizedBox(
-      height: _blockSize,
-      width: double.infinity,
-      child: Row(
-        children: [
-          Text(
-            "สถานะทางสรีระ: ",
-            style: TextStyle(
-                fontSize: _labelTextSize, fontWeight: FontWeight.bold),
-          ),
-          Text(
-            _petPhysiologyStatus,
-            style: TextStyle(fontSize: _labelTextSize),
-          )
-        ],
-      ),
-    );
-  }
+  // Widget _physiologyStatusField() {
+  //   return SizedBox(
+  //     height: _blockSize,
+  //     width: double.infinity,
+  //     child: Row(
+  //       children: [
+  //         Text(
+  //           "สถานะทางสรีระ: ",
+  //           style: TextStyle(
+  //               fontSize: _labelTextSize, fontWeight: FontWeight.bold),
+  //         ),
+  //         Text(
+  //           _petPhysiologyStatus,
+  //           style: TextStyle(fontSize: _labelTextSize),
+  //         )
+  //       ],
+  //     ),
+  //   );
+  // }
 
   Widget _petAgeField() {
     return SizedBox(

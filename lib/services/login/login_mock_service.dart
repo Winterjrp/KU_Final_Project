@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:untitled1/data/secure_storage.dart';
-import 'package:untitled1/models/user_info_model.dart';
+import 'package:untitled1/modules/normal/login/user_info_model.dart';
 import 'package:untitled1/services/login/login_service_interface.dart';
 import 'package:untitled1/services/shared_preferences_services/user_info.dart';
 

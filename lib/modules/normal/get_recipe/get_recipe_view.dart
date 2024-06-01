@@ -14,12 +14,12 @@ import 'package:untitled1/utility/navigation_with_animation.dart';
 
 class GetRecipeView extends StatefulWidget {
   final int selectedType;
-  final PostDataForRecipeModel postDataForRecipe;
+  // final PostDataForRecipeModel postDataForRecipe;
   final GetRecipeModel getRecipeData;
   const GetRecipeView(
       {Key? key,
       required this.getRecipeData,
-      required this.postDataForRecipe,
+      // required this.postDataForRecipe,
       required this.selectedType})
       : super(key: key);
 
@@ -91,14 +91,14 @@ class _GetRecipeViewState extends State<GetRecipeView> {
       children: [
         const Spacer(),
         _backToHomeButton(),
-        widget.selectedType == 2
-            ? const SizedBox()
-            : Row(
-                children: [
-                  const SizedBox(width: 10),
-                  _useAlgorithmButton(),
-                ],
-              ),
+        // widget.selectedType == 2
+        //     ? const SizedBox()
+        //     : Row(
+        //         children: [
+        //           const SizedBox(width: 10),
+        //           _useAlgorithmButton(),
+        //         ],
+        //       ),
       ],
     );
   }
@@ -125,55 +125,55 @@ class _GetRecipeViewState extends State<GetRecipeView> {
     );
   }
 
-  Future<void> _handleSearchRecipe() async {
-    showDialog(
-        barrierDismissible: false,
-        context: context,
-        builder: (context) {
-          return const Center(child: AdminLoadingScreen());
-        });
-    try {
-      GetRecipeModel getRecipeData = await _viewModel.onUserSearchRecipe(
-          postDataForRecipe: widget.postDataForRecipe);
-      if (!context.mounted) return;
-      Navigator.pop(context);
-      Navigator.push(
-        context,
-        NavigationUpward(
-          targetPage: GetRecipeFromAlgorithmView(getRecipeData: getRecipeData),
-          durationInMilliSec: 500,
-        ),
-      );
-    } catch (e) {
-      Navigator.pop(context);
-      Future.delayed(const Duration(milliseconds: 2200), () {
-        Navigator.pop(context);
-      });
-      AdminErrorPopup(context: context, errorMessage: e.toString()).show();
-    }
-  }
+  // Future<void> _handleSearchRecipe() async {
+  //   showDialog(
+  //       barrierDismissible: false,
+  //       context: context,
+  //       builder: (context) {
+  //         return const Center(child: AdminLoadingScreen());
+  //       });
+  //   try {
+  //     GetRecipeModel getRecipeData = await _viewModel.onUserSearchRecipe(
+  //         postDataForRecipe: widget.postDataForRecipe);
+  //     if (!context.mounted) return;
+  //     Navigator.pop(context);
+  //     Navigator.push(
+  //       context,
+  //       NavigationUpward(
+  //         targetPage: GetRecipeFromAlgorithmView(getRecipeData: getRecipeData),
+  //         durationInMilliSec: 500,
+  //       ),
+  //     );
+  //   } catch (e) {
+  //     Navigator.pop(context);
+  //     Future.delayed(const Duration(milliseconds: 2200), () {
+  //       Navigator.pop(context);
+  //     });
+  //     AdminErrorPopup(context: context, errorMessage: e.toString()).show();
+  //   }
+  // }
 
-  Widget _useAlgorithmButton() {
-    return SizedBox(
-      height: 45,
-      width: 200,
-      child: ElevatedButton(
-        onPressed: () async {
-          _handleSearchRecipe();
-        },
-        style: ElevatedButton.styleFrom(
-          backgroundColor: red,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10),
-          ),
-        ),
-        child: const Text(
-          'ให้อัลกอริทึมสร้างสูตรอาหาร',
-          style: TextStyle(fontSize: 17, color: Colors.white),
-        ),
-      ),
-    );
-  }
+  // Widget _useAlgorithmButton() {
+  //   return SizedBox(
+  //     height: 45,
+  //     width: 200,
+  //     child: ElevatedButton(
+  //       onPressed: () async {
+  //         _handleSearchRecipe();
+  //       },
+  //       style: ElevatedButton.styleFrom(
+  //         backgroundColor: red,
+  //         shape: RoundedRectangleBorder(
+  //           borderRadius: BorderRadius.circular(10),
+  //         ),
+  //       ),
+  //       child: const Text(
+  //         'ให้อัลกอริทึมสร้างสูตรอาหาร',
+  //         style: TextStyle(fontSize: 17, color: Colors.white),
+  //       ),
+  //     ),
+  //   );
+  // }
 
   Widget _searchedRecipe() {
     return Expanded(

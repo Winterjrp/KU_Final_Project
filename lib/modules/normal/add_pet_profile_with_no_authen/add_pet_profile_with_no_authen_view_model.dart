@@ -1,17 +1,21 @@
 import 'package:untitled1/constants/enum/pet_activity_enum.dart';
 import 'package:untitled1/constants/enum/pet_age_type_enum.dart';
 import 'package:untitled1/constants/enum/pet_neutering_status_enum.dart';
-import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
+import 'package:untitled1/manager/service_manager.dart';
+import 'package:untitled1/services/add_pet_profile_with_no_authen_service/add_pet_profile_with_no_authen_mock_service.dart';
+import 'package:untitled1/modules/admin/pet_type/update_pet_type_info/pet_type_info_model.dart';
 import 'package:untitled1/services/add_pet_profile_with_no_authen_service/add_pet_profile_with_no_authen_service.dart';
 import 'package:untitled1/services/add_pet_profile_with_no_authen_service/add_pet_profile_with_no_authen_service_interface.dart';
 
 class AddPetProfileWithNoAuthenticationViewModel {
   late AddPetProfileWithNoAuthenticationServiceInterface service;
-  late Future<List<PetTypeInfoModel>> petTypeInfoListData;
-  late List<PetTypeInfoModel> petTypeInfoList;
+  late Future<List<PetTypeModel>> petTypeInfoListData;
+  late List<PetTypeModel> petTypeInfoList;
 
   AddPetProfileWithNoAuthenticationViewModel() {
-    service = AddPetProfileWithNoAuthenticationService();
+    service = ServiceManager.isRealService
+        ? AddPetProfileWithNoAuthenticationService()
+        : AddPetProfileWithNoAuthenticationMockService();
     // fetchPetTypeData();
   }
 
@@ -20,16 +24,15 @@ class AddPetProfileWithNoAuthenticationViewModel {
     petTypeInfoList = await petTypeInfoListData;
   }
 
-  double calculatePetFactorNumber(
-      {required String petID,
-      required String petName,
-      required String petType,
-      required double petWeight,
-      required String petNeuteringStatus,
-      required String petAgeType,
-      required String petPhysiologyStatus,
-      required List<String> petChronicDisease,
-      required String petActivityType}) {
+  double calculatePetFactorNumber({
+    required String petID,
+    required String petName,
+    required String petType,
+    required double petWeight,
+    required String petNeuteringStatus,
+    required String petAgeType,
+    required String petActivityType,
+  }) {
     if (petNeuteringStatus == PetNeuterStatusEnum.neuterStatusChoice2) {
       if (petAgeType == PetAgeTypeEnum.petAgeChoice1) {
         if (petActivityType == PetActivityLevelEnum.activityLevelChoice1) {

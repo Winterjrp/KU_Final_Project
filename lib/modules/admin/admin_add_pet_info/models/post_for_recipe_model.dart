@@ -1,70 +1,69 @@
+// To parse this JSON data, do
+//
+//     final adminSearchPetRecipeInfoModel = adminSearchPetRecipeInfoModelFromJson(jsonString);
+
 import 'dart:convert';
 
-PostDataForRecipeModel postDataForRecipeModelFromJson(String str) =>
-    PostDataForRecipeModel.fromJson(json.decode(str));
+AdminSearchPetRecipeInfoModel adminSearchPetRecipeInfoModelFromJson(
+        String str) =>
+    AdminSearchPetRecipeInfoModel.fromJson(json.decode(str));
 
-String postDataForRecipeModelToJson(PostDataForRecipeModel data) =>
+String adminSearchPetRecipeInfoModelToJson(
+        AdminSearchPetRecipeInfoModel data) =>
     json.encode(data.toJson());
 
-class PostDataForRecipeModel {
+class AdminSearchPetRecipeInfoModel {
   double petFactorNumber;
+  String petTypeId;
   String petTypeName;
-  List<String> petChronicDiseaseList;
-  int selectedType;
   double petWeight;
-  List<SelectedIngredientList> selectedIngredientList;
+  int selectedType;
+  List<String> selectedIngredientList;
+  List<String> nutritionalRequirementBase;
+  List<String> petPhysiological;
+  List<String> petChronicDisease;
 
-  PostDataForRecipeModel({
+  AdminSearchPetRecipeInfoModel({
     required this.petFactorNumber,
+    required this.petTypeId,
     required this.petTypeName,
-    required this.petChronicDiseaseList,
-    required this.selectedType,
     required this.petWeight,
+    required this.selectedType,
     required this.selectedIngredientList,
+    required this.nutritionalRequirementBase,
+    required this.petPhysiological,
+    required this.petChronicDisease,
   });
 
-  factory PostDataForRecipeModel.fromJson(Map<String, dynamic> json) =>
-      PostDataForRecipeModel(
+  factory AdminSearchPetRecipeInfoModel.fromJson(Map<String, dynamic> json) =>
+      AdminSearchPetRecipeInfoModel(
         petFactorNumber: json["petFactorNumber"]?.toDouble(),
+        petTypeId: json["petTypeId"],
         petTypeName: json["petTypeName"],
-        petChronicDiseaseList:
-            List<String>.from(json["petChronicDiseaseList"].map((x) => x)),
-        selectedType: json["selectedType"]?.toInt(),
         petWeight: json["petWeight"]?.toDouble(),
-        selectedIngredientList: List<SelectedIngredientList>.from(
-            json["selectedIngredientList"]
-                .map((x) => SelectedIngredientList.fromJson(x))),
+        selectedType: json["selectedType"],
+        selectedIngredientList:
+            List<String>.from(json["selectedIngredientList"].map((x) => x)),
+        nutritionalRequirementBase:
+            List<String>.from(json["nutritionalRequirementBase"].map((x) => x)),
+        petPhysiological:
+            List<String>.from(json["petPhysiological"].map((x) => x)),
+        petChronicDisease:
+            List<String>.from(json["petChronicDisease"].map((x) => x)),
       );
 
   Map<String, dynamic> toJson() => {
         "petFactorNumber": petFactorNumber,
+        "petTypeId": petTypeId,
         "petTypeName": petTypeName,
-        "petChronicDiseaseList":
-            List<dynamic>.from(petChronicDiseaseList.map((x) => x)),
-        "selectedType": selectedType,
         "petWeight": petWeight,
+        "selectedType": selectedType,
         "selectedIngredientList":
-            List<dynamic>.from(selectedIngredientList.map((x) => x.toJson())),
-      };
-}
-
-class SelectedIngredientList {
-  String ingredientId;
-  String ingredientName;
-
-  SelectedIngredientList({
-    required this.ingredientId,
-    required this.ingredientName,
-  });
-
-  factory SelectedIngredientList.fromJson(Map<String, dynamic> json) =>
-      SelectedIngredientList(
-        ingredientId: json["ingredientId"],
-        ingredientName: json["ingredientName"],
-      );
-
-  Map<String, dynamic> toJson() => {
-        "ingredientId": ingredientId,
-        "ingredientName": ingredientName,
+            List<dynamic>.from(selectedIngredientList.map((x) => x)),
+        "nutritionalRequirementBase":
+            List<dynamic>.from(nutritionalRequirementBase.map((x) => x)),
+        "petPhysiological": List<dynamic>.from(petPhysiological.map((x) => x)),
+        "petChronicDisease":
+            List<dynamic>.from(petChronicDisease.map((x) => x)),
       };
 }

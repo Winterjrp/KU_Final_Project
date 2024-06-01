@@ -24,29 +24,29 @@ class MyPetWithNoAuthenticationView extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      NavigationForward(
-                        targetPage:
-                            ChangeNotifierProvider<AuthenticationProvider>(
-                                create: (context) => AuthenticationProvider(),
-                                child: const LoginView()),
-                      ),
-                    );
-                  },
-                  child: const Text(
-                    "Sign In",
-                    style: TextStyle(
-                      decoration: TextDecoration.underline,
-                    ),
-                  ),
-                ),
-              ],
-            ),
+            // Row(
+            //   children: [
+            //     TextButton(
+            //       onPressed: () {
+            //         Navigator.pushReplacement(
+            //           context,
+            //           NavigationForward(
+            //             targetPage:
+            //                 ChangeNotifierProvider<AuthenticationProvider>(
+            //                     create: (context) => AuthenticationProvider(),
+            //                     child: const LoginView()),
+            //           ),
+            //         );
+            //       },
+            //       child: const Text(
+            //         "Sign In",
+            //         style: TextStyle(
+            //           decoration: TextDecoration.underline,
+            //         ),
+            //       ),
+            //     ),
+            //   ],
+            // ),
             Container(
               alignment: Alignment.centerLeft,
               margin: const EdgeInsets.only(left: 20),
@@ -183,18 +183,20 @@ class MyPetWithNoAuthenticationView extends StatelessWidget {
             NavigationForward(
               targetPage: AddPetProfileWithNoAuthenticationView(
                 petProfileInfo: PetProfileModel(
-                    petId: Random().nextInt(999).toString(),
-                    petName: "-1",
-                    petType: "-1",
-                    factorType: "factorType",
-                    petFactorNumber: -1,
-                    petWeight: -1,
-                    petNeuteringStatus: "-1",
-                    petAgeType: "-1",
-                    petPhysiologyStatus: "-1",
-                    petChronicDisease: [],
-                    petActivityType: "-1",
-                    updateRecent: ""),
+                  petId: Random().nextInt(999).toString(),
+                  petName: "-1",
+                  petType: "-1",
+                  factorType: "factorType",
+                  petFactorNumber: -1,
+                  petWeight: -1,
+                  petNeuteringStatus: "-1",
+                  petAgeType: "-1",
+                  petPhysiologyStatus: [],
+                  petChronicDisease: [],
+                  petActivityType: "-1",
+                  updateRecent: "",
+                  nutritionalRequirementBase: [],
+                ),
               ),
             ),
           );

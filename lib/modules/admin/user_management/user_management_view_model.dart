@@ -1,4 +1,4 @@
-import 'package:untitled1/models/user_info_model.dart';
+import 'package:untitled1/modules/normal/login/user_info_model.dart';
 
 class UserManagementViewModel {
   // late AddPetInfoServiceInterface services;
@@ -47,7 +47,6 @@ class UserManagementViewModel {
           )),
     ]);
     filterUserInfoList = await userInfoListData;
-    print(filterUserInfoList.length);
     // await services.postHomeData(petProfile: petInfo);
   }
 }

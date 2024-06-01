@@ -1,34 +1,25 @@
-import 'package:hive/hive.dart';
+import 'package:untitled1/services/ingredient_management_services/ingredient_management_mock_service.dart';
+import 'package:untitled1/services/pet_type_info_management/pet_type_info_management_mock_service.dart';
+import 'package:untitled1/utility/hive_box.dart';
 import 'package:untitled1/utility/hive_models/ingredient_model.dart';
-import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
-import 'package:untitled1/utility/hive_models/recipes_model.dart';
+import 'package:untitled1/modules/admin/pet_type/update_pet_type_info/pet_type_info_model.dart';
+import 'package:untitled1/modules/admin/recipe/update_recipe/recipes_model.dart';
 import 'package:untitled1/services/update_recipes_services/update_recipes_service_interface.dart';
 
-class AddRecipesMockService implements UpdateRecipesServiceInterface {
+class UpdateRecipeMockService implements UpdateRecipeServiceInterface {
   @override
-  Future<List<IngredientModel>> getIngredientListData() async {
-    await Future.delayed(const Duration(milliseconds: 1200), () {});
-    final ingredientListBox =
-        await Hive.openBox<IngredientModel>('ingredientListBox');
-    List<IngredientModel> ingredientListData =
-        ingredientListBox.values.toList();
-    return ingredientListData;
+  Future<List<IngredientModel>> getIngredientList() async {
+    return await IngredientManagementMockService().getIngredientList();
   }
 
   @override
-  Future<List<PetTypeInfoModel>> getPetTypeInfoData() async {
-    await Future.delayed(const Duration(milliseconds: 1000), () {});
-    final petTypeInfoListBox =
-        await Hive.openBox<PetTypeInfoModel>('petTypeInfoListBox');
-    List<PetTypeInfoModel> petTypeInfoListData =
-        petTypeInfoListBox.values.toList();
-    return petTypeInfoListData;
+  Future<List<PetTypeModel>> getPetTypeList() async {
+    return await PetTypeInfoManagementMockService().getPetTypeList();
   }
 
   @override
-  Future<void> addRecipeData({required RecipeModel recipesData}) async {
-    await Future.delayed(const Duration(milliseconds: 1000), () {});
-    Box recipesListBox = Hive.box<RecipeModel>('recipesListBox');
-    await recipesListBox.put(recipesData.recipeId, recipesData);
+  Future<void> addRecipe({required RecipeModel recipeData}) async {
+    await Future.delayed(const Duration(milliseconds: 500), () {});
+    await recipeBox.put(recipeData.recipeId, recipeData);
   }
 }

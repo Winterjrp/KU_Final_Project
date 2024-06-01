@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:untitled1/models/user_info_model.dart';
+import 'package:untitled1/modules/normal/login/user_info_model.dart';
 
 class SharedPreferencesService {
   static const String _userInfoKey = 'userInfo';

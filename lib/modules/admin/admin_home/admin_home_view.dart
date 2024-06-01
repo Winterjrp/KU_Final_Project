@@ -7,9 +7,9 @@ import 'package:untitled1/constants/main_page_index_constants.dart';
 import 'package:untitled1/constants/size.dart';
 import 'package:untitled1/modules/admin/admin_home/admin_home_view_model.dart';
 import 'package:untitled1/modules/admin/admin_home/widgets/admin_card.dart';
-import 'package:untitled1/modules/admin/ingredient_management/ingredient_management_view.dart';
-import 'package:untitled1/modules/admin/pet_type_info_management/pet_type_info_management_view.dart';
-import 'package:untitled1/modules/admin/recipes_management/recipes_management_view.dart';
+import 'package:untitled1/modules/admin/ingredient/ingredient_management/ingredient_management_view.dart';
+import 'package:untitled1/modules/admin/pet_type/pet_type_info_management/pet_type_info_management_view.dart';
+import 'package:untitled1/modules/admin/recipe/recipes_management/recipes_management_view.dart';
 import 'package:untitled1/modules/admin/widgets/admin_appbar.dart';
 import 'package:untitled1/modules/admin/widgets/admin_drawer.dart';
 import 'package:untitled1/modules/admin/widgets/loading_screen/admin_loading_screen_with_text.dart';
@@ -122,7 +122,7 @@ class _AdminHomeViewState extends State<AdminHomeView> {
               "assets/my_dog.json",
             ),
           ),
-          SizedBox(height: _height * 0.2 - 130),
+          SizedBox(height: _height * 0.18 - 130),
         ],
       ),
     );

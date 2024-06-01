@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:untitled1/utility/hive_models/nutrient_limit_info_model.dart';
-import 'package:untitled1/utility/hive_models/recipes_model.dart';
+import 'package:untitled1/modules/admin/recipe/update_recipe/recipes_model.dart';
 
 GetRecipeModel getRecipeModelFromJson(String str) =>
     GetRecipeModel.fromJson(json.decode(str));

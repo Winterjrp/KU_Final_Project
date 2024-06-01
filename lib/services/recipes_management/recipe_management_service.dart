@@ -3,8 +3,8 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:untitled1/data/secure_storage.dart';
-import 'package:untitled1/utility/hive_models/recipes_model.dart';
-import 'package:untitled1/manager/api_link_manager.dart';
+import 'package:untitled1/modules/admin/recipe/update_recipe/recipes_model.dart';
+import 'package:untitled1/manager/service_manager.dart';
 import 'package:untitled1/services/recipes_management/recipes_management%20_service_interface.dart';
 
 class RecipeManagementService implements RecipeManagementServiceInterface {

@@ -2,15 +2,15 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:untitled1/data/secure_storage.dart';
-import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
+import 'package:untitled1/modules/admin/pet_type/update_pet_type_info/pet_type_info_model.dart';
 import 'package:http/http.dart' as http;
-import 'package:untitled1/manager/api_link_manager.dart';
+import 'package:untitled1/manager/service_manager.dart';
 import 'package:untitled1/services/add_pet_profile_with_no_authen_service/add_pet_profile_with_no_authen_service_interface.dart';
 
 class AddPetProfileWithNoAuthenticationService
     implements AddPetProfileWithNoAuthenticationServiceInterface {
   @override
-  Future<List<PetTypeInfoModel>> getPetTypeInfoData() async {
+  Future<List<PetTypeModel>> getPetTypeInfoData() async {
     String token = await SecureStorage().readSecureData(key: "token");
     try {
       final response = await http.get(
@@ -23,10 +23,9 @@ class AddPetProfileWithNoAuthenticationService
         },
       ).timeout(const Duration(seconds: 30));
       if (response.statusCode == 200) {
-        List<PetTypeInfoModel> data =
-            (json.decode(response.body) as List<dynamic>)
-                .map((json) => PetTypeInfoModel.fromJson(json))
-                .toList();
+        List<PetTypeModel> data = (json.decode(response.body) as List<dynamic>)
+            .map((json) => PetTypeModel.fromJson(json))
+            .toList();
 
         return data;
       } else if (response.statusCode == 500) {
@@ -36,6 +35,9 @@ class AddPetProfileWithNoAuthenticationService
       }
     } on TimeoutException catch (_) {
       throw Exception('Connection timeout.');
+    } catch (e) {
+      print(e);
+      throw Exception(e);
     }
   }
 }

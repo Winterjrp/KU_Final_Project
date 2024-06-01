@@ -1,39 +1,31 @@
-import 'package:hive/hive.dart';
+import 'package:untitled1/utility/hive_box.dart';
 import 'package:untitled1/utility/hive_models/ingredient_model.dart';
 import 'package:untitled1/services/ingredient_management_services/ingredient_management_service_interface.dart';
 
 class IngredientManagementMockService
     implements IngredientManagementServiceInterface {
   @override
-  Future<List<IngredientModel>> getIngredientListData() async {
+  Future<List<IngredientModel>> getIngredientList() async {
     await Future.delayed(const Duration(milliseconds: 1000), () {});
-    final ingredientListBox =
-        await Hive.openBox<IngredientModel>('ingredientListBox');
-    List<IngredientModel> ingredientListData =
-        ingredientListBox.values.toList();
+    List<IngredientModel> ingredientListData = ingredientBox.values.toList();
     return ingredientListData;
   }
 
   @override
-  Future<void> addIngredientData(
-      {required IngredientModel ingredientData}) async {
+  Future<void> addIngredient({required IngredientModel ingredientData}) async {
     await Future.delayed(const Duration(milliseconds: 1200), () {});
-    Box ingredientListBox = Hive.box<IngredientModel>('ingredientListBox');
-    await ingredientListBox.put(ingredientData.ingredientId, ingredientData);
+    await ingredientBox.put(ingredientData.ingredientId, ingredientData);
   }
 
   @override
-  Future<void> editIngredientData(
-      {required IngredientModel ingredientData}) async {
+  Future<void> editIngredient({required IngredientModel ingredientData}) async {
     await Future.delayed(const Duration(milliseconds: 1200), () {});
-    Box ingredientListBox = Hive.box<IngredientModel>('ingredientListBox');
-    await ingredientListBox.put(ingredientData.ingredientId, ingredientData);
+    await ingredientBox.put(ingredientData.ingredientId, ingredientData);
   }
 
   @override
-  Future<void> deleteIngredientInfo({required String ingredientId}) async {
+  Future<void> deleteIngredient({required String ingredientId}) async {
     await Future.delayed(const Duration(milliseconds: 1200), () {});
-    Box ingredientListBox = Hive.box<IngredientModel>('ingredientListBox');
-    await ingredientListBox.delete(ingredientId);
+    await ingredientBox.delete(ingredientId);
   }
 }

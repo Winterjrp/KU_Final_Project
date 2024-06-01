@@ -46,6 +46,7 @@ dependencies:
   flutter_secure_storage: ^9.0.0
   rive: ^0.12.4
   lottie: ^2.7.0
+  intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:
@@ -58,6 +59,7 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
+  build_web_compilers: ^4.0.10
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

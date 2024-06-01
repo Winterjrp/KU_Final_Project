@@ -25,17 +25,18 @@ class PetProfileModelAdapter extends TypeAdapter<PetProfileModel> {
       petWeight: fields[5] as double,
       petNeuteringStatus: fields[6] as String,
       petAgeType: fields[7] as String,
-      petPhysiologyStatus: fields[8] as String,
+      petPhysiologyStatus: (fields[8] as List).cast<String>(),
       petChronicDisease: (fields[9] as List).cast<String>(),
       petActivityType: fields[10] as String,
       updateRecent: fields[11] as String,
+      nutritionalRequirementBase: (fields[12] as List).cast<String>(),
     );
   }
 
   @override
   void write(BinaryWriter writer, PetProfileModel obj) {
     writer
-      ..writeByte(12)
+      ..writeByte(13)
       ..writeByte(0)
       ..write(obj.petId)
       ..writeByte(1)
@@ -59,7 +60,9 @@ class PetProfileModelAdapter extends TypeAdapter<PetProfileModel> {
       ..writeByte(10)
       ..write(obj.petActivityType)
       ..writeByte(11)
-      ..write(obj.updateRecent);
+      ..write(obj.updateRecent)
+      ..writeByte(12)
+      ..write(obj.nutritionalRequirementBase);
   }
 
   @override

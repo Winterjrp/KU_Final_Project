@@ -3,16 +3,16 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:untitled1/data/secure_storage.dart';
 import 'package:untitled1/utility/hive_models/ingredient_model.dart';
-import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
+import 'package:untitled1/modules/admin/pet_type/update_pet_type_info/pet_type_info_model.dart';
 import 'package:http/http.dart' as http;
-import 'package:untitled1/manager/api_link_manager.dart';
+import 'package:untitled1/manager/service_manager.dart';
 import 'package:untitled1/modules/admin/admin_add_pet_info/models/post_for_recipe_model.dart';
 import 'package:untitled1/modules/admin/admin_get_recipe/get_recipe_model.dart';
 import 'package:untitled1/services/admin_add_pet_profile_service/admin_add_pet_profile_service_interface.dart';
 
 class AdminAddPetProfileService implements AdminAddPetProfileServiceInterface {
   @override
-  Future<List<PetTypeInfoModel>> getPetTypeInfoData() async {
+  Future<List<PetTypeModel>> getPetTypeInfoData() async {
     String token = await SecureStorage().readSecureData(key: "token");
     try {
       final response = await http.get(
@@ -25,10 +25,9 @@ class AdminAddPetProfileService implements AdminAddPetProfileServiceInterface {
         },
       ).timeout(const Duration(seconds: 30));
       if (response.statusCode == 200) {
-        List<PetTypeInfoModel> data =
-            (json.decode(response.body) as List<dynamic>)
-                .map((json) => PetTypeInfoModel.fromJson(json))
-                .toList();
+        List<PetTypeModel> data = (json.decode(response.body) as List<dynamic>)
+            .map((json) => PetTypeModel.fromJson(json))
+            .toList();
 
         return data;
       } else if (response.statusCode == 500) {
@@ -72,11 +71,11 @@ class AdminAddPetProfileService implements AdminAddPetProfileServiceInterface {
 
   @override
   Future<GetRecipeModel> searchRecipe(
-      {required PostDataForRecipeModel postDataForRecipe}) async {
+      {required AdminSearchPetRecipeInfoModel postDataForRecipe}) async {
     String token = await SecureStorage().readSecureData(key: "token");
     try {
       final response = await http
-          .post(Uri.parse(ApiLinkManager.searchRecipe()),
+          .post(Uri.parse(ApiLinkManager.adminSearchRecipe()),
               headers: <String, String>{
                 // 'Accept': 'application/json',
                 'Content-Type': 'application/json; charset=UTF-8',
@@ -87,7 +86,10 @@ class AdminAddPetProfileService implements AdminAddPetProfileServiceInterface {
       // print(response.statusCode);
       // print(response.body);
       if (response.statusCode == 200) {
-        return GetRecipeModel.fromJson(json.decode(response.body));
+        GetRecipeModel data =
+            GetRecipeModel.fromJson(json.decode(response.body));
+        print(data.searchPetRecipesList.length);
+        return data;
       } else if (response.statusCode == 500) {
         throw Exception('Internal Server Error. Please try again later.');
       } else {

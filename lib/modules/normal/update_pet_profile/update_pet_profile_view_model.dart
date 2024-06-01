@@ -21,22 +21,25 @@ class UpdatePetProfileViewModel {
       required double petWeight,
       required String petNeuteringStatus,
       required String petAgeType,
-      required String petPhysiologyStatus,
+      required List<String> petPhysiologyStatus,
       required List<String> petChronicDisease,
-      required String petActivityType}) async {
+      required String petActivityType,
+      required List<String> nutritionalRequirementBase}) async {
     PetProfileModel petInfo = PetProfileModel(
-        petId: petID,
-        petName: petName,
-        petType: petType,
-        factorType: factorType,
-        petFactorNumber: petFactorNumber,
-        petWeight: petWeight,
-        petNeuteringStatus: petNeuteringStatus,
-        petAgeType: petAgeType,
-        petPhysiologyStatus: petPhysiologyStatus,
-        petChronicDisease: petChronicDisease,
-        petActivityType: petActivityType,
-        updateRecent: '');
+      petId: petID,
+      petName: petName,
+      petType: petType,
+      factorType: factorType,
+      petFactorNumber: petFactorNumber,
+      petWeight: petWeight,
+      petNeuteringStatus: petNeuteringStatus,
+      petAgeType: petAgeType,
+      petPhysiologyStatus: petPhysiologyStatus,
+      petChronicDisease: petChronicDisease,
+      petActivityType: petActivityType,
+      updateRecent: '',
+      nutritionalRequirementBase: nutritionalRequirementBase,
+    );
     return await services.addPetInfo(petProfile: petInfo);
   }
 
@@ -49,22 +52,25 @@ class UpdatePetProfileViewModel {
       required double petWeight,
       required String petNeuteringStatus,
       required String petAgeType,
-      required String petPhysiologyStatus,
+      required List<String> petPhysiologyStatus,
       required List<String> petChronicDisease,
-      required String petActivityType}) async {
+      required String petActivityType,
+      required List<String> nutritionalRequirementBase}) async {
     PetProfileModel petInfo = PetProfileModel(
-        petId: petID,
-        petName: petName,
-        petType: petType,
-        factorType: factorType,
-        petFactorNumber: petFactorNumber,
-        petWeight: petWeight,
-        petNeuteringStatus: petNeuteringStatus,
-        petAgeType: petAgeType,
-        petPhysiologyStatus: petPhysiologyStatus,
-        petChronicDisease: petChronicDisease,
-        petActivityType: petActivityType,
-        updateRecent: '');
+      petId: petID,
+      petName: petName,
+      petType: petType,
+      factorType: factorType,
+      petFactorNumber: petFactorNumber,
+      petWeight: petWeight,
+      petNeuteringStatus: petNeuteringStatus,
+      petAgeType: petAgeType,
+      petPhysiologyStatus: petPhysiologyStatus,
+      petChronicDisease: petChronicDisease,
+      petActivityType: petActivityType,
+      updateRecent: '',
+      nutritionalRequirementBase: nutritionalRequirementBase,
+    );
     return await services.updatePetInfo(petInfo: petInfo);
   }
 

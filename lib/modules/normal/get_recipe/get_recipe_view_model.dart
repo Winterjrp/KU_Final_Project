@@ -21,7 +21,7 @@ class GetRecipeViewModel {
   // }
 
   Future<GetRecipeModel> onUserSearchRecipe(
-      {required PostDataForRecipeModel postDataForRecipe}) async {
+      {required AdminSearchPetRecipeInfoModel postDataForRecipe}) async {
     return await service.searchRecipe(postDataForRecipe: postDataForRecipe);
   }
 }

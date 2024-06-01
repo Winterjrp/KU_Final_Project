@@ -170,6 +170,7 @@ class CustomMultipleDropdownSearch extends StatelessWidget {
                       width: 20,
                       height: 20,
                       child: IconButton(
+                        splashRadius: 1,
                         onPressed: () {
                           selectedItems.remove(e);
                           updateValueCallback(value: selectedItems);

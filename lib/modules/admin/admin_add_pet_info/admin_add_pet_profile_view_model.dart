@@ -1,8 +1,10 @@
 import 'package:untitled1/constants/enum/pet_activity_enum.dart';
 import 'package:untitled1/constants/enum/pet_age_type_enum.dart';
 import 'package:untitled1/constants/enum/pet_neutering_status_enum.dart';
+import 'package:untitled1/manager/service_manager.dart';
+import 'package:untitled1/services/admin_add_pet_profile_service/admin_add_pet_profile_mock_service.dart';
 import 'package:untitled1/utility/hive_models/ingredient_model.dart';
-import 'package:untitled1/utility/hive_models/pet_type_info_model.dart';
+import 'package:untitled1/modules/admin/pet_type/update_pet_type_info/pet_type_info_model.dart';
 import 'package:untitled1/modules/admin/admin_add_pet_info/models/post_for_recipe_model.dart';
 import 'package:untitled1/modules/admin/admin_get_recipe/get_recipe_model.dart';
 import 'package:untitled1/services/admin_add_pet_profile_service/admin_add_pet_profile_service.dart';
@@ -11,18 +13,21 @@ import 'package:untitled1/services/admin_add_pet_profile_service/admin_add_pet_p
 class AdminAddPetProfileViewModel {
   late AdminAddPetProfileServiceInterface services;
   late List<IngredientModel> selectedIngredient;
-  late Future<List<PetTypeInfoModel>> petTypeInfoListData;
-  late List<PetTypeInfoModel> petTypeInfoList;
+  late Future<List<PetTypeModel>> petTypeInfoListData;
+  late List<PetTypeModel> petTypeInfoList;
   late Future<List<IngredientModel>> ingredientListData;
   late List<IngredientModel> ingredientList;
 
   AdminAddPetProfileViewModel() {
-    services = AdminAddPetProfileService();
+    services = ServiceManager.isRealService
+        ? AdminAddPetProfileService()
+        : AdminAddPetProfileMockService();
     selectedIngredient = [];
     // fetchPetTypeData();
   }
 
   Future<void> fetchPetTypeData() async {
+    // petTypeInfoListData = AdminAddPetProfileMockService().getPetTypeInfoData();
     petTypeInfoListData = services.getPetTypeInfoData();
     petTypeInfoList = await petTypeInfoListData;
   }
@@ -33,8 +38,10 @@ class AdminAddPetProfileViewModel {
   }
 
   Future<GetRecipeModel> onUserSearchRecipe(
-      {required PostDataForRecipeModel postDataForRecipe}) async {
+      {required AdminSearchPetRecipeInfoModel postDataForRecipe}) async {
     return await services.searchRecipe(postDataForRecipe: postDataForRecipe);
+    // return await AdminAddPetProfileMockService()
+    //     .searchRecipe(postDataForRecipe: postDataForRecipe);
   }
 
   double calculatePetFactorNumber(
